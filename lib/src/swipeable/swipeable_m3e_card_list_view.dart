@@ -1,0 +1,125 @@
+import 'package:flutter/material.dart';
+
+import 'swipeable_m3e_card_controller.dart';
+import 'swipeable_m3e_card_style.dart';
+
+/// A swipeable M3E card list backed by [ListView.builder] — suitable for large
+/// or lazily-loaded data sets.
+///
+/// Only the visible cards are materialised, so this variant scales to thousands
+/// of items without keeping them all in the widget tree at once.
+///
+/// ```dart
+/// SwipeableM3CardListView(
+///   itemCount: items.length,
+///   itemBuilder: (ctx, i) => Text(items[i].title),
+///   onSwipe: (i, dir) async { items.removeAt(i); return true; },
+///   style: const SwipeableM3CardStyle(outerRadius: 24),
+/// )
+/// ```
+class SwipeableM3CardListView extends StatefulWidget {
+  /// Number of data items.
+  final int itemCount;
+
+  /// Builds content for the item at [index].
+  final IndexedWidgetBuilder itemBuilder;
+
+  /// Called when a swipe exceeds the dismiss threshold.
+  final Future<bool> Function(int index, DismissDirection direction)? onSwipe;
+
+  /// Called on tap (blocked while a drag or dismiss is in-flight).
+  final void Function(int index)? onTap;
+
+  /// Visual and interaction configuration.
+  final SwipeableM3CardStyle style;
+
+  /// Standard [ListView] scroll physics.
+  final ScrollPhysics? physics;
+
+  /// Standard [ListView] controller.
+  final ScrollController? scrollController;
+
+  /// Padding around the entire list.
+  final EdgeInsetsGeometry? listPadding;
+
+  /// Whether the list should shrink-wrap its children.
+  final bool shrinkWrap;
+
+  /// Clip behavior for the list.
+  final Clip clipBehavior;
+
+  const SwipeableM3CardListView({
+    super.key,
+    required this.itemCount,
+    required this.itemBuilder,
+    this.onSwipe,
+    this.onTap,
+    this.style = const SwipeableM3CardStyle(),
+    this.physics,
+    this.scrollController,
+    this.listPadding,
+    this.shrinkWrap = false,
+    this.clipBehavior = Clip.hardEdge,
+  });
+
+  @override
+  State<SwipeableM3CardListView> createState() =>
+      _SwipeableM3CardListViewState();
+}
+
+class _SwipeableM3CardListViewState extends State<SwipeableM3CardListView>
+    with TickerProviderStateMixin, SwipeableM3CardMixin {
+  // ── Mixin interface ──
+
+  @override
+  int get swipeItemCount => widget.itemCount;
+
+  @override
+  Widget swipeItemBuilder(BuildContext context, int dataIndex) =>
+      widget.itemBuilder(context, dataIndex);
+
+  @override
+  SwipeableM3CardStyle get style => widget.style;
+
+  @override
+  Future<bool> Function(int, DismissDirection)? get onSwipeCallback =>
+      widget.onSwipe;
+
+  @override
+  void Function(int)? get onTapCallback => widget.onTap;
+
+  // ── Lifecycle ──
+
+  @override
+  void initState() {
+    super.initState();
+    initSlots();
+  }
+
+  @override
+  void didUpdateWidget(SwipeableM3CardListView old) {
+    super.didUpdateWidget(old);
+    syncSlotsIfNeeded(old.itemCount);
+  }
+
+  @override
+  void dispose() {
+    disposeSlots();
+    super.dispose();
+  }
+
+  // ── Build ──
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      controller: widget.scrollController,
+      physics: widget.physics,
+      padding: widget.listPadding,
+      shrinkWrap: widget.shrinkWrap,
+      clipBehavior: widget.clipBehavior,
+      itemCount: slots.length,
+      itemBuilder: (ctx, i) => buildSlot(ctx, i),
+    );
+  }
+}
