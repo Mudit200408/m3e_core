@@ -9,3 +9,9 @@ export 'src/swipeable/swipeable_m3e_card_controller.dart' show SwipeSlot;
 export 'src/swipeable/swipeable_m3e_card_list_view.dart';
 export 'src/swipeable/swipeable_m3e_card_sliver.dart';
 export 'src/swipeable/swipeable_m3e_card_style.dart';
+
+// Dropdown menu.
+export 'src/dropdown/dropdown.dart';
+
+// Expandable card list.
+export 'src/expandable/expandable.dart';
