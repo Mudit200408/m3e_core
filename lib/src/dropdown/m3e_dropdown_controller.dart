@@ -60,13 +60,13 @@ class M3EDropdownController<T> extends ChangeNotifier {
   ///
   /// Returns the filtered subset when a search query is active, otherwise
   /// returns all items.
-  List<M3EDropdownItem<T>> get items =>
-      _searchQuery.isEmpty ? List.unmodifiable(_items) : List.unmodifiable(_filteredItems);
+  List<M3EDropdownItem<T>> get items => _searchQuery.isEmpty
+      ? List.unmodifiable(_items)
+      : List.unmodifiable(_filteredItems);
 
   /// The currently selected items.
   List<M3EDropdownItem<T>> get selectedItems {
-    return _cachedSelectedItems ??=
-        _items.where((i) => i.selected).toList();
+    return _cachedSelectedItems ??= _items.where((i) => i.selected).toList();
   }
 
   /// Convenience — the [T] values of the currently selected items.
@@ -90,8 +90,7 @@ class M3EDropdownController<T> extends ChangeNotifier {
   }
 
   /// Wires up the selection-change callback. Called by the widget.
-  void setOnSelectionChange(
-      ValueChanged<List<M3EDropdownItem<T>>>? callback) {
+  void setOnSelectionChange(ValueChanged<List<M3EDropdownItem<T>>>? callback) {
     _onSelectionChange = callback;
   }
 
@@ -108,8 +107,9 @@ class M3EDropdownController<T> extends ChangeNotifier {
       _filteredItems = List.from(_items);
     } else {
       final q = _searchQuery.toLowerCase();
-      _filteredItems =
-          _items.where((i) => i.label.toLowerCase().contains(q)).toList();
+      _filteredItems = _items
+          .where((i) => i.label.toLowerCase().contains(q))
+          .toList();
     }
   }
 
@@ -325,8 +325,7 @@ class M3EDropdownController<T> extends ChangeNotifier {
   }
 
   @override
-  String toString() =>
-      'M3EDropdownController(items: $_items, open: $_isOpen)';
+  String toString() => 'M3EDropdownController(items: $_items, open: $_isOpen)';
 
   @override
   bool operator ==(Object other) {

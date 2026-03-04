@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
-import 'swipeable_m3e_card_controller.dart';
-import 'swipeable_m3e_card_style.dart';
+import 'm3e_dismissible_card_controller.dart';
+import 'm3e_dismissible_card_style.dart';
 
-/// A swipeable M3E card list backed by [ListView.builder] — suitable for large
+/// A dismissible M3E card list backed by [ListView.builder] — suitable for large
 /// or lazily-loaded data sets.
 ///
 /// Only the visible cards are materialised, so this variant scales to thousands
 /// of items without keeping them all in the widget tree at once.
 ///
 /// ```dart
-/// SwipeableM3CardListView(
+/// M3EDismissibleCardList(
 ///   itemCount: items.length,
 ///   itemBuilder: (ctx, i) => Text(items[i].title),
-///   onSwipe: (i, dir) async { items.removeAt(i); return true; },
-///   style: const SwipeableM3CardStyle(outerRadius: 24),
+///   onDismiss: (i, dir) async { items.removeAt(i); return true; },
+///   style: const M3EDismissibleCardStyle(outerRadius: 24),
 /// )
 /// ```
-class SwipeableM3CardListView extends StatefulWidget {
+class M3EDismissibleCardList extends StatefulWidget {
   /// Number of data items.
   final int itemCount;
 
@@ -25,13 +25,13 @@ class SwipeableM3CardListView extends StatefulWidget {
   final IndexedWidgetBuilder itemBuilder;
 
   /// Called when a swipe exceeds the dismiss threshold.
-  final Future<bool> Function(int index, DismissDirection direction)? onSwipe;
+  final Future<bool> Function(int index, DismissDirection direction)? onDismiss;
 
   /// Called on tap (blocked while a drag or dismiss is in-flight).
   final void Function(int index)? onTap;
 
   /// Visual and interaction configuration.
-  final SwipeableM3CardStyle style;
+  final M3EDismissibleCardStyle style;
 
   /// Standard [ListView] scroll physics.
   final ScrollPhysics? physics;
@@ -48,13 +48,13 @@ class SwipeableM3CardListView extends StatefulWidget {
   /// Clip behavior for the list.
   final Clip clipBehavior;
 
-  const SwipeableM3CardListView({
+  const M3EDismissibleCardList({
     super.key,
     required this.itemCount,
     required this.itemBuilder,
-    this.onSwipe,
+    this.onDismiss,
     this.onTap,
-    this.style = const SwipeableM3CardStyle(),
+    this.style = const M3EDismissibleCardStyle(),
     this.physics,
     this.scrollController,
     this.listPadding,
@@ -63,12 +63,11 @@ class SwipeableM3CardListView extends StatefulWidget {
   });
 
   @override
-  State<SwipeableM3CardListView> createState() =>
-      _SwipeableM3CardListViewState();
+  State<M3EDismissibleCardList> createState() => _M3EDismissibleCardListState();
 }
 
-class _SwipeableM3CardListViewState extends State<SwipeableM3CardListView>
-    with TickerProviderStateMixin, SwipeableM3CardMixin {
+class _M3EDismissibleCardListState extends State<M3EDismissibleCardList>
+    with TickerProviderStateMixin, M3EDismissibleCardMixin {
   // ── Mixin interface ──
 
   @override
@@ -79,11 +78,11 @@ class _SwipeableM3CardListViewState extends State<SwipeableM3CardListView>
       widget.itemBuilder(context, dataIndex);
 
   @override
-  SwipeableM3CardStyle get style => widget.style;
+  M3EDismissibleCardStyle get style => widget.style;
 
   @override
-  Future<bool> Function(int, DismissDirection)? get onSwipeCallback =>
-      widget.onSwipe;
+  Future<bool> Function(int, DismissDirection)? get onDismissCallback =>
+      widget.onDismiss;
 
   @override
   void Function(int)? get onTapCallback => widget.onTap;
@@ -97,7 +96,7 @@ class _SwipeableM3CardListViewState extends State<SwipeableM3CardListView>
   }
 
   @override
-  void didUpdateWidget(SwipeableM3CardListView old) {
+  void didUpdateWidget(M3EDismissibleCardList old) {
     super.didUpdateWidget(old);
     syncSlotsIfNeeded(old.itemCount);
   }

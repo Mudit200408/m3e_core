@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'screens/dropdown_m3e_screen.dart';
 import 'screens/expandable_m3e_screen.dart';
 import 'screens/m3e_card_screen.dart';
-import 'screens/swipeable_m3e_screen.dart';
+import 'screens/dismissible_m3e_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -153,11 +153,11 @@ class ExampleHomePage extends StatelessWidget {
           ),
           _buildNavCard(
             context,
-            title: 'Swipeable M3E',
+            title: 'Dismissible M3E',
             subtitle:
-                'Archive or delete data using robust, highly-damped swipeable lists',
+                'Archive or delete data using robust, highly-damped dismissible lists',
             icon: Icons.swipe_rounded,
-            destination: const SwipeableM3EScreen(),
+            destination: const DismissibleM3EScreen(),
           ),
           _buildNavCard(
             context,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// Immutable visual and interaction configuration for swipeable M3E cards.
+/// Immutable visual and interaction configuration for dismissible M3E cards.
 ///
 /// Encapsulates all styling, animation tuning, and interaction parameters
 /// so they can be shared across the three wrapper variants
-/// ([SwipeableM3CardColumn], [SwipeableM3CardListView],
-/// [SliverSwipeableM3CardList]).
-class SwipeableM3CardStyle {
+/// ([M3EDismissibleCardColumn], [M3EDismissibleCardList],
+/// [SliverM3EDismissibleCardList]).
+class M3EDismissibleCardStyle {
   // ── Visual ──
 
   /// Outer corner radius for first / last / single items.
@@ -82,7 +82,7 @@ class SwipeableM3CardStyle {
   /// Spring damping for neighbour snapping.
   final double neighbourDamping;
 
-  const SwipeableM3CardStyle({
+  const M3EDismissibleCardStyle({
     this.outerRadius = 18.0,
     this.selectedBorderRadius,
     this.innerRadius = 4.0,
@@ -109,7 +109,7 @@ class SwipeableM3CardStyle {
   });
 
   /// Creates a copy with the given fields replaced.
-  SwipeableM3CardStyle copyWith({
+  M3EDismissibleCardStyle copyWith({
     double? outerRadius,
     double? selectedBorderRadius,
     double? innerRadius,
@@ -134,7 +134,7 @@ class SwipeableM3CardStyle {
     double? neighbourStiffness,
     double? neighbourDamping,
   }) {
-    return SwipeableM3CardStyle(
+    return M3EDismissibleCardStyle(
       outerRadius: outerRadius ?? this.outerRadius,
       selectedBorderRadius: selectedBorderRadius ?? this.selectedBorderRadius,
       innerRadius: innerRadius ?? this.innerRadius,

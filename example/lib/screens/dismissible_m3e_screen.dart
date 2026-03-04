@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:m3e_card_list/m3e_card_list.dart';
 import '../data/mock_data.dart';
 
-class SwipeableM3EScreen extends StatelessWidget {
-  const SwipeableM3EScreen({super.key});
+class DismissibleM3EScreen extends StatelessWidget {
+  const DismissibleM3EScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +11,7 @@ class SwipeableM3EScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Swipeable M3E'),
+          title: const Text('Dismissible M3E'),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           bottom: const TabBar(
             tabs: [
@@ -23,9 +23,9 @@ class SwipeableM3EScreen extends StatelessWidget {
         ),
         body: const TabBarView(
           children: [
-            _SwipeableListViewTab(),
-            _SwipeableSliverTab(),
-            _SwipeableColumnTab(),
+            _DismissibleListViewTab(),
+            _DismissibleSliverTab(),
+            _DismissibleColumnTab(),
           ],
         ),
       ),
@@ -34,17 +34,18 @@ class SwipeableM3EScreen extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tab 1: Swipeable — ListView
+// Tab 1: Dismissible — ListView
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _SwipeableListViewTab extends StatefulWidget {
-  const _SwipeableListViewTab();
+class _DismissibleListViewTab extends StatefulWidget {
+  const _DismissibleListViewTab();
 
   @override
-  State<_SwipeableListViewTab> createState() => _SwipeableListViewTabState();
+  State<_DismissibleListViewTab> createState() =>
+      _DismissibleListViewTabState();
 }
 
-class _SwipeableListViewTabState extends State<_SwipeableListViewTab> {
+class _DismissibleListViewTabState extends State<_DismissibleListViewTab> {
   static const int _pageSize = 20;
   final List<EmailItem> _items = List.of(allItems.take(_pageSize));
   bool _isLoadingMore = false;
@@ -81,7 +82,7 @@ class _SwipeableListViewTabState extends State<_SwipeableListViewTab> {
     });
   }
 
-  Future<bool> _onSwipe(int index, DismissDirection direction) async {
+  Future<bool> _onDismiss(int index, DismissDirection direction) async {
     final item = _items[index];
     final label = direction == DismissDirection.startToEnd
         ? 'Archived'
@@ -97,12 +98,12 @@ class _SwipeableListViewTabState extends State<_SwipeableListViewTab> {
       children: [
         lazyLoadBanner(context, _items.length, allItems.length),
         Expanded(
-          child: SwipeableM3CardListView(
+          child: M3EDismissibleCardList(
             scrollController: _scrollController,
             listPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             itemCount: _items.length + (_isLoadingMore ? 1 : 0),
-            onSwipe: _onSwipe,
-            style: getSwipeStyle(),
+            onDismiss: _onDismiss,
+            style: getDismissStyle(),
             itemBuilder: (context, index) {
               if (index == _items.length) {
                 return const KeyedSubtree(
@@ -124,17 +125,17 @@ class _SwipeableListViewTabState extends State<_SwipeableListViewTab> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tab 2: Swipeable — Sliver
+// Tab 2: Dismissible — Sliver
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _SwipeableSliverTab extends StatefulWidget {
-  const _SwipeableSliverTab();
+class _DismissibleSliverTab extends StatefulWidget {
+  const _DismissibleSliverTab();
 
   @override
-  State<_SwipeableSliverTab> createState() => _SwipeableSliverTabState();
+  State<_DismissibleSliverTab> createState() => _DismissibleSliverTabState();
 }
 
-class _SwipeableSliverTabState extends State<_SwipeableSliverTab> {
+class _DismissibleSliverTabState extends State<_DismissibleSliverTab> {
   static const int _pageSize = 20;
   final List<EmailItem> _items = List.of(allItems.take(_pageSize));
   bool _isLoadingMore = false;
@@ -171,7 +172,7 @@ class _SwipeableSliverTabState extends State<_SwipeableSliverTab> {
     });
   }
 
-  Future<bool> _onSwipe(int index, DismissDirection direction) async {
+  Future<bool> _onDismiss(int index, DismissDirection direction) async {
     if (index >= _items.length) return false;
     final item = _items[index];
     final label = direction == DismissDirection.startToEnd
@@ -193,10 +194,10 @@ class _SwipeableSliverTabState extends State<_SwipeableSliverTab> {
             slivers: [
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                sliver: SliverSwipeableM3CardList(
+                sliver: SliverM3EDismissibleCardList(
                   itemCount: _items.length + (_isLoadingMore ? 1 : 0),
-                  onSwipe: _onSwipe,
-                  style: getSwipeStyle().copyWith(
+                  onDismiss: _onDismiss,
+                  style: getDismissStyle().copyWith(
                     outerRadius: 6,
                     innerRadius: 6,
                     selectedBorderRadius: 80,
@@ -243,17 +244,17 @@ class _SwipeableSliverTabState extends State<_SwipeableSliverTab> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tab 3: Swipeable — Column
+// Tab 3: Dismissible — Column
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _SwipeableColumnTab extends StatefulWidget {
-  const _SwipeableColumnTab();
+class _DismissibleColumnTab extends StatefulWidget {
+  const _DismissibleColumnTab();
 
   @override
-  State<_SwipeableColumnTab> createState() => _SwipeableColumnTabState();
+  State<_DismissibleColumnTab> createState() => _DismissibleColumnTabState();
 }
 
-class _SwipeableColumnTabState extends State<_SwipeableColumnTab> {
+class _DismissibleColumnTabState extends State<_DismissibleColumnTab> {
   List<EmailItem> _items = List.of(allItems.take(20));
 
   double _neighbourPull = 8.0;
@@ -262,7 +263,7 @@ class _SwipeableColumnTabState extends State<_SwipeableColumnTab> {
   double _neighbourDamping = 0.7;
   double _dismissThreshold = 0.6;
 
-  Future<bool> _onSwipe(int index, DismissDirection direction) async {
+  Future<bool> _onDismiss(int index, DismissDirection direction) async {
     final item = _items[index];
     final label = direction == DismissDirection.startToEnd
         ? 'Archived'
@@ -380,11 +381,11 @@ class _SwipeableColumnTabState extends State<_SwipeableColumnTab> {
               ),
             )
           else
-            SwipeableM3CardColumn(
+            M3EDismissibleCardColumn(
               itemCount: _items.length,
-              onSwipe: _onSwipe,
+              onDismiss: _onDismiss,
               onTap: (i) => showSnack(context, 'Tapped: ${_items[i].subject}'),
-              style: SwipeableM3CardStyle(
+              style: M3EDismissibleCardStyle(
                 hapticOnTap: 1,
                 hapticOnThreshold: 2,
                 dismissThreshold: _dismissThreshold,

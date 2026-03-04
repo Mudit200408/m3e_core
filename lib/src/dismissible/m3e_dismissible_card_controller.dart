@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:motor/motor.dart';
 
-import 'swipeable_m3e_card_style.dart';
+import 'm3e_dismissible_card_style.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Spring presets (Material 3 Expressive via motor)
@@ -34,7 +34,7 @@ final _kRoundnessSnap = MaterialSpringMotion.expressiveSpatialDefault()
 
 enum _SlotStatus { visible, collapsing }
 
-class SwipeSlot {
+class DismissibleSlot {
   _SlotStatus _status;
   double capturedHeight = 0;
   double capturedWidth = 0;
@@ -52,7 +52,7 @@ class SwipeSlot {
   /// stable even when surrounding slots collapse.
   final Object identity = Object();
 
-  SwipeSlot() : _status = _SlotStatus.visible;
+  DismissibleSlot() : _status = _SlotStatus.visible;
 
   bool get isVisible => _status == _SlotStatus.visible;
   bool get isCollapsing => _status == _SlotStatus.collapsing;
@@ -73,12 +73,12 @@ class SwipeSlot {
 // Mixin — all shared drag / animation / build logic
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// A mixin that implements the full swipeable M3E card interaction model.
+/// A mixin that implements the full dismissible M3E card interaction model.
 ///
 /// Concrete wrappers (Column, ListView, Sliver) only need to provide a layout
 /// container in their [build] methods and delegate per‑slot widget creation to
 /// [buildSlot].
-mixin SwipeableM3CardMixin<T extends StatefulWidget>
+mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     on State<T>, TickerProviderStateMixin<T> {
   // ── Abstract interface — each wrapper implements these ──
 
@@ -89,21 +89,21 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
   Widget swipeItemBuilder(BuildContext context, int dataIndex);
 
   /// Visual / interaction configuration.
-  SwipeableM3CardStyle get style;
+  M3EDismissibleCardStyle get style;
 
-  /// Called when a swipe exceeds [SwipeableM3CardStyle.dismissThreshold].
+  /// Called when a swipe exceeds [M3EDismissibleCardStyle.dismissThreshold].
   Future<bool> Function(int index, DismissDirection direction)?
-      get onSwipeCallback;
+  get onDismissCallback;
 
   /// Called on tap (unless interaction is locked).
   void Function(int index)? get onTapCallback;
 
   // ── Internal state ──
 
-  final List<SwipeSlot> _slots = [];
+  final List<DismissibleSlot> _slots = [];
 
   /// The slot currently being dragged (by identity reference, NOT index).
-  SwipeSlot? _dragSlotRef;
+  DismissibleSlot? _dragSlotRef;
 
   /// Cached slot-list index of the dragged slot (recomputed on every mutation).
   int _dragSlotIndex = -1;
@@ -118,7 +118,7 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
 
   int _lastVibrationTime = 0;
 
-  final Map<SwipeSlot, GlobalKey> _measureKeys = {};
+  final Map<DismissibleSlot, GlobalKey> _measureKeys = {};
 
   SingleMotionController? _springCtrl;
   SingleMotionController? _nbrCtrl;
@@ -136,18 +136,17 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
 
   /// Sorted indices of visible (non-collapsing) slots.
   List<int> computeVisibleIndices() => [
-        for (int i = 0; i < _slots.length; i++)
-          if (_slots[i].isVisible) i,
-      ];
+    for (int i = 0; i < _slots.length; i++)
+      if (_slots[i].isVisible) i,
+  ];
 
   /// All managed slots (visible + collapsing).
-  List<SwipeSlot> get slots => _slots;
+  List<DismissibleSlot> get slots => _slots;
 
   /// `true` while any drag or collapse animation is running — used to block
   /// tap events and prevent mis-touch.
   bool get isInteractionLocked =>
-      _dragSlotRef != null ||
-      _slots.any((s) => s.isCollapsing);
+      _dragSlotRef != null || _slots.any((s) => s.isCollapsing);
 
   // ── Lifecycle ──
 
@@ -187,7 +186,7 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
     } else if (visibleCount < swipeItemCount) {
       final toAdd = swipeItemCount - visibleCount;
       for (int i = 0; i < toAdd; i++) {
-        _slots.add(SwipeSlot());
+        _slots.add(DismissibleSlot());
       }
     }
 
@@ -211,10 +210,10 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
 
   // ── Measurement helpers ──
 
-  GlobalKey _measureKey(SwipeSlot slot) =>
+  GlobalKey _measureKey(DismissibleSlot slot) =>
       _measureKeys.putIfAbsent(slot, () => GlobalKey());
 
-  Size _cardSize(SwipeSlot slot) {
+  Size _cardSize(DismissibleSlot slot) {
     final box =
         _measureKeys[slot]?.currentContext?.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) return const Size(320, 52);
@@ -306,12 +305,15 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
 
     final reach = style.neighbourReach;
     final falloff = reach > 1 ? (reach - distance) / (reach - 1) : 1.0;
-    return _neighbourFraction * style.neighbourPull * falloff * _dragOffset.sign;
+    return _neighbourFraction *
+        style.neighbourPull *
+        falloff *
+        _dragOffset.sign;
   }
 
   // ── Gesture handlers ──
 
-  void handleDragStart(SwipeSlot slot) {
+  void handleDragStart(DismissibleSlot slot) {
     if (slot._status != _SlotStatus.visible) return;
 
     _springCtrl?.stop(canceled: true);
@@ -367,46 +369,49 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
       final pushDir = newOffset.sign;
 
       _pushCtrl?.dispose();
-      _pushCtrl = SingleMotionController(
-        motion: _kDetachPush.copyWith(stiffness: 800 * multiplier),
-        vsync: this,
-        initialValue: 0.0,
-      )
-        ..addListener(() {
-          if (mounted) setState(() => _detachPush = _pushCtrl!.value);
-        })
-        ..animateTo(
-          style.background == null || style.secondaryBackground == null
-              ? pushDir * _kDetachPushPixels
-              : 0,
-        );
+      _pushCtrl =
+          SingleMotionController(
+              motion: _kDetachPush.copyWith(stiffness: 800 * multiplier),
+              vsync: this,
+              initialValue: 0.0,
+            )
+            ..addListener(() {
+              if (mounted) setState(() => _detachPush = _pushCtrl!.value);
+            })
+            ..animateTo(
+              style.background == null || style.secondaryBackground == null
+                  ? pushDir * _kDetachPushPixels
+                  : 0,
+            );
 
       _nbrCtrl?.dispose();
-      _nbrCtrl = SingleMotionController(
-        motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-          stiffness: style.neighbourStiffness * multiplier,
-          damping: style.neighbourDamping,
-        ),
-        vsync: this,
-        initialValue: _neighbourFraction,
-      )
-        ..addListener(() {
-          if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
-        })
-        ..animateTo(0.0);
+      _nbrCtrl =
+          SingleMotionController(
+              motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
+                stiffness: style.neighbourStiffness * multiplier,
+                damping: style.neighbourDamping,
+              ),
+              vsync: this,
+              initialValue: _neighbourFraction,
+            )
+            ..addListener(() {
+              if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
+            })
+            ..animateTo(0.0);
 
       _roundnessCtrl?.dispose();
-      _roundnessCtrl = SingleMotionController(
-        motion: _kRoundnessSnap.copyWith(stiffness: 1000 * multiplier),
-        vsync: this,
-        initialValue: _roundnessFraction,
-      )
-        ..addListener(() {
-          if (mounted) {
-            setState(() => _roundnessFraction = _roundnessCtrl!.value);
-          }
-        })
-        ..animateTo(1.0);
+      _roundnessCtrl =
+          SingleMotionController(
+              motion: _kRoundnessSnap.copyWith(stiffness: 1000 * multiplier),
+              vsync: this,
+              initialValue: _roundnessFraction,
+            )
+            ..addListener(() {
+              if (mounted) {
+                setState(() => _roundnessFraction = _roundnessCtrl!.value);
+              }
+            })
+            ..animateTo(1.0);
     } else if (!crossedNow && _pastThreshold) {
       // ── Re-engaging (back below threshold) ──
       _pastThreshold = false;
@@ -426,15 +431,16 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
       }
 
       _pushCtrl?.dispose();
-      _pushCtrl = SingleMotionController(
-        motion: _kDetachPush.copyWith(stiffness: 800 * multiplier),
-        vsync: this,
-        initialValue: _detachPush,
-      )
-        ..addListener(() {
-          if (mounted) setState(() => _detachPush = _pushCtrl!.value);
-        })
-        ..animateTo(0.0);
+      _pushCtrl =
+          SingleMotionController(
+              motion: _kDetachPush.copyWith(stiffness: 800 * multiplier),
+              vsync: this,
+              initialValue: _detachPush,
+            )
+            ..addListener(() {
+              if (mounted) setState(() => _detachPush = _pushCtrl!.value);
+            })
+            ..animateTo(0.0);
 
       // Compute target neighbour fraction at the new offset.
       _dragOffset = newOffset;
@@ -442,37 +448,39 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
       _dragOffset = savedOffset;
 
       _nbrCtrl?.dispose();
-      _nbrCtrl = SingleMotionController(
-        motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-          stiffness: style.neighbourStiffness * multiplier,
-          damping: style.neighbourDamping,
-        ),
-        vsync: this,
-        initialValue: _neighbourFraction,
-      )
-        ..addListener(() {
-          if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
-        })
-        ..addStatusListener((s) {
-          if (s == AnimationStatus.completed ||
-              s == AnimationStatus.dismissed) {
-            _reEngaging = false;
-          }
-        })
-        ..animateTo(target);
+      _nbrCtrl =
+          SingleMotionController(
+              motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
+                stiffness: style.neighbourStiffness * multiplier,
+                damping: style.neighbourDamping,
+              ),
+              vsync: this,
+              initialValue: _neighbourFraction,
+            )
+            ..addListener(() {
+              if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
+            })
+            ..addStatusListener((s) {
+              if (s == AnimationStatus.completed ||
+                  s == AnimationStatus.dismissed) {
+                _reEngaging = false;
+              }
+            })
+            ..animateTo(target);
 
       _roundnessCtrl?.dispose();
-      _roundnessCtrl = SingleMotionController(
-        motion: _kReEngageSpring.copyWith(stiffness: 800 * multiplier),
-        vsync: this,
-        initialValue: _roundnessFraction,
-      )
-        ..addListener(() {
-          if (mounted) {
-            setState(() => _roundnessFraction = _roundnessCtrl!.value);
-          }
-        })
-        ..animateTo(target * _kPreThresholdRoundnessScale);
+      _roundnessCtrl =
+          SingleMotionController(
+              motion: _kReEngageSpring.copyWith(stiffness: 800 * multiplier),
+              vsync: this,
+              initialValue: _roundnessFraction,
+            )
+            ..addListener(() {
+              if (mounted) {
+                setState(() => _roundnessFraction = _roundnessCtrl!.value);
+              }
+            })
+            ..animateTo(target * _kPreThresholdRoundnessScale);
     } else if (!_pastThreshold) {
       // ── Normal pre-threshold tracking ──
       if (_reEngaging) {
@@ -481,8 +489,10 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
         _roundnessCtrl?.stop(canceled: true);
       }
       newNeighbour = newProgress;
-      newRoundness = (newProgress * _kMaxPreDetachRoundness)
-          .clamp(0.0, _kMaxPreDetachRoundness);
+      newRoundness = (newProgress * _kMaxPreDetachRoundness).clamp(
+        0.0,
+        _kMaxPreDetachRoundness,
+      );
 
       if (style.dismissHapticStream) _playPullHaptics();
     }
@@ -551,34 +561,36 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
     final ref = _dragSlotRef;
 
     _springCtrl?.dispose();
-    _springCtrl = SingleMotionController(
-      motion: _kSpatialSpring.copyWith(stiffness: 380 * speedMul),
-      vsync: this,
-      initialValue: _dragOffset,
-    )
-      ..addListener(() {
-        if (mounted) setState(() => _dragOffset = _springCtrl!.value);
-      })
-      ..addStatusListener((s) {
-        if ((s == AnimationStatus.completed ||
-                s == AnimationStatus.dismissed) &&
-            mounted &&
-            _dragSlotRef == ref) {
-          _resetDragState();
-        }
-      })
-      ..animateTo(0.0);
+    _springCtrl =
+        SingleMotionController(
+            motion: _kSpatialSpring.copyWith(stiffness: 380 * speedMul),
+            vsync: this,
+            initialValue: _dragOffset,
+          )
+          ..addListener(() {
+            if (mounted) setState(() => _dragOffset = _springCtrl!.value);
+          })
+          ..addStatusListener((s) {
+            if ((s == AnimationStatus.completed ||
+                    s == AnimationStatus.dismissed) &&
+                mounted &&
+                _dragSlotRef == ref) {
+              _resetDragState();
+            }
+          })
+          ..animateTo(0.0);
 
     _nbrCtrl?.dispose();
-    _nbrCtrl = SingleMotionController(
-      motion: _kSpatialSpring.copyWith(stiffness: 380 * speedMul),
-      vsync: this,
-      initialValue: _neighbourFraction,
-    )
-      ..addListener(() {
-        if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
-      })
-      ..animateTo(0.0);
+    _nbrCtrl =
+        SingleMotionController(
+            motion: _kSpatialSpring.copyWith(stiffness: 380 * speedMul),
+            vsync: this,
+            initialValue: _neighbourFraction,
+          )
+          ..addListener(() {
+            if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
+          })
+          ..animateTo(0.0);
   }
 
   // ── Dismiss (above threshold release) ──
@@ -675,7 +687,7 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
       ..animateTo(1.0);
 
     // Notify consumer.
-    onSwipeCallback?.call(dataIndex, direction);
+    onDismissCallback?.call(dataIndex, direction);
   }
 
   // ── Widget builders ──
@@ -713,8 +725,9 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
                           child: Padding(
                             padding: s.margin ?? EdgeInsets.zero,
                             child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(s.outerRadius),
+                              borderRadius: BorderRadius.circular(
+                                s.outerRadius,
+                              ),
                               child: _buildDismissedBackground(
                                 slot.dismissedDirection ==
                                         DismissDirection.startToEnd
@@ -728,8 +741,9 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
                       // ── Flying card ──
                       OverflowBox(
                         alignment: Alignment.topLeft,
-                        minWidth:
-                            slot.capturedWidth > 0 ? slot.capturedWidth : 0,
+                        minWidth: slot.capturedWidth > 0
+                            ? slot.capturedWidth
+                            : 0,
                         maxWidth: slot.capturedWidth > 0
                             ? slot.capturedWidth
                             : MediaQuery.sizeOf(ctx).width,
@@ -738,8 +752,7 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
                         child: IgnorePointer(
                           child: ValueListenableBuilder<double>(
                             valueListenable: slot.flyNotifier,
-                            builder: (_, flyOff, child) =>
-                                Transform.translate(
+                            builder: (_, flyOff, child) => Transform.translate(
                               offset: Offset(flyOff, 0),
                               child: child,
                             ),
@@ -747,12 +760,14 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
                               padding: s.margin ?? EdgeInsets.zero,
                               child: _FlyingCard(
                                 key: ValueKey('fly_${slot.identity.hashCode}'),
-                                borderRadius:
-                                    BorderRadius.circular(s.outerRadius),
-                                color: s.color ??
-                                    Theme.of(ctx)
-                                        .colorScheme
-                                        .surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(
+                                  s.outerRadius,
+                                ),
+                                color:
+                                    s.color ??
+                                    Theme.of(
+                                      ctx,
+                                    ).colorScheme.surfaceContainerHighest,
                                 elevation: s.elevation + 6,
                                 border: s.border,
                                 padding: s.padding ?? const EdgeInsets.all(16),
@@ -771,7 +786,10 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
   }
 
   Widget _buildActiveCard(
-      BuildContext context, int slotIndex, List<int> visible) {
+    BuildContext context,
+    int slotIndex,
+    List<int> visible,
+  ) {
     final slot = _slots[slotIndex];
     final s = style;
     final dataIndex = visible.indexOf(slotIndex);
@@ -814,7 +832,9 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
                         child: Opacity(
                           opacity: (_dragProgress * 3.0).clamp(0.0, 1.0),
                           child: _buildActiveBackground(
-                              activeBg, _dragProgress),
+                            activeBg,
+                            _dragProgress,
+                          ),
                         ),
                       ),
                     ),
@@ -823,8 +843,7 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
 
               // ── Foreground card ──
               Transform.translate(
-                offset:
-                    Offset(isDragged ? _dragOffset + _detachPush : nOff, 0),
+                offset: Offset(isDragged ? _dragOffset + _detachPush : nOff, 0),
                 child: GestureDetector(
                   onHorizontalDragStart: (_) => handleDragStart(slot),
                   onHorizontalDragUpdate: handleDragUpdate,
@@ -833,12 +852,10 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
                     key: ValueKey('card_${slot.identity.hashCode}'),
                     cardKey: _measureKey(slot),
                     borderRadius: br,
-                    color: s.color ??
-                        Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
-                    elevation:
-                        isDragged ? s.elevation + 6 : s.elevation,
+                    color:
+                        s.color ??
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    elevation: isDragged ? s.elevation + 6 : s.elevation,
                     border: s.border,
                     isDragged: isDragged,
                     hasActiveDrag: _dragSlotRef != null,
@@ -896,8 +913,9 @@ mixin SwipeableM3CardMixin<T extends StatefulWidget>
   Widget _buildActiveBackground(Widget? bg, double progress) {
     if (bg == null) return const SizedBox.shrink();
 
-    final iconOpacity =
-        progress < 0.3 ? 0.0 : ((progress - 0.3) / 0.7).clamp(0.0, 1.0);
+    final iconOpacity = progress < 0.3
+        ? 0.0
+        : ((progress - 0.3) / 0.7).clamp(0.0, 1.0);
     final iconScale = progress < 0.3
         ? 0.8
         : (0.8 + ((progress - 0.3) / 0.7) * 0.2).clamp(0.0, 1.0);
@@ -969,8 +987,9 @@ class _AnimatedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       width: double.infinity,
-      duration:
-          hasActiveDrag ? Duration.zero : const Duration(milliseconds: 520),
+      duration: hasActiveDrag
+          ? Duration.zero
+          : const Duration(milliseconds: 520),
       curve: const Cubic(0.34, 1.56, 0.64, 1),
       decoration: BoxDecoration(
         color: color,

@@ -5,7 +5,7 @@ import 'package:m3e_card_list/m3e_card_list.dart';
 // Shared swipe style
 // ─────────────────────────────────────────────────────────────────────────────
 
-SwipeableM3CardStyle getSwipeStyle() => SwipeableM3CardStyle(
+M3EDismissibleCardStyle getDismissStyle() => M3EDismissibleCardStyle(
   hapticOnTap: 1,
   hapticOnThreshold: 1,
   background: Container(

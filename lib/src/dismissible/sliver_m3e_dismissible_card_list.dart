@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'swipeable_m3e_card_controller.dart';
-import 'swipeable_m3e_card_style.dart';
+import 'm3e_dismissible_card_controller.dart';
+import 'm3e_dismissible_card_style.dart';
 
-/// A swipeable M3E card list that plugs into a [CustomScrollView] as a sliver.
+/// A dismissible M3E card list that plugs into a [CustomScrollView] as a sliver.
 ///
 /// Items are built lazily by the viewport, making this suitable for very large
 /// data sets sitting alongside other slivers.
@@ -11,15 +11,15 @@ import 'swipeable_m3e_card_style.dart';
 /// ```dart
 /// CustomScrollView(
 ///   slivers: [
-///     SliverSwipeableM3CardList(
+///     SliverM3EDismissibleCardList(
 ///       itemCount: items.length,
 ///       itemBuilder: (ctx, i) => Text(items[i].title),
-///       onSwipe: (i, dir) async { items.removeAt(i); return true; },
+///       onDismiss: (i, dir) async { items.removeAt(i); return true; },
 ///     ),
 ///   ],
 /// )
 /// ```
-class SliverSwipeableM3CardList extends StatefulWidget {
+class SliverM3EDismissibleCardList extends StatefulWidget {
   /// Number of data items.
   final int itemCount;
 
@@ -27,30 +27,31 @@ class SliverSwipeableM3CardList extends StatefulWidget {
   final IndexedWidgetBuilder itemBuilder;
 
   /// Called when a swipe exceeds the dismiss threshold.
-  final Future<bool> Function(int index, DismissDirection direction)? onSwipe;
+  final Future<bool> Function(int index, DismissDirection direction)? onDismiss;
 
   /// Called on tap (blocked while a drag or dismiss is in-flight).
   final void Function(int index)? onTap;
 
   /// Visual and interaction configuration.
-  final SwipeableM3CardStyle style;
+  final M3EDismissibleCardStyle style;
 
-  const SliverSwipeableM3CardList({
+  const SliverM3EDismissibleCardList({
     super.key,
     required this.itemCount,
     required this.itemBuilder,
-    this.onSwipe,
+    this.onDismiss,
     this.onTap,
-    this.style = const SwipeableM3CardStyle(),
+    this.style = const M3EDismissibleCardStyle(),
   });
 
   @override
-  State<SliverSwipeableM3CardList> createState() =>
-      _SliverSwipeableM3CardListState();
+  State<SliverM3EDismissibleCardList> createState() =>
+      _SliverM3EDismissibleCardListState();
 }
 
-class _SliverSwipeableM3CardListState extends State<SliverSwipeableM3CardList>
-    with TickerProviderStateMixin, SwipeableM3CardMixin {
+class _SliverM3EDismissibleCardListState
+    extends State<SliverM3EDismissibleCardList>
+    with TickerProviderStateMixin, M3EDismissibleCardMixin {
   // ── Mixin interface ──
 
   @override
@@ -61,11 +62,11 @@ class _SliverSwipeableM3CardListState extends State<SliverSwipeableM3CardList>
       widget.itemBuilder(context, dataIndex);
 
   @override
-  SwipeableM3CardStyle get style => widget.style;
+  M3EDismissibleCardStyle get style => widget.style;
 
   @override
-  Future<bool> Function(int, DismissDirection)? get onSwipeCallback =>
-      widget.onSwipe;
+  Future<bool> Function(int, DismissDirection)? get onDismissCallback =>
+      widget.onDismiss;
 
   @override
   void Function(int)? get onTapCallback => widget.onTap;
@@ -79,7 +80,7 @@ class _SliverSwipeableM3CardListState extends State<SliverSwipeableM3CardList>
   }
 
   @override
-  void didUpdateWidget(SliverSwipeableM3CardList old) {
+  void didUpdateWidget(SliverM3EDismissibleCardList old) {
     super.didUpdateWidget(old);
     syncSlotsIfNeeded(old.itemCount);
   }
