@@ -62,7 +62,8 @@ class M3EDismissibleCardStyle {
   final double dismissThreshold;
 
   /// Haptic intensity when the drag crosses / re‑crosses: 0 = none, 1 = light, 2 = medium, 3 = heavy.
-  /// Default to 1
+  ///
+  /// Defaults to `1`.
   final int hapticOnThreshold;
 
   /// Fire continuous light haptics during the drag.
@@ -125,7 +126,7 @@ class M3EDismissibleCardStyle {
     Color? highlightColor,
     InteractiveInkFeatureFactory? splashFactory,
     bool? enableFeedback,
-    int? haptic,
+    int? hapticOnTap,
     double? dismissThreshold,
     int? hapticOnThreshold,
     bool? dismissHapticStream,
@@ -150,7 +151,7 @@ class M3EDismissibleCardStyle {
       highlightColor: highlightColor ?? this.highlightColor,
       splashFactory: splashFactory ?? this.splashFactory,
       enableFeedback: enableFeedback ?? this.enableFeedback,
-      hapticOnTap: haptic ?? hapticOnTap,
+      hapticOnTap: hapticOnTap ?? this.hapticOnTap,
       dismissThreshold: dismissThreshold ?? this.dismissThreshold,
       hapticOnThreshold: hapticOnThreshold ?? this.hapticOnThreshold,
       dismissHapticStream: dismissHapticStream ?? this.dismissHapticStream,

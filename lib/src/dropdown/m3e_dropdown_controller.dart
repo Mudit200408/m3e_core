@@ -17,10 +17,10 @@ import 'm3e_dropdown_item.dart';
 /// ```dart
 /// final controller = M3EDropdownController<String>();
 ///
-/// // Select items matching a condition
+/// Select items matching a condition
 /// controller.selectWhere((item) => item.value == 'dart');
 ///
-/// // Clear all selections
+/// Clear all selections
 /// controller.clearAll();
 /// ```
 class M3EDropdownController<T> extends ChangeNotifier {
@@ -326,15 +326,4 @@ class M3EDropdownController<T> extends ChangeNotifier {
 
   @override
   String toString() => 'M3EDropdownController(items: $_items, open: $_isOpen)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is M3EDropdownController<T> &&
-        listEquals(other._items, _items) &&
-        other._isOpen == _isOpen;
-  }
-
-  @override
-  int get hashCode => Object.hash(_items, _isOpen);
 }

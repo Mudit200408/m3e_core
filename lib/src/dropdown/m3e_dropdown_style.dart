@@ -335,12 +335,12 @@ class M3EDropdownItemDecoration {
   /// Outer radius applied to the first and last dropdown item cards
   /// (the "cap" corners), mirroring the M3E card list treatment.
   ///
-  /// When set, overrides the widget-level [M3EDropdownMenu.outerRadius].
+  /// Defaults to `12.0`.
   final double? outerRadius;
 
   /// Inner radius applied to middle dropdown item cards.
   ///
-  /// When set, overrides the widget-level [M3EDropdownMenu.innerRadius].
+  /// Defaults to `4.0`.
   final double? innerRadius;
 
   /// Gap between items.

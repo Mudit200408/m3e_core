@@ -116,8 +116,8 @@ class M3ECardList extends StatelessWidget {
   factory M3ECardList.of({
     required List<Widget> children,
     double outerRadius = 24.0,
-    double innerRadius = 10.0,
-    double gap = 12.0,
+    double innerRadius = 4.0,
+    double gap = 3.0,
     Color? color,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,

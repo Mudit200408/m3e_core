@@ -1,6 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'm3e_expandable_item.dart';
+
+void _applyHaptic(int hapticLevel) {
+  switch (hapticLevel) {
+    case 1:
+      HapticFeedback.lightImpact();
+      break;
+    case 2:
+      HapticFeedback.mediumImpact();
+      break;
+    case 3:
+      HapticFeedback.heavyImpact();
+      break;
+    default:
+      break;
+  }
+}
 
 /// A lazily-loaded Material 3 Expressive expandable card list for slivers.
 ///
@@ -161,7 +178,7 @@ class _SliverM3EExpandableCardListState
   }
 
   void _handleToggle(int index) {
-    applyHaptic(widget.haptic);
+    _applyHaptic(widget.haptic);
     final isExpanding = !_expandedIndices.contains(index);
 
     setState(() {

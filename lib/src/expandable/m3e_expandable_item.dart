@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:motor/motor.dart';
 
 /// Signature for building the header (collapsed view) of an expandable item.
@@ -11,26 +10,6 @@ typedef M3EExpandableHeaderBuilder =
 /// Signature for building the body (expanded content) of an expandable item.
 typedef M3EExpandableBodyBuilder =
     Widget Function(BuildContext context, int index);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-void applyHaptic(int hapticLevel) {
-  switch (hapticLevel) {
-    case 1:
-      HapticFeedback.lightImpact();
-      break;
-    case 2:
-      HapticFeedback.mediumImpact();
-      break;
-    case 3:
-      HapticFeedback.heavyImpact();
-      break;
-    default:
-      break;
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // M3EExpandableItem — self-contained animated expandable card
