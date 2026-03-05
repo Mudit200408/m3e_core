@@ -202,97 +202,99 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       );
     }
 
-    return Padding(
-      padding: widget.margin ?? EdgeInsets.zero,
+    return RepaintBoundary(
       child: Padding(
-        padding: EdgeInsets.only(bottom: isLast ? 0 : widget.gap),
-        child: AnimatedBuilder(
-          animation: _radiusCtrl,
-          builder: (context, child) {
-            final t = _radiusCtrl.value.clamp(0.0, 1.0);
-            final effectiveRadius = widget.selectedBorderRadius != null
-                ? BorderRadius.lerp(
-                    borderRadius,
-                    widget.selectedBorderRadius,
-                    t,
-                  )!
-                : borderRadius;
-            return Material(
-              elevation: widget.elevation,
-              color: widget.color ?? cs.surfaceContainerHighest,
-              shape: RoundedRectangleBorder(
-                borderRadius: effectiveRadius,
-                side: widget.border ?? BorderSide.none,
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: child,
-            );
-          },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header — always visible
-              InkWell(
-                splashColor: widget.splashColor,
-                highlightColor: widget.highlightColor,
-                splashFactory: widget.splashFactory,
-                enableFeedback: widget.enableFeedback,
-                onTap: widget.onToggle,
-                child: Padding(
-                  padding: widget.headerPadding ?? const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: widget.headerBuilder(
-                          context,
-                          widget.index,
-                          widget.isExpanded,
+        padding: widget.margin ?? EdgeInsets.zero,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: isLast ? 0 : widget.gap),
+          child: AnimatedBuilder(
+            animation: _radiusCtrl,
+            builder: (context, child) {
+              final t = _radiusCtrl.value.clamp(0.0, 1.0);
+              final effectiveRadius = widget.selectedBorderRadius != null
+                  ? BorderRadius.lerp(
+                      borderRadius,
+                      widget.selectedBorderRadius,
+                      t,
+                    )!
+                  : borderRadius;
+              return Material(
+                elevation: widget.elevation,
+                color: widget.color ?? cs.surfaceContainerHighest,
+                shape: RoundedRectangleBorder(
+                  borderRadius: effectiveRadius,
+                  side: widget.border ?? BorderSide.none,
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: child,
+              );
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header — always visible
+                InkWell(
+                  splashColor: widget.splashColor,
+                  highlightColor: widget.highlightColor,
+                  splashFactory: widget.splashFactory,
+                  enableFeedback: widget.enableFeedback,
+                  onTap: widget.onToggle,
+                  child: Padding(
+                    padding: widget.headerPadding ?? const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: widget.headerBuilder(
+                            context,
+                            widget.index,
+                            widget.isExpanded,
+                          ),
                         ),
-                      ),
-                      ?trailing,
-                    ],
+                        ?trailing,
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
-              // Body — animated expand / collapse
-              AnimatedBuilder(
-                animation: _expandCtrl,
-                builder: (context, child) {
-                  // The spring can overshoot past 1.0 which creates the
-                  // subtle "push down then up" effect.
-                  final progress = _expandCtrl.value.clamp(0.0, 1.5);
+                // Body — animated expand / collapse
+                AnimatedBuilder(
+                  animation: _expandCtrl,
+                  builder: (context, child) {
+                    // The spring can overshoot past 1.0 which creates the
+                    // subtle "push down then up" effect.
+                    final progress = _expandCtrl.value.clamp(0.0, 1.5);
 
-                  if (progress <= 0.001) {
-                    return const SizedBox.shrink();
-                  }
+                    if (progress <= 0.001) {
+                      return const SizedBox.shrink();
+                    }
 
-                  return ClipRect(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      heightFactor: progress.clamp(0.0, 1.0),
-                      child: Opacity(
-                        opacity: progress.clamp(0.0, 1.0),
-                        child: Transform.translate(
-                          // Overshoot creates a small downward push
-                          offset: Offset(
-                            0,
-                            (progress > 1.0) ? (progress - 1.0) * 6 : 0,
+                    return ClipRect(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        heightFactor: progress.clamp(0.0, 1.0),
+                        child: Opacity(
+                          opacity: progress.clamp(0.0, 1.0),
+                          child: Transform.translate(
+                            // Overshoot creates a small downward push
+                            offset: Offset(
+                              0,
+                              (progress > 1.0) ? (progress - 1.0) * 6 : 0,
+                            ),
+                            child: child,
                           ),
-                          child: child,
                         ),
                       ),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding:
-                      widget.bodyPadding ??
-                      const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: widget.bodyBuilder(context, widget.index),
+                    );
+                  },
+                  child: Padding(
+                    padding:
+                        widget.bodyPadding ??
+                        const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: widget.bodyBuilder(context, widget.index),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

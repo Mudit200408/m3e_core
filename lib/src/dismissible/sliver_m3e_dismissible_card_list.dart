@@ -95,9 +95,10 @@ class _SliverM3EDismissibleCardListState
 
   @override
   Widget build(BuildContext context) {
+    final visible = computeVisibleIndices();
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (ctx, i) => buildSlot(ctx, i),
+        (ctx, i) => buildSlot(ctx, i, visible),
         childCount: slots.length,
       ),
     );

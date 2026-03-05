@@ -171,45 +171,48 @@ class M3ECardList extends StatelessWidget {
       isSingle,
     );
 
-    return Padding(
-      padding: margin ?? EdgeInsets.zero,
+    return RepaintBoundary(
       child: Padding(
-        padding: EdgeInsets.only(bottom: isLast ? 0 : gap),
-        child: Material(
-          elevation: elevation,
-          color: color ?? Theme.of(context).colorScheme.surfaceContainerHighest,
-          shape: RoundedRectangleBorder(
-            borderRadius: borderRadius,
-            side: border ?? BorderSide.none,
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            splashColor: splashColor,
-            highlightColor: highlightColor,
-            splashFactory: splashFactory,
-            enableFeedback: enableFeedback,
-            onTap: onTap != null
-                ? () {
-                    onTap!(index);
-                    switch (haptic) {
-                      case 1:
-                        HapticFeedback.lightImpact();
-                        break;
-                      case 2:
-                        HapticFeedback.mediumImpact();
-                        break;
-                      case 3:
-                        HapticFeedback.heavyImpact();
-                        break;
-                      case 0:
-                      default:
-                        break;
+        padding: margin ?? EdgeInsets.zero,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: isLast ? 0 : gap),
+          child: Material(
+            elevation: elevation,
+            color:
+                color ?? Theme.of(context).colorScheme.surfaceContainerHighest,
+            shape: RoundedRectangleBorder(
+              borderRadius: borderRadius,
+              side: border ?? BorderSide.none,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              splashColor: splashColor,
+              highlightColor: highlightColor,
+              splashFactory: splashFactory,
+              enableFeedback: enableFeedback,
+              onTap: onTap != null
+                  ? () {
+                      onTap!(index);
+                      switch (haptic) {
+                        case 1:
+                          HapticFeedback.lightImpact();
+                          break;
+                        case 2:
+                          HapticFeedback.mediumImpact();
+                          break;
+                        case 3:
+                          HapticFeedback.heavyImpact();
+                          break;
+                        case 0:
+                        default:
+                          break;
+                      }
                     }
-                  }
-                : null,
-            child: Padding(
-              padding: padding ?? const EdgeInsets.all(16.0),
-              child: itemBuilder(context, index),
+                  : null,
+              child: Padding(
+                padding: padding ?? const EdgeInsets.all(16.0),
+                child: itemBuilder(context, index),
+              ),
             ),
           ),
         ),

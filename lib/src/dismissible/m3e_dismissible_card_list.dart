@@ -111,6 +111,7 @@ class _M3EDismissibleCardListState extends State<M3EDismissibleCardList>
 
   @override
   Widget build(BuildContext context) {
+    final visible = computeVisibleIndices();
     return ListView.builder(
       controller: widget.scrollController,
       physics: widget.physics,
@@ -118,7 +119,7 @@ class _M3EDismissibleCardListState extends State<M3EDismissibleCardList>
       shrinkWrap: widget.shrinkWrap,
       clipBehavior: widget.clipBehavior,
       itemCount: slots.length,
-      itemBuilder: (ctx, i) => buildSlot(ctx, i),
+      itemBuilder: (ctx, i) => buildSlot(ctx, i, visible),
     );
   }
 }

@@ -44,6 +44,7 @@ class DismissibleSlot {
   DismissDirection? dismissedDirection;
 
   SingleMotionController? collapseCtrl;
+  SingleMotionController? flyCtrl;
   final ValueNotifier<double> flyNotifier = ValueNotifier(0.0);
   bool _flyDisposed = false;
   Widget? frozenChild;
@@ -59,6 +60,8 @@ class DismissibleSlot {
 
   void dispose() {
     collapseCtrl?.dispose();
+    flyCtrl?.dispose();
+    disposeFlyNotifier();
   }
 
   void disposeFlyNotifier() {
@@ -116,7 +119,8 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   double _roundnessFraction = 0.0;
   double _detachPush = 0.0;
 
-  int _lastVibrationTime = 0;
+  /// Stopwatch for throttling haptic feedback — cheaper than DateTime.now().
+  final Stopwatch _hapticStopwatch = Stopwatch()..start();
 
   final Map<DismissibleSlot, GlobalKey> _measureKeys = {};
 
@@ -127,7 +131,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
 
   // ── Constants ──
 
-  static const int _kVibrationThreshold = 60; // ms
+  static const int _kVibrationThresholdMs = 60;
   static const double _kMaxPreDetachRoundness = 0.6;
   static const double _kPreThresholdRoundnessScale = 0.4;
   static const double _kDetachPushPixels = 30.0;
@@ -542,9 +546,8 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
 
   void _playPullHaptics() {
     if (!style.enableFeedback) return;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    if (now - _lastVibrationTime < _kVibrationThreshold) return;
-    _lastVibrationTime = now;
+    if (_hapticStopwatch.elapsedMilliseconds < _kVibrationThresholdMs) return;
+    _hapticStopwatch.reset();
     HapticFeedback.selectionClick();
   }
 
@@ -635,30 +638,11 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       _roundnessFraction = 0.0;
     });
 
-    // ── Fly-out spring ──
-    final flySign = flyInitial.sign;
-    final flyTarget = flySign == 0
-        ? slot.capturedWidth + 80.0
-        : flySign * (slot.capturedWidth + 80.0);
-
-    final flyCtrl = SingleMotionController(
-      motion: _kFlySpring.copyWith(stiffness: 400 * speedMul),
-      vsync: this,
-      initialValue: flyInitial,
-    );
-    flyCtrl
-      ..addListener(() => slot.flyNotifier.value = flyCtrl.value)
-      ..addStatusListener((s) {
-        if (s == AnimationStatus.completed || s == AnimationStatus.dismissed) {
-          slot.disposeFlyNotifier();
-          flyCtrl.dispose();
-        }
-      })
-      ..animateTo(flyTarget);
-
     // ── Collapse spring (gap closes) ──
     final colCtrl = SingleMotionController(
-      motion: _kSpatialSpringBack.copyWith(stiffness: 200 * speedMul),
+      motion: _kSpatialSpringBack.copyWith(
+        stiffness: style.collapseSpeed * speedMul,
+      ),
       vsync: this,
       initialValue: 0.0,
     );
@@ -680,11 +664,37 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
               _measureKeys.remove(slot);
             }
           }
+          slot.disposeFlyNotifier();
           slot.dispose();
           colCtrl.dispose();
         }
       })
       ..animateTo(1.0);
+
+    // ── Fly-out spring ──
+    final flySign = flyInitial.sign;
+    final flyTarget = flySign == 0
+        ? slot.capturedWidth + 80.0
+        : flySign * (slot.capturedWidth + 80.0);
+
+    slot.flyCtrl?.dispose();
+    final flyCtrl = SingleMotionController(
+      motion: _kFlySpring.copyWith(stiffness: 400 * speedMul),
+      vsync: this,
+      initialValue: flyInitial,
+    );
+    slot.flyCtrl = flyCtrl;
+    flyCtrl
+      ..addListener(() => slot.flyNotifier.value = flyCtrl.value)
+      ..addStatusListener((s) {
+        if (s == AnimationStatus.completed || s == AnimationStatus.dismissed) {
+          slot.flyCtrl = null;
+          flyCtrl.dispose();
+          // Start the collapse spring after the fly-out finishes
+          colCtrl.animateTo(1.0);
+        }
+      })
+      ..animateTo(flyTarget);
 
     // Notify consumer.
     onDismissCallback?.call(dataIndex, direction);
@@ -693,12 +703,19 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   // ── Widget builders ──
 
   /// Dispatches to either [_buildActiveCard] or [_buildCollapsingCard].
-  Widget buildSlot(BuildContext context, int slotIndex) {
+  ///
+  /// Pass a pre-computed [visible] list to avoid recomputing
+  /// [computeVisibleIndices] once per slot.
+  Widget buildSlot(BuildContext context, int slotIndex, [List<int>? visible]) {
     final slot = _slots[slotIndex];
     if (slot.isCollapsing) {
       return _buildCollapsingCard(context, slotIndex);
     }
-    return _buildActiveCard(context, slotIndex, computeVisibleIndices());
+    return _buildActiveCard(
+      context,
+      slotIndex,
+      visible ?? computeVisibleIndices(),
+    );
   }
 
   Widget _buildCollapsingCard(BuildContext context, int slotIndex) {
@@ -706,6 +723,10 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     final ctrl = slot.collapseCtrl!;
     final totalH = slot.capturedHeight + style.gap;
     final s = style;
+    final bool swipingRight = _dragOffset > 0;
+    final borderRadius = swipingRight
+        ? s.backgroundBorderRadius
+        : (s.secondaryBackgroundBorderRadius ?? s.backgroundBorderRadius);
 
     return IgnorePointer(
       child: AnimatedBuilder(
@@ -719,23 +740,44 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                 ? null
                 : Stack(
                     children: [
-                      // ── Background (stays visible during fly-out) ──
+                      // ── Background (stays visible during fly-out, pushing card) ──
                       if (slot.dismissedDirection != null)
-                        Positioned.fill(
-                          child: Padding(
-                            padding: s.margin ?? EdgeInsets.zero,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                s.outerRadius,
-                              ),
-                              child: _buildDismissedBackground(
+                        ValueListenableBuilder<double>(
+                          valueListenable: slot.flyNotifier,
+                          builder: (ctx, flyOff, child) {
+                            // Calculate how far the card has flown.
+                            final progress = flyOff.abs();
+                            // If swiping right (flyOff > 0), align background to left and increase its width.
+                            // If swiping left (flyOff < 0), align background to right and increase its width.
+                            final swipingRight =
                                 slot.dismissedDirection ==
-                                        DismissDirection.startToEnd
-                                    ? s.background
-                                    : (s.secondaryBackground ?? s.background),
+                                DismissDirection.startToEnd;
+                            return Positioned.fill(
+                              child: Align(
+                                alignment: swipingRight
+                                    ? Alignment.centerLeft
+                                    : Alignment.centerRight,
+                                child: SizedBox(
+                                  width: progress,
+                                  height: double.infinity,
+                                  child: Padding(
+                                    padding: s.margin ?? EdgeInsets.zero,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        borderRadius,
+                                      ),
+                                      child: _buildDismissedBackground(
+                                        swipingRight
+                                            ? s.background
+                                            : (s.secondaryBackground ??
+                                                  s.background),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
 
                       // ── Flying card ──
@@ -761,7 +803,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                               child: _FlyingCard(
                                 key: ValueKey('fly_${slot.identity.hashCode}'),
                                 borderRadius: BorderRadius.circular(
-                                  s.outerRadius,
+                                  borderRadius,
                                 ),
                                 color:
                                     s.color ??
@@ -809,6 +851,10 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         ? s.background
         : (s.secondaryBackground ?? s.background);
 
+    final borderRadius = swipingRight
+        ? s.backgroundBorderRadius
+        : (s.secondaryBackgroundBorderRadius ?? s.backgroundBorderRadius);
+
     return RepaintBoundary(
       child: Padding(
         padding: s.margin ?? EdgeInsets.zero,
@@ -820,20 +866,22 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
               // ── Expanding pill background ──
               if (isDragged && _dragOffset != 0 && activeBg != null)
                 Positioned.fill(
-                  child: Align(
-                    alignment: swipingRight
-                        ? Alignment.centerLeft
-                        : Alignment.centerRight,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: SizedBox(
-                        width: _dragOffset.abs(),
-                        height: double.infinity,
-                        child: Opacity(
-                          opacity: (_dragProgress * 3.0).clamp(0.0, 1.0),
-                          child: _buildActiveBackground(
-                            activeBg,
-                            _dragProgress,
+                  child: RepaintBoundary(
+                    child: Align(
+                      alignment: swipingRight
+                          ? Alignment.centerLeft
+                          : Alignment.centerRight,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(borderRadius),
+                        child: SizedBox(
+                          width: _dragOffset.abs(),
+                          height: double.infinity,
+                          child: Opacity(
+                            opacity: (_dragProgress * 3.0).clamp(0.0, 1.0),
+                            child: _buildActiveBackground(
+                              activeBg,
+                              _dragProgress,
+                            ),
                           ),
                         ),
                       ),

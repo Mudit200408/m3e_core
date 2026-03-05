@@ -133,48 +133,50 @@ class M3ECardColumn extends StatelessWidget {
           borderRadius = BorderRadius.circular(innerRadius);
         }
 
-        return Padding(
-          padding: margin ?? EdgeInsets.zero,
+        return RepaintBoundary(
           child: Padding(
-            padding: EdgeInsets.only(bottom: isLast ? 0 : gap),
-            child: Material(
-              elevation: elevation,
-              color:
-                  color ??
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-              shape: RoundedRectangleBorder(
-                borderRadius: borderRadius,
-                side: border ?? BorderSide.none,
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                splashColor: splashColor,
-                highlightColor: highlightColor,
-                splashFactory: splashFactory,
-                enableFeedback: enableFeedback,
-                onTap: onTap != null
-                    ? () {
-                        onTap!(index);
-                        switch (haptic) {
-                          case 1:
-                            HapticFeedback.lightImpact();
-                            break;
-                          case 2:
-                            HapticFeedback.mediumImpact();
-                            break;
-                          case 3:
-                            HapticFeedback.heavyImpact();
-                            break;
-                          case 0:
-                          default:
-                            break;
+            padding: margin ?? EdgeInsets.zero,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : gap),
+              child: Material(
+                elevation: elevation,
+                color:
+                    color ??
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
+                shape: RoundedRectangleBorder(
+                  borderRadius: borderRadius,
+                  side: border ?? BorderSide.none,
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  splashColor: splashColor,
+                  highlightColor: highlightColor,
+                  splashFactory: splashFactory,
+                  enableFeedback: enableFeedback,
+                  onTap: onTap != null
+                      ? () {
+                          onTap!(index);
+                          switch (haptic) {
+                            case 1:
+                              HapticFeedback.lightImpact();
+                              break;
+                            case 2:
+                              HapticFeedback.mediumImpact();
+                              break;
+                            case 3:
+                              HapticFeedback.heavyImpact();
+                              break;
+                            case 0:
+                            default:
+                              break;
+                          }
                         }
-                      }
-                    : null,
-                child: Container(
-                  width: double.infinity,
-                  padding: itemPadding ?? const EdgeInsets.all(12),
-                  child: children[index],
+                      : null,
+                  child: Container(
+                    width: double.infinity,
+                    padding: itemPadding ?? const EdgeInsets.all(12),
+                    child: children[index],
+                  ),
                 ),
               ),
             ),

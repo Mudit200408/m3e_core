@@ -8,8 +8,13 @@ import 'package:m3e_card_list/m3e_card_list.dart';
 M3EDismissibleCardStyle getDismissStyle() => M3EDismissibleCardStyle(
   hapticOnTap: 1,
   hapticOnThreshold: 1,
+  backgroundBorderRadius: 100,
+  secondaryBackgroundBorderRadius: 100,
+  collapseSpeed: 60,
+  dismissHapticStream: true,
+  dismissThreshold: 0.3,
   background: Container(
-    color: Colors.green.shade600,
+    color: const Color.fromARGB(255, 80, 218, 87),
     alignment: Alignment.center,
     child: const Icon(Icons.archive, color: Colors.white, size: 28),
   ),

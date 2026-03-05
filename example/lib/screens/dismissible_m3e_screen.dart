@@ -2,32 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:m3e_card_list/m3e_card_list.dart';
 import '../data/mock_data.dart';
 
-class DismissibleM3EScreen extends StatelessWidget {
+class DismissibleM3EScreen extends StatefulWidget {
   const DismissibleM3EScreen({super.key});
 
   @override
+  State<DismissibleM3EScreen> createState() => _DismissibleM3EScreenState();
+}
+
+class _DismissibleM3EScreenState extends State<DismissibleM3EScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Dismissible M3E'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'ListView'),
-              Tab(text: 'Sliver'),
-              Tab(text: 'Column'),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            _DismissibleListViewTab(),
-            _DismissibleSliverTab(),
-            _DismissibleColumnTab(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dismissible M3E'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'ListView'),
+            Tab(text: 'Sliver'),
+            Tab(text: 'Column'),
           ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          _DismissibleListViewTab(),
+          _DismissibleSliverTab(),
+          _DismissibleColumnTab(),
+        ],
       ),
     );
   }
@@ -104,6 +123,7 @@ class _DismissibleListViewTabState extends State<_DismissibleListViewTab> {
             itemCount: _items.length + (_isLoadingMore ? 1 : 0),
             onDismiss: _onDismiss,
             style: getDismissStyle(),
+            
             itemBuilder: (context, index) {
               if (index == _items.length) {
                 return const KeyedSubtree(
@@ -388,6 +408,7 @@ class _DismissibleColumnTabState extends State<_DismissibleColumnTab> {
               style: M3EDismissibleCardStyle(
                 hapticOnTap: 1,
                 hapticOnThreshold: 2,
+                dismissHapticStream: false,
                 dismissThreshold: _dismissThreshold,
                 neighbourPull: _neighbourPull,
                 neighbourReach: _neighbourReach,

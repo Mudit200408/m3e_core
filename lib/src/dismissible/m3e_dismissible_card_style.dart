@@ -46,6 +46,21 @@ class M3EDismissibleCardStyle {
   /// Falls back to [background] if null.
   final Widget? secondaryBackground;
 
+  /// Background Border Radius
+  final double backgroundBorderRadius;
+
+  /// Secondary Background Border Radius
+  final double? secondaryBackgroundBorderRadius;
+
+  /// Background And Secondary Background Collapse speed
+  /// [The speed becomes faster when the user swipes faster]
+  /// 
+  /// Higher Number = Faster Collapse
+  /// Lower Number = Slower Collapse
+  /// 
+  /// Defaults to `50` for that slower Gmail type collapse
+  final double collapseSpeed;
+
   // ── Interaction ──
 
   final Color? splashColor;
@@ -67,6 +82,11 @@ class M3EDismissibleCardStyle {
   final int hapticOnThreshold;
 
   /// Fire continuous light haptics during the drag.
+  /// 
+  /// Defaults to `false`.
+  /// 
+  /// Try it out once!! 
+  /// It's just me or it's super satisfying to use?
   final bool dismissHapticStream;
 
   // ── Neighbour physics ──
@@ -107,6 +127,9 @@ class M3EDismissibleCardStyle {
     this.neighbourReach = 3,
     this.neighbourStiffness = 800,
     this.neighbourDamping = 0.7,
+    this.backgroundBorderRadius = 100,
+    this.secondaryBackgroundBorderRadius = 100,
+    this.collapseSpeed = 50,
   });
 
   /// Creates a copy with the given fields replaced.
@@ -134,6 +157,9 @@ class M3EDismissibleCardStyle {
     int? neighbourReach,
     double? neighbourStiffness,
     double? neighbourDamping,
+    double? backgroundBorderRadius,
+    double? secondaryBackgroundBorderRadius,
+    double? collapseSpeed,
   }) {
     return M3EDismissibleCardStyle(
       outerRadius: outerRadius ?? this.outerRadius,
@@ -159,6 +185,9 @@ class M3EDismissibleCardStyle {
       neighbourReach: neighbourReach ?? this.neighbourReach,
       neighbourStiffness: neighbourStiffness ?? this.neighbourStiffness,
       neighbourDamping: neighbourDamping ?? this.neighbourDamping,
+      backgroundBorderRadius: backgroundBorderRadius ?? this.backgroundBorderRadius,
+      secondaryBackgroundBorderRadius: secondaryBackgroundBorderRadius ?? this.secondaryBackgroundBorderRadius,
+      collapseSpeed: collapseSpeed ?? this.collapseSpeed,
     );
   }
 }

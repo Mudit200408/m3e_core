@@ -110,10 +110,13 @@ class _M3EDismissibleCardColumnState extends State<M3EDismissibleCardColumn>
 
   @override
   Widget build(BuildContext context) {
+    final visible = computeVisibleIndices();
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [for (int i = 0; i < slots.length; i++) buildSlot(context, i)],
+      children: [
+        for (int i = 0; i < slots.length; i++) buildSlot(context, i, visible),
+      ],
     );
   }
 }
