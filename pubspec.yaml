@@ -1,16 +1,16 @@
-name: m3e_card_list
-description: "A Flutter package providing expressive Material 3 card lists with dynamically rounded corners for ListView, SliverList and Column."
-version: 0.1.0
-homepage: https://github.com/Mudit200408/m3e_card_list
-repository: https://github.com/Mudit200408/m3e_card_list
-issue_tracker: https://github.com/Mudit200408/m3e_card_list/issues
+name: m3e_core
+description: "A single Flutter package providing Material 3 expressive components like card list, dismissible cards, expandable cards and dropdown menu."
+version: 0.0.1
+homepage: https://github.com/Mudit200408/m3e_core
+repository: https://github.com/Mudit200408/m3e_core
+issue_tracker: https://github.com/Mudit200408/m3e_core/issues
 
 topics:
   - ui
   - material-3-expressive
-  - m3e
-  - listview
-  - sliver
+  - dismissible
+  - cards
+  - dropdown
 
 environment:
   sdk: ^3.11.0

@@ -53,11 +53,11 @@ class M3EDismissibleCardStyle {
   final double? secondaryBackgroundBorderRadius;
 
   /// Background And Secondary Background Collapse speed
-  /// [The speed becomes faster when the user swipes faster]
-  /// 
+  /// The speed becomes faster when the user swipes faster
+  ///
   /// Higher Number = Faster Collapse
   /// Lower Number = Slower Collapse
-  /// 
+  ///
   /// Defaults to `50` for that slower Gmail type collapse
   final double collapseSpeed;
 
@@ -82,10 +82,10 @@ class M3EDismissibleCardStyle {
   final int hapticOnThreshold;
 
   /// Fire continuous light haptics during the drag.
-  /// 
+  ///
   /// Defaults to `false`.
-  /// 
-  /// Try it out once!! 
+  ///
+  /// Try it out once!!
   /// It's just me or it's super satisfying to use?
   final bool dismissHapticStream;
 
@@ -185,8 +185,11 @@ class M3EDismissibleCardStyle {
       neighbourReach: neighbourReach ?? this.neighbourReach,
       neighbourStiffness: neighbourStiffness ?? this.neighbourStiffness,
       neighbourDamping: neighbourDamping ?? this.neighbourDamping,
-      backgroundBorderRadius: backgroundBorderRadius ?? this.backgroundBorderRadius,
-      secondaryBackgroundBorderRadius: secondaryBackgroundBorderRadius ?? this.secondaryBackgroundBorderRadius,
+      backgroundBorderRadius:
+          backgroundBorderRadius ?? this.backgroundBorderRadius,
+      secondaryBackgroundBorderRadius:
+          secondaryBackgroundBorderRadius ??
+          this.secondaryBackgroundBorderRadius,
       collapseSpeed: collapseSpeed ?? this.collapseSpeed,
     );
   }

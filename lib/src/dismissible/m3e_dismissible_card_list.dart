@@ -21,7 +21,7 @@ class M3EDismissibleCardList extends StatefulWidget {
   /// Number of data items.
   final int itemCount;
 
-  /// Builds content for the item at [index].
+  /// Builds content for the item at the given index.
   final IndexedWidgetBuilder itemBuilder;
 
   /// Called when a swipe exceeds the dismiss threshold.

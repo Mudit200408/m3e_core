@@ -8,7 +8,7 @@ import 'm3e_dropdown_item.dart';
 /// set items dynamically, and listen for changes.
 ///
 /// Items are managed as **immutable** [M3EDropdownItem] instances. All
-/// mutations go through [copyWith], which ensures the controller properly
+/// mutations go through [M3EDropdownItem.copyWith], which ensures the controller properly
 /// detects changes and notifies listeners.
 ///
 /// Search filtering is handled internally — [items] returns either the
@@ -24,6 +24,9 @@ import 'm3e_dropdown_item.dart';
 /// controller.clearAll();
 /// ```
 class M3EDropdownController<T> extends ChangeNotifier {
+  /// Creates a new [M3EDropdownController].
+  M3EDropdownController();
+
   // ── Internal state ──
 
   bool _initialized = false;

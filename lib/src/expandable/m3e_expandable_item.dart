@@ -58,6 +58,7 @@ class M3EExpandableItem extends StatefulWidget {
 
   final VoidCallback onToggle;
 
+  /// Creates an [M3EExpandableItem].
   const M3EExpandableItem({
     super.key,
     required this.index,

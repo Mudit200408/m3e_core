@@ -68,7 +68,7 @@ class M3EDropdownFieldDecoration {
 
   /// Border radius of the field.
   ///
-  /// When null the widget's [outerRadius] is used as a circular radius.
+  /// When null the widget's `outerRadius` inside [M3EDropdownItemDecoration] is used as a circular radius.
   final BorderRadius? borderRadius;
 
   /// Whether to show a clear-all icon when items are selected.
@@ -345,7 +345,7 @@ class M3EDropdownItemDecoration {
 
   /// Gap between items.
   ///
-  /// When set, overrides the widget-level [M3EDropdownMenu.itemGap].
+  /// When set, specifies the gap between items list.
   final double? itemGap;
 
   /// Inner padding applied to each dropdown item.

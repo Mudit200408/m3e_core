@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:m3e_card_list/m3e_card_list.dart';
+import 'package:m3e_core/m3e_core.dart';
 import '../data/mock_data.dart';
 
 class DismissibleM3EScreen extends StatefulWidget {
@@ -123,7 +123,7 @@ class _DismissibleListViewTabState extends State<_DismissibleListViewTab> {
             itemCount: _items.length + (_isLoadingMore ? 1 : 0),
             onDismiss: _onDismiss,
             style: getDismissStyle(),
-            
+
             itemBuilder: (context, index) {
               if (index == _items.length) {
                 return const KeyedSubtree(

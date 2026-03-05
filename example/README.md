@@ -1,6 +1,6 @@
 # M3E Card List Example App
 
-This example app demonstrates the various components provided by the `m3e_card_list` package.
+This example app demonstrates the various components provided by the `m3e_core` package.
 
 ## 1. M3E Card List
 A basic Material 3 style card list. Available in three variants:

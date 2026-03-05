@@ -122,7 +122,7 @@ class M3EDropdownMenu<T> extends StatefulWidget {
 
   /// An optional widget placed between dropdown items.
   ///
-  /// When non-null, overrides [itemGap] and is used as the separator in
+  /// When non-null, overrides `itemGap` inside [M3EDropdownItemDecoration.itemGap] and is used as the separator in
   /// the dropdown item list.
   final Widget? itemSeparator;
 
