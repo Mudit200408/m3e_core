@@ -1,0 +1,2 @@
+# Ignore doc for pub publish to reduce package size
+doc/

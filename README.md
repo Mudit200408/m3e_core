@@ -1,10 +1,10 @@
 # M3E Card List
 
-![M3E Intro](docs/intro.png)
+![M3E Intro](https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/intro.png)
 
 A comprehensive Flutter package providing expressive, Material 3 card lists with dynamically rounded corners inside normal `ListView`s and `CustomScrollView`s (via slivers). Beyond static layouts, it offers **interactive dismissible cards**, **expandable cards**, and a highly customizable **dropdown menu**—all featuring expressive M3 styling and spring physics.
 
-It automatically calculates and draws the corners to fit exactly the [Material 3 Expressive](https://m3.material.io/blog/building-with-m3-expressive) spec for adjacent items. It gives extensive customization options including customizable splash ripples, custom border colors, custom elevation, and highly tunable haptic feedback.
+It automatically calculates and draws the corners to fit exactly the [Material 3 Expressive](https://m3.material.io/blog/building-with-m3-expressive) spec for adjacent items. It gives extensive customization options including customizable splash ripples, custom border colors, custom elevation and highly tunable haptic feedback along with stiffness and damping for animations.
 
 ---
 
@@ -30,16 +30,12 @@ import 'package:m3e_card_list/m3e_card_list.dart';
 ```
 
 ---
-
-### Check the [Example](https://github.com/Mudit200408/m3e_card_list/tree/main/example) App for more details. 
-
----
 ## 🧩 Components & Usage
 
 ## 1. Basic M3E Card List
 Use for static or simple scrollable interactive card lists. 
 
-![M3E Card List](docs/card_list.png)
+<img src="https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/card_list.png"  height="450" alt="M3E Card List"/>
 
 ### Usage:
 ```dart
@@ -82,12 +78,12 @@ Swipe-to-dismiss items with a beautiful spring-driven "neighbour pull" effect.
 
 ### 🔴 Dismissible M3E (Gmail Style)
 
-![Dismissible M3E List](docs/dismissible-gmail.gif)
+<img src="https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/dismissible-gmail.gif"  height="450" alt="Dismissible M3E List"/>
 
 
 ### 🔴 Dismissible M3E (neighbourPull: 50.0, neighbourReach: 3, stiffness: 500, damping: 0.25, dismissThreshold: 0.6)
 
-![Dismissible M3E High Pull](docs/dismissible-highPull.gif)
+<img src="https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/dismissible-highPull.gif"  height="450" alt="Dismissible M3E High Pull"/>
 
 ### Usage:
 
@@ -159,10 +155,10 @@ M3EDismissibleCardList(
 Smoothly expand and collapse individual cards using `motor` spring animations.
 
 ### 🔴 Expandable M3E (Without selectedBorderRadius, allowMultipleExpanded: true)
-![Expandable M3E List](docs/expandable-no-autocollapse.gif)
+<img src="https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/expandable-no-autocollapse.gif" height="450" alt="Expandable M3E List"/>
 
 ### 🔴 Expandable M3E (With selectedBorderRadius, allowMultipleExpanded: true)
-![Expandable M3E List](docs/expandable-autocollapse.gif)
+<img src="https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/expandable-autocollapse.gif" height="450" alt="Expandable M3E List"/>
 
 
 ### Usage:
@@ -217,10 +213,10 @@ M3EExpandableCardList(
 A powerful, stylized dropdown with support for single/multi-selection, fuzzy search, async loading, and animated chip tags.
 
 ### 🔴 M3E Dropdown (With expandedBorderRadius)
-![M3E Dropdown](docs/dropdown-normal.gif)
+<img src="https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/dropdown-normal.gif"  height="450" alt="M3E Dropdown"/>
 
 ### 🔴 M3E Dropdown (Without expandedBorderRadius, With Chips)
-![M3E Dropdown](docs/dropdown-chip.gif)
+<img src="https://raw.githubusercontent.com/Mudit200408/m3e_card_list/main/doc/dropdown-chip.gif"  height="450" alt="M3E Dropdown"/>
 
 
 ### Usage:
@@ -475,6 +471,19 @@ M3EDropdownMenu<int>.future(
 
 ---
 
+### 🎯 Check the [Example](https://github.com/Mudit200408/m3e_card_list/tree/main/example) App for more details. 
+
+---
+## 🐞 Found a bug? or ✨ You have a Feature Request?
+
+Feel free to open a [Issue](https://github.com/Mudit200408/m3e_card_list/issues) or [Contribute](https://github.com/Mudit200408/m3e_card_list/pulls) to the project.
+
+Hope You Love It!
+
+----
 ## Credits
 - [Motor](https://pub.dev/packages/motor) Pub Package for Expressive Animations
+- [Multi_dropdown](https://pub.dev/packages/multi_dropdown) Pub Package for Dropdown Menu
 - Claude and Gemini for helping me with the code and documentation.
+
+### Radhe Radhe 🙏
