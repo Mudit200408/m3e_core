@@ -8,20 +8,14 @@ It automatically calculates and draws the corners to fit exactly the [Material 3
 
 ---
 
-## 🚀 Features
-
-- **Dynamic border radius:** The first and last items get a larger outer radius while adjoining cards receive a smaller inner radius seamlessly.
-- **Rich Components:** Offers `M3ECardList`, `M3EDismissibleCardList`, `M3EExpandableCardList`, and `M3EDropdownMenu`.
-- **Sliver & Column Support:** Provides Slivers and Column wrappers out of the box to beautifully tie into complex layouts.
-- **Physics & Animations:** Spring-driven physics for expanding, collapsing, and dragging. Neighbour-pull effects on swipe.
-- **Highly Customizable:** Complete control over gaps, radii, colors, haptics, and padding.
-
 ## 📦 Individual Packages
 
 This package (`m3e_core`) contains all the M3E components bundled together. If you only need a specific component, you can use the individual packages:
+- [m3e_card_list](https://pub.dev/packages/m3e_card_list)
 - [m3e_dismissible](https://pub.dev/packages/m3e_dismissible)
 - [m3e_expandable](https://pub.dev/packages/m3e_expandable)
 - [m3e_dropdown_menu](https://pub.dev/packages/m3e_dropdown_menu)
+- [flutter_m3shapes_extended](https://pub.dev/packages/flutter_m3shapes_extended)
 
 ---
 
@@ -29,7 +23,7 @@ This package (`m3e_core`) contains all the M3E components bundled together. If y
 
 ```yaml
 dependencies:
-  m3e_core: ^0.0.1
+  m3e_core: ^0.0.2
 ```
 
 ```dart
@@ -57,24 +51,24 @@ M3ECardList(
 ```
 
 **Constructor Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `itemCount` | `int` | **Required** | Number of items in the list. |
-| `itemBuilder` | `IndexedWidgetBuilder` | **Required** | Builds the widget for each index. |
-| `outerRadius` | `double` | `24.0` | Radius for the cap corners of the first/last items. |
-| `innerRadius` | `double` | `4.0` | Radius for the inner corners of adjoining items. |
-| `gap` | `double` | `3.0` | Spacing between items. |
-| `color` | `Color?` | `surfaceContainerHighest` | Background color of the cards. |
-| `padding` | `EdgeInsetsGeometry?` | `EdgeInsets.all(16)` | Inner padding for each card. |
-| `margin` | `EdgeInsetsGeometry?` | `EdgeInsets.zero` | Outer margin for the cards. |
-| `onTap` | `void Function(int)?` | `null` | Item tap callback. |
-| `border` | `BorderSide?` | `BorderSide.none` | Border drawn around each card. |
-| `elevation` | `double` | `0` | Elevation of the card. |
-| `splashColor` | `Color?` | `null` | Ink splash color on tap. |
-| `highlightColor` | `Color?` | `null` | Ink highlight color on tap. |
-| `splashFactory` | `InteractiveInkFeatureFactory?` | `null` | Splash factory (e.g. `NoSplash.splashFactory`). |
-| `enableFeedback` | `bool` | `true` | Whether gestures provide acoustic/haptic feedback. |
-| `haptic` | `int` | `0` | Haptic intensity on tap (0=none, 1=light, 2=medium, 3=heavy). |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `itemCount` | `int` | Number of items in the list. |
+| `itemBuilder` | `IndexedWidgetBuilder` | Builds the widget for each index. |
+| `outerRadius` | `double` | Radius for the cap corners of the first/last items. |
+| `innerRadius` | `double` | Radius for the inner corners of adjoining items. |
+| `gap` | `double` | Spacing between items. |
+| `color` | `Color?` | Background color of the cards. |
+| `padding` | `EdgeInsetsGeometry?` | Inner padding for each card. |
+| `margin` | `EdgeInsetsGeometry?` | Outer margin for the cards. |
+| `onTap` | `void Function(int)?` | Item tap callback. |
+| `border` | `BorderSide?` | Border drawn around each card. |
+| `elevation` | `double` | Elevation of the card. |
+| `splashColor` | `Color?` | Ink splash color on tap. |
+| `highlightColor` | `Color?` | Ink highlight color on tap. |
+| `splashFactory` | `InteractiveInkFeatureFactory?` | Splash factory (e.g. `NoSplash.splashFactory`). |
+| `enableFeedback` | `bool` | Whether gestures provide acoustic/haptic feedback. |
+| `haptic` | `int` | Haptic intensity on tap (0=none, 1=light, 2=medium, 3=heavy). |
 
 > *Variants Available:* `SliverM3ECardList`, `M3ECardColumn`
 
@@ -111,48 +105,48 @@ M3EDismissibleCardList(
 ```
 
 **`M3EDismissibleCardList` Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `itemCount` | `int` | **Required** | Number of data items. |
-| `itemBuilder` | `IndexedWidgetBuilder` | **Required** | Builds content for each item. |
-| `onDismiss` | `Future<bool> Function(int, DismissDirection)?` | `null` | Called when swipe exceeds threshold. Return `true` to dismiss. |
-| `onTap` | `void Function(int)?` | `null` | Called on tap (blocked during drag). |
-| `style` | `M3EDismissibleCardStyle` | `const M3EDismissibleCardStyle()` | Visual and interaction configuration. |
-| `physics` | `ScrollPhysics?` | `null` | Scroll physics override. |
-| `scrollController` | `ScrollController?` | `null` | Scroll controller. |
-| `listPadding` | `EdgeInsetsGeometry?` | `null` | Padding around the entire list. |
-| `shrinkWrap` | `bool` | `false` | Whether the list should shrink-wrap its children. |
-| `clipBehavior` | `Clip` | `Clip.hardEdge` | Clip behavior for the list. |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `itemCount` | `int` | Number of data items. |
+| `itemBuilder` | `IndexedWidgetBuilder` | Builds content for each item. |
+| `onDismiss` | `Future<bool> Function(int, DismissDirection)?` | Called when swipe exceeds threshold. Return `true` to dismiss. |
+| `onTap` | `void Function(int)?` | Called on tap (blocked during drag). |
+| `style` | `M3EDismissibleCardStyle` | Visual and interaction configuration. |
+| `physics` | `ScrollPhysics?` | Scroll physics override. |
+| `scrollController` | `ScrollController?` | Scroll controller. |
+| `listPadding` | `EdgeInsetsGeometry?` | Padding around the entire list. |
+| `shrinkWrap` | `bool` | Whether the list should shrink-wrap its children. |
+| `clipBehavior` | `Clip` | Clip behavior for the list. |
 
 **`M3EDismissibleCardStyle` Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `outerRadius` | `double` | `18.0` | Outer corner radius for first/last/single items. |
-| `innerRadius` | `double` | `4.0` | Inner corner radius for middle items. |
-| `selectedBorderRadius` | `double?` | `null` | Radius applied to the dragged card once threshold is crossed. |
-| `backgroundBorderRadius` | `double?` | `100` | Radius applied to the background when swiping start-to-end. |
-| `secondaryBackgroundBorderRadius` | `double?` | `100` | Radius applied to the secondary background when swiping end-to-start. |
-| `collapseSpeed` | `double` | `50` | Speed of collapse animation after the card is dismissed. Higher Number = Faster Collapse, Lower Number = Slower Collapse |
-| `gap` | `double` | `3.0` | Vertical gap between cards. |
-| `color` | `Color?` | `surfaceContainerHighest` | Card background colour. |
-| `padding` | `EdgeInsetsGeometry?` | `null` | Inner padding of each card's content area. |
-| `margin` | `EdgeInsetsGeometry?` | `null` | Outer margin around each card. |
-| `border` | `BorderSide?` | `null` | Optional border drawn on every card. |
-| `elevation` | `double` | `0.0` | Resting elevation. |
-| `background` | `Widget?` | `null` | Revealed background when swiping start-to-end. |
-| `secondaryBackground` | `Widget?` | `null` | Revealed background when swiping end-to-start. |
-| `splashColor` | `Color?` | `null` | Ink splash color. |
-| `highlightColor` | `Color?` | `null` | Ink highlight color. |
-| `splashFactory` | `InteractiveInkFeatureFactory?` | `null` | Splash factory. |
-| `enableFeedback` | `bool` | `true` | Whether gestures provide acoustic/haptic feedback. |
-| `hapticOnTap` | `int` | `0` | Haptic intensity on tap (0=none, 1=light, 2=medium, 3=heavy). |
-| `dismissThreshold` | `double` | `0.2` | Fraction of width before dismiss triggers. |
-| `hapticOnThreshold` | `int` | `1` | Haptic feedback level when crossing dismiss threshold. |
-| `dismissHapticStream` | `bool` | `false` | Fire continuous light haptics during drag. |
-| `neighbourPull` | `double` | `8.0` | Maximum pixel offset applied to neighbouring cards. |
-| `neighbourReach` | `int` | `3` | How many cards above + below the dragged card are affected. |
-| `neighbourStiffness` | `double` | `800` | Spring stiffness for neighbour snapping. |
-| `neighbourDamping` | `double` | `0.7` | Spring damping for neighbour snapping. |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `outerRadius` | `double` | Outer corner radius for first/last/single items. |
+| `innerRadius` | `double` | Inner corner radius for middle items. |
+| `selectedBorderRadius` | `double?` | Radius applied to the dragged card once threshold is crossed. |
+| `backgroundBorderRadius` | `double?` | Radius applied to the background when swiping start-to-end. |
+| `secondaryBackgroundBorderRadius` | `double?` | Radius applied to the secondary background when swiping end-to-start. |
+| `collapseSpeed` | `double` | Speed of collapse animation after the card is dismissed. Higher Number = Faster Collapse, Lower Number = Slower Collapse |
+| `gap` | `double` | Vertical gap between cards. |
+| `color` | `Color?` | Card background colour. |
+| `padding` | `EdgeInsetsGeometry?` | Inner padding of each card's content area. |
+| `margin` | `EdgeInsetsGeometry?` | Outer margin around each card. |
+| `border` | `BorderSide?` | Optional border drawn on every card. |
+| `elevation` | `double` | Resting elevation. |
+| `background` | `Widget?` | Revealed background when swiping start-to-end. |
+| `secondaryBackground` | `Widget?` | Revealed background when swiping end-to-start. |
+| `splashColor` | `Color?` | Ink splash color. |
+| `highlightColor` | `Color?` | Ink highlight color. |
+| `splashFactory` | `InteractiveInkFeatureFactory?` | Splash factory. |
+| `enableFeedback` | `bool` | Whether gestures provide acoustic/haptic feedback. |
+| `hapticOnTap` | `int` | Haptic intensity on tap (0=none, 1=light, 2=medium, 3=heavy). |
+| `dismissThreshold` | `double` | Fraction of width before dismiss triggers. |
+| `hapticOnThreshold` | `int` | Haptic feedback level when crossing dismiss threshold. |
+| `dismissHapticStream` | `bool` | Fire continuous light haptics during drag. |
+| `neighbourPull` | `double` | Maximum pixel offset applied to neighbouring cards. |
+| `neighbourReach` | `int` | How many cards above + below the dragged card are affected. |
+| `neighbourStiffness` | `double` | Spring stiffness for neighbour snapping. |
+| `neighbourDamping` | `double` | Spring damping for neighbour snapping. |
 
 > *Variants Available:* `SliverM3EDismissibleCardList`, `M3EDismissibleCardColumn`
 
@@ -180,35 +174,35 @@ M3EExpandableCardList(
 ```
 
 **Constructor Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `itemCount` | `int` | **Required** | Number of expandable items. |
-| `headerBuilder` | `M3EExpandableHeaderBuilder` | **Required** | Builds the always-visible header section. |
-| `bodyBuilder` | `M3EExpandableBodyBuilder` | **Required** | Builds the hidden, expandable body section. |
-| `allowMultipleExpanded` | `bool` | `false` | If true, allows multiple items to be expanded simultaneously. |
-| `initiallyExpanded` | `Set<int>` | `{}` | Indices of initially expanded items. |
-| `outerRadius` | `double` | `24.0` | Outer radius for first/last items. |
-| `innerRadius` | `double` | `4.0` | Inner radius for middle items. |
-| `gap` | `double` | `3.0` | Gap between cards. |
-| `color` | `Color?` | `surfaceContainerHighest` | Background colour for each card. |
-| `headerPadding` | `EdgeInsetsGeometry?` | `EdgeInsets.all(16)` | Padding inside each header. |
-| `bodyPadding` | `EdgeInsetsGeometry?` | `EdgeInsets.fromLTRB(16,0,16,16)` | Padding inside each body. |
-| `margin` | `EdgeInsetsGeometry?` | `null` | Outer margin around each card. |
-| `border` | `BorderSide?` | `null` | Border drawn around each card. |
-| `elevation` | `double` | `0` | Elevation of the card. |
-| `selectedBorderRadius` | `BorderRadius?` | `null` | Custom border radius for expanded items (spring-animated). |
-| `showArrow` | `bool` | `true` | Shows an animated dropdown arrow in the header. |
-| `trailingIcon` | `Widget?` | `null` | Custom trailing widget, replaces default arrow when provided. |
-| `openStiffness` | `double` | `380` | Spring stiffness for the expand animation. |
-| `openDamping` | `double` | `0.75` | Spring damping ratio for the expand animation. |
-| `closeStiffness` | `double` | `380` | Spring stiffness for the collapse animation. |
-| `closeDamping` | `double` | `0.75` | Spring damping ratio for the collapse animation. |
-| `haptic` | `int` | `0` | Haptic feedback level on tap (0=none, 1=light, 2=medium, 3=heavy). |
-| `splashColor` | `Color?` | `null` | Ink splash colour. |
-| `highlightColor` | `Color?` | `null` | Ink highlight colour. |
-| `splashFactory` | `InteractiveInkFeatureFactory?` | `null` | Splash factory. |
-| `enableFeedback` | `bool` | `true` | Whether gestures provide acoustic/haptic feedback. |
-| `onExpansionChanged` | `void Function(int, bool)?` | `null` | Called when an item is expanded or collapsed. |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `itemCount` | `int` | Number of expandable items. |
+| `headerBuilder` | `M3EExpandableHeaderBuilder` | Builds the always-visible header section. |
+| `bodyBuilder` | `M3EExpandableBodyBuilder` | Builds the hidden, expandable body section. |
+| `allowMultipleExpanded` | `bool` | If true, allows multiple items to be expanded simultaneously. |
+| `initiallyExpanded` | `Set<int>` | Indices of initially expanded items. |
+| `outerRadius` | `double` | Outer radius for first/last items. |
+| `innerRadius` | `double` | Inner radius for middle items. |
+| `gap` | `double` | Gap between cards. |
+| `color` | `Color?` | Background colour for each card. |
+| `headerPadding` | `EdgeInsetsGeometry?` | Padding inside each header. |
+| `bodyPadding` | `EdgeInsetsGeometry?` | Padding inside each body. |
+| `margin` | `EdgeInsetsGeometry?` | Outer margin around each card. |
+| `border` | `BorderSide?` | Border drawn around each card. |
+| `elevation` | `double` | Elevation of the card. |
+| `selectedBorderRadius` | `BorderRadius?` | Custom border radius for expanded items (spring-animated). |
+| `showArrow` | `bool` | Shows an animated dropdown arrow in the header. |
+| `trailingIcon` | `Widget?` | Custom trailing widget, replaces default arrow when provided. |
+| `openStiffness` | `double` | Spring stiffness for the expand animation. |
+| `openDamping` | `double` | Spring damping ratio for the expand animation. |
+| `closeStiffness` | `double` | Spring stiffness for the collapse animation. |
+| `closeDamping` | `double` | Spring damping ratio for the collapse animation. |
+| `haptic` | `int` | Haptic feedback level on tap (0=none, 1=light, 2=medium, 3=heavy). |
+| `splashColor` | `Color?` | Ink splash colour. |
+| `highlightColor` | `Color?` | Ink highlight colour. |
+| `splashFactory` | `InteractiveInkFeatureFactory?` | Splash factory. |
+| `enableFeedback` | `bool` | Whether gestures provide acoustic/haptic feedback. |
+| `onExpansionChanged` | `void Function(int, bool)?` | Called when an item is expanded or collapsed. |
 
 > The `M3EExpandableCardList` variant also accepts `controller`, `physics`, `shrinkWrap`, and `padding` for scroll control.
 
@@ -370,111 +364,191 @@ M3EDropdownMenu<int>.future(
 ```
 
 **Constructor Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `items` | `List<M3EDropdownItem<T>>` | **Required** | List of dropdown items. |
-| `future` | `M3EDropdownFutureRequest<T>?` | `null` | Async item provider (use `.future()` constructor). |
-| `singleSelect` | `bool` | `false` | Limits to a single choice if true. |
-| `searchEnabled` | `bool` | `false` | Displays a search bar inside the overlay. |
-| `showChipAnimation` | `bool` | `true` | Chips slide / pop when selections change. |
-| `maxSelections` | `int` | `0 (Unlimited)` | Maximum allowed selections. |
-| `onSelectionChanged` | `ValueChanged<List<M3EDropdownItem<T>>>?` | `null` | Called whenever the selection changes. |
-| `onSearchChanged` | `ValueChanged<String>?` | `null` | Called when the search text changes. |
-| `controller` | `M3EDropdownController<T>?` | `null` | Optional programmatic controller. |
-| `enabled` | `bool` | `true` | Whether the dropdown is enabled. |
-| `containerRadius` | `double` | `28.0` | Radius for the dropdown panel and field (when no field radius is set). |
-| `fieldDecoration` | `M3EDropdownFieldDecoration` | `const` | Stylize the field placeholder, background, hint text, and icons. |
-| `dropdownDecoration` | `M3EDropdownDecoration` | `const` | Stylize the overlay panel height, colors, and shadow. |
-| `chipDecoration` | `M3EChipDecoration` | `const` | Stylize the chips, spacing, and pop animations. |
-| `searchDecoration` | `M3ESearchDecoration` | `const` | Stylize the search field inside the dropdown. |
-| `itemDecoration` | `M3EDropdownItemDecoration` | `const` | Stylize individual dropdown items. |
-| `itemBuilder` | `M3EDropdownItemBuilder<T>?` | `null` | Custom builder for each dropdown item. |
-| `selectedItemBuilder` | `Widget Function(M3EDropdownItem<T>)?` | `null` | Custom builder for selected items in the field. |
-| `itemSeparator` | `Widget?` | `null` | Widget placed between dropdown items. |
-| `validator` | `String? Function(List?)?` | `null` | Form validation callback. |
-| `autovalidateMode` | `AutovalidateMode` | `disabled` | Autovalidate mode for form integration. |
-| `focusNode` | `FocusNode?` | `null` | Focus node for the dropdown field. |
-| `closeOnBackButton` | `bool` | `false` | Close the dropdown on system back button press. |
-| `stiffness` | `double` | `380` | Spring stiffness for expand/collapse animation. |
-| `damping` | `double` | `0.8` | Spring damping for expand/collapse animation. |
-| `splashFactory` | `InteractiveInkFeatureFactory?` | `NoSplash.splashFactory` | Splash factory for tap feedback. |
-| `haptic` | `int` | `0` | Haptic feedback level on tap (0=none, 1=light, 2=medium, 3=heavy). |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `items` | `List<M3EDropdownItem<T>>` | List of dropdown items. |
+| `future` | `M3EDropdownFutureRequest<T>?` | Async item provider (use `.future()` constructor). |
+| `singleSelect` | `bool` | Limits to a single choice if true. |
+| `searchEnabled` | `bool` | Displays a search bar inside the overlay. |
+| `showChipAnimation` | `bool` | Chips slide / pop when selections change. |
+| `maxSelections` | `int` | Maximum allowed selections. |
+| `onSelectionChanged` | `ValueChanged<List<M3EDropdownItem<T>>>?` | Called whenever the selection changes. |
+| `onSearchChanged` | `ValueChanged<String>?` | Called when the search text changes. |
+| `controller` | `M3EDropdownController<T>?` | Optional programmatic controller. |
+| `enabled` | `bool` | Whether the dropdown is enabled. |
+| `containerRadius` | `double` | Radius for the dropdown panel and field (when no field radius is set). |
+| `fieldDecoration` | `M3EDropdownFieldDecoration` | Stylize the field placeholder, background, hint text, and icons. |
+| `dropdownDecoration` | `M3EDropdownDecoration` | Stylize the overlay panel height, colors, and shadow. |
+| `chipDecoration` | `M3EChipDecoration` | Stylize the chips, spacing, and pop animations. |
+| `searchDecoration` | `M3ESearchDecoration` | Stylize the search field inside the dropdown. |
+| `itemDecoration` | `M3EDropdownItemDecoration` | Stylize individual dropdown items. |
+| `itemBuilder` | `M3EDropdownItemBuilder<T>?` | Custom builder for each dropdown item. |
+| `selectedItemBuilder` | `Widget Function(M3EDropdownItem<T>)?` | Custom builder for selected items in the field. |
+| `itemSeparator` | `Widget?` | Widget placed between dropdown items. |
+| `validator` | `String? Function(List?)?` | Form validation callback. |
+| `autovalidateMode` | `AutovalidateMode` | Autovalidate mode for form integration. |
+| `focusNode` | `FocusNode?` | Focus node for the dropdown field. |
+| `closeOnBackButton` | `bool` | Close the dropdown on system back button press. |
+| `stiffness` | `double` | Spring stiffness for expand/collapse animation. |
+| `damping` | `double` | Spring damping for expand/collapse animation. |
+| `splashFactory` | `InteractiveInkFeatureFactory?` | Splash factory for tap feedback. |
+| `haptic` | `int` | Haptic feedback level on tap (0=none, 1=light, 2=medium, 3=heavy). |
 
 **`M3EDropdownFieldDecoration` Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `hintText` / `hintStyle` | `String?` / `TextStyle?` | - | Placeholder text and its style. |
-| `selectedTextStyle` | `TextStyle?` | - | Style for the selected value text (single-select). |
-| `prefixIcon` / `suffixIcon` | `Widget?` | - | Optional leading/trailing widgets. |
-| `backgroundColor` / `foregroundColor` | `Color?` | - | Colors for the field. |
-| `padding` / `margin` | `EdgeInsetsGeometry` | - | Inner content padding and outer margin. |
-| `border` / `focusedBorder` | `BorderSide?` | - | Resting and focused borders. |
-| `borderRadius` / `expandedBorderRadius` | `BorderRadius?` | - | Resting radius, and animated radius when open. |
-| `showArrow` | `bool` | `true` | Shows default animated chevron. |
-| `showClearIcon` | `bool` | `false` | Shows clear-all icon when selections exist. |
-| `animateSuffixIcon` | `bool` | `true` | Rotates suffix icon when expanded. |
-| `loadingWidget` | `Widget?` | `CircularProgressIndicator` | Widget shown while async loading. |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hintText` / `hintStyle` | `String?` / `TextStyle?` | Placeholder text and its style. |
+| `selectedTextStyle` | `TextStyle?` | Style for the selected value text (single-select). |
+| `prefixIcon` / `suffixIcon` | `Widget?` | Optional leading/trailing widgets. |
+| `backgroundColor` / `foregroundColor` | `Color?` | Colors for the field. |
+| `padding` / `margin` | `EdgeInsetsGeometry` | Inner content padding and outer margin. |
+| `border` / `focusedBorder` | `BorderSide?` | Resting and focused borders. |
+| `borderRadius` / `expandedBorderRadius` | `BorderRadius?` | Resting radius, and animated radius when open. |
+| `showArrow` | `bool` | Shows default animated chevron. |
+| `showClearIcon` | `bool` | Shows clear-all icon when selections exist. |
+| `animateSuffixIcon` | `bool` | Rotates suffix icon when expanded. |
+| `loadingWidget` | `Widget?` | Widget shown while async loading. |
 
 **`M3EDropdownDecoration` Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `backgroundColor` | `Color?` | - | Background color of the dropdown panel. |
-| `elevation` | `double` | `3` | Dropdown panel elevation. |
-| `maxHeight` | `double` | `350` | Maximum height bounds for the panel. |
-| `marginTop` | `double` | `4` | Gap between the field and panel. |
-| `expandDirection` | `ExpandDirection` | `auto` | Extends `up`, `down`, or `auto` based on screen space. |
-| `containerRadius` | `double?` | - | Overrides the menu's `containerRadius`. |
-| `contentPadding` | `EdgeInsetsGeometry` | `EdgeInsets.all(8)` | Inner padding for the list items. |
-| `noItemsFoundText` | `String` | `'No items found'` | Text when search yields nothing. |
-| `header` / `footer` | `Widget?` | - | Widgets placed above/below the items inside the panel. |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `backgroundColor` | `Color?` | Background color of the dropdown panel. |
+| `elevation` | `double` | Dropdown panel elevation. |
+| `maxHeight` | `double` | Maximum height bounds for the panel. |
+| `marginTop` | `double` | Gap between the field and panel. |
+| `expandDirection` | `ExpandDirection` | Extends `up`, `down`, or `auto` based on screen space. |
+| `containerRadius` | `double?` | Overrides the menu's `containerRadius`. |
+| `contentPadding` | `EdgeInsetsGeometry` | Inner padding for the list items. |
+| `noItemsFoundText` | `String` | Text when search yields nothing. |
+| `header` / `footer` | `Widget?` | Widgets placed above/below the items inside the panel. |
 
 **`M3EChipDecoration` Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `backgroundColor` | `Color?` | - | Chip background color. |
-| `labelStyle` | `TextStyle?` | - | Text style for the chip. |
-| `deleteIcon` | `Widget?` | - | Custom widget for deletion icon. |
-| `padding` | `EdgeInsetsGeometry` | - | Inner chip padding. |
-| `border` / `borderRadius` | `BorderSide?` / `BorderRadius` | - | Borders and radii (`Radius.circular(20)`). |
-| `wrap` | `bool` | `true` | Wraps chips instead of horizontal scroll. |
-| `spacing` / `runSpacing` | `double` | `6` | Horizontal & vertical distance between chips. |
-| `maxDisplayCount` | `int?` | - | Shows "+N more" if exceeding max count. |
-| `openStiffness` / `openDamping` | `double` | `380` / `0.8` | Spring mechanics for entry (scale-in). |
-| `closeStiffness` / `closeDamping` | `double` | `380` / `0.8` | Spring mechanics for exit (scale-out). |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `backgroundColor` | `Color?` | Chip background color. |
+| `labelStyle` | `TextStyle?` | Text style for the chip. |
+| `deleteIcon` | `Widget?` | Custom widget for deletion icon. |
+| `padding` | `EdgeInsetsGeometry` | Inner chip padding. |
+| `border` / `borderRadius` | `BorderSide?` / `BorderRadius` | Borders and radii (`Radius.circular(20)`). |
+| `wrap` | `bool` | Wraps chips instead of horizontal scroll. |
+| `spacing` / `runSpacing` | `double` | Horizontal & vertical distance between chips. |
+| `maxDisplayCount` | `int?` | Shows "+N more" if exceeding max count. |
+| `openStiffness` / `openDamping` | `double` | Spring mechanics for entry (scale-in). |
+| `closeStiffness` / `closeDamping` | `double` | Spring mechanics for exit (scale-out). |
 
 **`M3ESearchDecoration` Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `hintText` | `String` | `'Search…'` | Hint text shown in the search field. |
-| `hintStyle` | `TextStyle?` | - | Search field hint style. |
-| `textStyle` | `TextStyle?` | - | Search field text style. |
-| `fillColor` | `Color?` | - | Fill color for the search field. |
-| `filled` | `bool` | `false` | Whether the search field is filled. |
-| `autofocus` | `bool` | `false` | Auto-focus the search field when the dropdown opens. |
-| `showClearIcon` | `bool` | `true` | Whether to show a clear-search icon. |
-| `clearIcon` | `Widget?` | - | Custom clear icon widget. |
-| `searchDebounceMs` | `int` | `0` | Debounce duration in ms (0 = no debounce). |
-| `borderRadius` | `BorderRadius?` | - | Border radius of the search field. |
-| `contentPadding` | `EdgeInsetsGeometry` | `EdgeInsets.symmetric(horizontal: 12, vertical: 8)` | Content padding inside the search field. |
-| `margin` | `EdgeInsetsGeometry` | `EdgeInsets.fromLTRB(12, 8, 12, 4)` | Outer margin around the search field. |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `hintText` | `String` | Hint text shown in the search field. |
+| `hintStyle` | `TextStyle?` | Search field hint style. |
+| `textStyle` | `TextStyle?` | Search field text style. |
+| `fillColor` | `Color?` | Fill color for the search field. |
+| `filled` | `bool` | Whether the search field is filled. |
+| `autofocus` | `bool` | Auto-focus the search field when the dropdown opens. |
+| `showClearIcon` | `bool` | Whether to show a clear-search icon. |
+| `clearIcon` | `Widget?` | Custom clear icon widget. |
+| `searchDebounceMs` | `int` | Debounce duration in ms (0 = no debounce). |
+| `borderRadius` | `BorderRadius?` | Border radius of the search field. |
+| `contentPadding` | `EdgeInsetsGeometry` | Content padding inside the search field. |
+| `margin` | `EdgeInsetsGeometry` | Outer margin around the search field. |
 
 **`M3EDropdownItemDecoration` Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `backgroundColor` | `Color?` | - | Item background color. |
-| `selectedBackgroundColor` | `Color?` | - | Background color for selected items. |
-| `disabledBackgroundColor` | `Color?` | - | Background color for disabled items. |
-| `textColor` | `Color?` | - | Item text color. |
-| `selectedTextColor` | `Color?` | - | Text color for selected items. |
-| `disabledTextColor` | `Color?` | - | Text color for disabled items. |
-| `textStyle` | `TextStyle?` | - | Text style for item labels. |
-| `selectedTextStyle` | `TextStyle?` | - | Text style for selected item labels. |
-| `selectedIcon` | `Widget?` | `Icons.check_rounded` | Icon shown next to selected items. |
-| `outerRadius` | `double?` | `12.0` | Outer radius for first/last dropdown item cards. |
-| `innerRadius` | `double?` | `4.0` | Inner radius for middle dropdown item cards. |
-| `itemGap` | `double?` | `3.0` | Gap between items. |
-| `itemPadding` | `EdgeInsetsGeometry` | `EdgeInsets.symmetric(horizontal: 16, vertical: 12)` | Inner padding for each dropdown item. |
-| `selectedBorderRadius` | `double?` | `outerRadius` | Border radius applied to a selected item. |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `backgroundColor` | `Color?` | Item background color. |
+| `selectedBackgroundColor` | `Color?` | Background color for selected items. |
+| `disabledBackgroundColor` | `Color?` | Background color for disabled items. |
+| `textColor` | `Color?` | Item text color. |
+| `selectedTextColor` | `Color?` | Text color for selected items. |
+| `disabledTextColor` | `Color?` | Text color for disabled items. |
+| `textStyle` | `TextStyle?` | Text style for item labels. |
+| `selectedTextStyle` | `TextStyle?` | Text style for selected item labels. |
+| `selectedIcon` | `Widget?` | Icon shown next to selected items. |
+| `outerRadius` | `double?` | Outer radius for first/last dropdown item cards. |
+| `innerRadius` | `double?` | Inner radius for middle dropdown item cards. |
+| `itemGap` | `double?` | Gap between items. |
+| `itemPadding` | `EdgeInsetsGeometry` | Inner padding for each dropdown item. |
+| `selectedBorderRadius` | `double?` | Border radius applied to a selected item. |
+
+---
+
+## 5. Flutter M3 Shapes Extended
+
+A Flutter package for easily using the new **Material 3 Expressive Shapes**.
+
+Bring a unique and modern feel to your app with a wide variety of predefined shapes. This library provides simple widgets that are easy to customize and integrate into any project.
+
+### ✨ Features
+- **Extended Customization**: Now supports **shadows**, **borders**, **gradients**, and **margins** for all shapes.
+- **Complete Collection**: Includes the full suite of Material 3 expressive shapes like Gem, Slanted, Flower, and more.
+- **Highly Customizable**: Easily adjust the size, color, and child of any shape.
+- **Easy to Use**: A simple, declarative API lets you add expressive shapes in seconds.
+- **Lightweight & Performant**: Built with performance in mind using Flutter's `CustomClipper`.
+
+### Usage:
+
+You can use the shapes as a pure visual element without a child using `M3EShape`:
+
+<img src="https://i.postimg.cc/vmttVRNr/temp-Image-Ed-Qdd0.avif" alt="M3EShape Examples" width="400" />
+<br>
+
+Or you can use `M3EContainer` if you need to wrap a child widget and clip it exactly to the shape.
+
+<img src="https://i.postimg.cc/kXH86MMw/temp-Image-N6-HTyy.avif" alt="M3EShape Examples" width="400" />
+
+```dart
+// Using as a pure shape
+M3EShape.circle(
+    width: 100,
+    height: 100,
+    gradient: LinearGradient(
+        colors: [Colors.red, Colors.orange],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+    ),
+    border: BorderSide(color: Colors.black, width: 2),
+    boxShadow: [
+        BoxShadow(
+            color: Colors.black,
+            offset: Offset(0, 4),
+            blurRadius: 4,
+        ),
+    ],
+    padding: EdgeInsets.all(16),
+    margin: EdgeInsets.all(8),
+    clipBehavior: Clip.antiAlias,
+)
+
+// Using as a container with a child
+M3EContainer.gem(
+    width: 200,
+    height: 200,
+    color: Colors.blue,
+    child: Center(
+       child: Text("Gem Shape"),
+    ),
+)
+```
+
+Or using the general constructor:
+
+```dart
+M3EShape(
+    Shapes.<your_shape>, // Shapes.slanted
+    clipBehavior: clipBehavior,
+    height: height,
+    width: width,
+    color: color,
+    gradient: gradient,
+    border: border,
+    boxShadow: boxShadow,
+    padding: padding,
+    margin: margin,
+);
+```
+
+You can use all the `Shapes` in this enum:
+`circle`, `clampShell`, `square`, `slanted`, `arch`, `semicircle`, `oval`, `pill`, `triangle`, `arrow`, `fan`, `diamond`, `pentagon`, `gem`, `very_sunny`, `sunny`, `c4_sided_cookie`, `c6_sided_cookie`, `c7_sided_cookie`, `c9_sided_cookie`, `c12_sided_cookie`, `l4_leaf_clover`, `l8_leaf_clover`, `burst`, `soft_burst`, `boom`, `soft_boom`, `flower`, `puffy`, `puffy_diamond`, `ghostish`, `pixel_circle`, `pixel_triangle`, `bun`, `hearth`
 
 ---
 
@@ -491,6 +565,7 @@ Hope You Love It!
 ## Credits
 - [Motor](https://pub.dev/packages/motor) Pub Package for Expressive Animations
 - [Multi_dropdown](https://pub.dev/packages/multi_dropdown) Pub Package for Dropdown Menu
+- [flutter_m3shapes](https://pub.dev/packages/flutter_m3shapes) Base Package for M3 Shapes Extended
 - Claude and Gemini for helping me with the code and documentation.
 
 ### Radhe Radhe 🙏

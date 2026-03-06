@@ -1,5 +1,9 @@
-## 0.0.1
+## 0.0.2
+* Adds `M3EShape` for M3 shapes.
+* Adds `M3EContainer` for M3 containers.
+* Update the documentation
 
+## 0.0.1
 * Initial release.
 * Adds `M3ECardList`, `SliverM3ECardList`, and `M3ECardColumn` for standard and sliver static card lists.
 * Adds `M3EDismissibleCardList`, `SliverM3EDismissibleCardList`, and `M3EDismissibleCardColumn` for swipe-to-dismiss cards with spring-driven neighbour-pull effects.
