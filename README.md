@@ -2,9 +2,9 @@
 
 ![M3E Intro](https://raw.githubusercontent.com/Mudit200408/m3e_core/main/doc/intro.png)
 
-A comprehensive Flutter package providing Material 3 expressive card lists with dynamically rounded corners inside normal `ListView`s and `CustomScrollView`s (via slivers). Beyond static layouts, it offers **interactive dismissible cards**, **expandable cards**, and a highly customizable **dropdown menu**—all featuring expressive M3 styling and spring physics.
+A comprehensive Flutter package that combines **5 expressive Material 3 libraries** into one robust bundle: **Card Lists**, **Dismissible Cards**, **Expandable Cards**, **Dropdown Menus**, and **Extended M3 Shapes**. It brings the new [Material 3 Expressive](https://m3.material.io/blog/building-with-m3-expressive) styling to your app with dynamic border radii, beautiful spring physics, and tailored sliver support out of the box.
 
-It automatically calculates and draws the corners to fit exactly the [Material 3 Expressive](https://m3.material.io/blog/building-with-m3-expressive) spec for adjacent items. It gives extensive customization options including customizable splash ripples, custom border colors, custom elevation and highly tunable haptic feedback along with stiffness and damping for animations.
+Whether you need a simple static list, swipe-to-dismiss functionality with "neighbour pull" mechanics, animated expandable cards, a highly customizable dropdown menu with chip selections, or beautifully crafted M3 shapes, this unified package gives you robust customization options—from haptic feedback and custom border colors to tunable stiffness and damping for all animations.
 
 ---
 
