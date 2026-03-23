@@ -1,3 +1,7 @@
+## 0.0.3
+- Adds `M3EButton` for M3E buttons.
+- Update the documentation to make it more readable
+
 ## 0.0.2
 * Adds `M3EShape` for M3 shapes.
 * Adds `M3EContainer` for M3 containers.
