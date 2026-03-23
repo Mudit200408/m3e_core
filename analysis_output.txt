@@ -1,0 +1,17 @@
+Analyzing m3e_core...                                           
+
+   info • The constant name 'very_sunny' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:92:3 • constant_identifier_names
+   info • The constant name 'c4_sided_cookie' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:104:3 • constant_identifier_names
+   info • The constant name 'c6_sided_cookie' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:110:3 • constant_identifier_names
+   info • The constant name 'c7_sided_cookie' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:116:3 • constant_identifier_names
+   info • The constant name 'c9_sided_cookie' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:122:3 • constant_identifier_names
+   info • The constant name 'c12_sided_cookie' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:128:3 • constant_identifier_names
+   info • The constant name 'l4_leaf_clover' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:134:3 • constant_identifier_names
+   info • The constant name 'l8_leaf_clover' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:140:3 • constant_identifier_names
+   info • The constant name 'soft_burst' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:152:3 • constant_identifier_names
+   info • The constant name 'soft_boom' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:164:3 • constant_identifier_names
+   info • The constant name 'puffy_diamond' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:182:3 • constant_identifier_names
+   info • The constant name 'pixel_circle' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:194:3 • constant_identifier_names
+   info • The constant name 'pixel_triangle' isn't a lowerCamelCase identifier • lib/src/shapes/enums/shapes.dart:200:3 • constant_identifier_names
+
+13 issues found. (ran in 0.8s)

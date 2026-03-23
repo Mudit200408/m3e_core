@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens/dropdown_m3e_screen.dart';
+import 'screens/button_m3e_screen.dart';
 import 'screens/expandable_m3e_screen.dart';
 import 'screens/m3e_card_screen.dart';
 import 'screens/dismissible_m3e_screen.dart';
@@ -174,6 +175,14 @@ class ExampleHomePage extends StatelessWidget {
                 'Smooth OverlayPortal powered dropdowns with fluid chip morphing',
             icon: Icons.arrow_drop_down_circle_rounded,
             destination: const DropdownM3EScreen(),
+          ),
+          _buildNavCard(
+            context,
+            title: 'M3E Buttons',
+            subtitle:
+                'Expressive button system with neighbor squish, shape morphing, and overflow management',
+            icon: Icons.smart_button_rounded,
+            destination: const ButtonM3EScreen(),
           ),
         ],
       ),

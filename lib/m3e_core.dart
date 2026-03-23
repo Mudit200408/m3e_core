@@ -12,3 +12,6 @@ export 'src/expandable/expandable.dart';
 
 // M3 Shapes
 export 'src/shapes/m3e_shapes_core.dart';
+
+// M3E Buttons
+export 'src/buttons/button.dart';
