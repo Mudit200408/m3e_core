@@ -296,92 +296,47 @@ class M3ESplitButtonCheckboxStyle {
 /// - [M3EButtonSize] for size override options
 @immutable
 class M3ESplitButtonDecoration extends M3EButtonDecoration {
-  /// Background color for the trailing (menu trigger) segment.
-  ///
-  /// When null, uses the same background color as the leading segment
-  /// (determined by [M3EButtonDecoration.backgroundColor] or the style).
   final Color? trailingBackgroundColor;
-
-  /// Foreground color for the trailing (menu trigger) segment.
-  ///
-  /// When null, uses the same foreground color as the leading segment
-  /// (determined by [M3EButtonDecoration.foregroundColor] or the style).
   final Color? trailingForegroundColor;
-
-  /// Background color for the dropdown menu.
-  ///
-  /// When null, uses the same background color as the button container,
-  /// or [ColorScheme.surfaceContainerHigh] for transparent buttons.
   final Color? menuBackgroundColor;
-
-  /// Foreground color for the dropdown menu items.
-  ///
-  /// When null, uses the same foreground color as the button,
-  /// or [ColorScheme.onSurface] for transparent buttons.
   final Color? menuForegroundColor;
-
-  /// Color for the visual divider between leading and trailing segments.
-  ///
-  /// When null, no explicit divider color is set (uses Material default).
   final Color? dividerColor;
-
-  /// Custom size overrides for the leading segment.
-  ///
-  /// When provided, these values override the default measurements for
-  /// the specified [M3EButtonSize] for the leading action area.
   final M3EButtonSize? leadingCustomSize;
-
-  /// Custom size overrides for the trailing (menu trigger) segment.
-  ///
-  /// When provided, these values override the default measurements for
-  /// the trailing segment's width and padding.
   final M3EButtonSize? trailingCustomSize;
-
-  /// Corner radius when the trailing segment is selected/open.
-  ///
-  /// For round shape buttons, this defaults to half the button height
-  /// (creating a pill/circle shape). For square shapes, this controls
-  /// the corner radius during selection.
   final double? trailingSelectedRadius;
-
-  /// Gap between the leading and trailing segments.
-  ///
-  /// When null, uses the token default (typically 2-4dp depending on style).
   final double? gap;
-
-  /// Menu display style when using `items` parameter.
-  ///
-  /// - [SplitButtonMenuStyle.popup]: Spring-animated dropdown (default)
-  /// - [SplitButtonMenuStyle.bottomSheet]: Modal bottom sheet
-  /// - [SplitButtonMenuStyle.native]: Standard Flutter showMenu
   final SplitButtonMenuStyle menuStyle;
-
-  /// Decoration for the spring-animated popup menu.
-  ///
-  /// Use to customize background, elevation, border radius, and spring physics.
-  /// Only used when [menuStyle] is [SplitButtonMenuStyle.popup].
   final M3ESplitButtonPopupDecoration? popupDecoration;
-
-  /// Decoration for the bottom sheet menu.
-  ///
-  /// Use to customize title, drag handle, background, and shape.
-  /// Only used when [menuStyle] is [SplitButtonMenuStyle.bottomSheet].
   final M3ESplitButtonBottomSheetDecoration? bottomSheetDecoration;
 
   const M3ESplitButtonDecoration({
     super.backgroundColor,
     super.foregroundColor,
-    super.disabledBackgroundColor,
-    super.disabledForegroundColor,
-    super.borderSide,
-    super.borderRadius,
-    super.haptic,
+    super.shadowColor,
+    super.elevation,
+    super.side,
     super.mouseCursor,
-    super.hoveredRadius,
-    super.pressedRadius,
-    super.size,
     super.overlayColor,
     super.surfaceTintColor,
+    super.iconSize,
+    super.iconAlignment,
+    super.textStyle,
+    super.padding,
+    super.minimumSize,
+    super.fixedSize,
+    super.maximumSize,
+    super.visualDensity,
+    super.tapTargetSize,
+    super.animationDuration,
+    super.enableFeedback,
+    super.alignment,
+    super.splashFactory,
+    super.backgroundBuilder,
+    super.foregroundBuilder,
+    super.motion,
+    super.haptic,
+    super.hoveredRadius,
+    super.pressedRadius,
     this.trailingBackgroundColor,
     this.trailingForegroundColor,
     this.menuBackgroundColor,
@@ -396,22 +351,155 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
     this.bottomSheetDecoration,
   });
 
-  @override
-  M3ESplitButtonDecoration copyWith({
-    Color? backgroundColor,
+  static M3ESplitButtonDecoration styleFrom({
     Color? foregroundColor,
-    Color? disabledBackgroundColor,
+    Color? backgroundColor,
     Color? disabledForegroundColor,
-    BorderSide? borderSide,
-    BorderRadius? borderRadius,
+    Color? disabledBackgroundColor,
+    Color? shadowColor,
+    Color? surfaceTintColor,
+    Color? overlayColor,
+    double? iconSize,
+    IconAlignment? iconAlignment,
+    double? elevation,
+    TextStyle? textStyle,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    Size? fixedSize,
+    Size? maximumSize,
+    BorderSide? side,
+    MouseCursor? enabledMouseCursor,
+    MouseCursor? disabledMouseCursor,
+    VisualDensity? visualDensity,
+    MaterialTapTargetSize? tapTargetSize,
+    Duration? animationDuration,
+    bool? enableFeedback,
+    AlignmentGeometry? alignment,
+    InteractiveInkFeatureFactory? splashFactory,
+    ButtonLayerBuilder? backgroundBuilder,
+    ButtonLayerBuilder? foregroundBuilder,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
-    MouseCursor? mouseCursor,
     double? hoveredRadius,
     double? pressedRadius,
-    M3EButtonSize? size,
+    Color? trailingBackgroundColor,
+    Color? trailingForegroundColor,
+    Color? menuBackgroundColor,
+    Color? menuForegroundColor,
+    Color? dividerColor,
+    M3EButtonSize? leadingCustomSize,
+    M3EButtonSize? trailingCustomSize,
+    double? trailingSelectedRadius,
+    double? gap,
+    SplitButtonMenuStyle menuStyle = SplitButtonMenuStyle.popup,
+    M3ESplitButtonPopupDecoration? popupDecoration,
+    M3ESplitButtonBottomSheetDecoration? bottomSheetDecoration,
+  }) {
+    final base = M3EButtonDecoration.styleFrom(
+      foregroundColor: foregroundColor,
+      backgroundColor: backgroundColor,
+      disabledForegroundColor: disabledForegroundColor,
+      disabledBackgroundColor: disabledBackgroundColor,
+      shadowColor: shadowColor,
+      surfaceTintColor: surfaceTintColor,
+      overlayColor: overlayColor,
+      iconSize: iconSize,
+      iconAlignment: iconAlignment,
+      elevation: elevation,
+      textStyle: textStyle,
+      padding: padding,
+      minimumSize: minimumSize,
+      fixedSize: fixedSize,
+      maximumSize: maximumSize,
+      side: side,
+      enabledMouseCursor: enabledMouseCursor,
+      disabledMouseCursor: disabledMouseCursor,
+      visualDensity: visualDensity,
+      tapTargetSize: tapTargetSize,
+      animationDuration: animationDuration,
+      enableFeedback: enableFeedback,
+      alignment: alignment,
+      splashFactory: splashFactory,
+      backgroundBuilder: backgroundBuilder,
+      foregroundBuilder: foregroundBuilder,
+      motion: motion,
+      haptic: haptic,
+      hoveredRadius: hoveredRadius,
+      pressedRadius: pressedRadius,
+    );
+
+    return M3ESplitButtonDecoration(
+      backgroundColor: base.backgroundColor,
+      foregroundColor: base.foregroundColor,
+      shadowColor: base.shadowColor,
+      elevation: base.elevation,
+      side: base.side,
+      mouseCursor: base.mouseCursor,
+      overlayColor: base.overlayColor,
+      surfaceTintColor: base.surfaceTintColor,
+      iconSize: base.iconSize,
+      iconAlignment: base.iconAlignment,
+      textStyle: base.textStyle,
+      padding: base.padding,
+      minimumSize: base.minimumSize,
+      fixedSize: base.fixedSize,
+      maximumSize: base.maximumSize,
+      visualDensity: base.visualDensity,
+      tapTargetSize: base.tapTargetSize,
+      animationDuration: base.animationDuration,
+      enableFeedback: base.enableFeedback,
+      alignment: base.alignment,
+      splashFactory: base.splashFactory,
+      backgroundBuilder: base.backgroundBuilder,
+      foregroundBuilder: base.foregroundBuilder,
+      motion: base.motion,
+      haptic: base.haptic,
+      hoveredRadius: base.hoveredRadius,
+      pressedRadius: base.pressedRadius,
+      trailingBackgroundColor: trailingBackgroundColor,
+      trailingForegroundColor: trailingForegroundColor,
+      menuBackgroundColor: menuBackgroundColor,
+      menuForegroundColor: menuForegroundColor,
+      dividerColor: dividerColor,
+      leadingCustomSize: leadingCustomSize,
+      trailingCustomSize: trailingCustomSize,
+      trailingSelectedRadius: trailingSelectedRadius,
+      gap: gap,
+      menuStyle: menuStyle,
+      popupDecoration: popupDecoration,
+      bottomSheetDecoration: bottomSheetDecoration,
+    );
+  }
+
+  @override
+  M3ESplitButtonDecoration copyWith({
+    WidgetStateProperty<Color?>? backgroundColor,
+    WidgetStateProperty<Color?>? foregroundColor,
+    WidgetStateProperty<Color?>? shadowColor,
+    WidgetStateProperty<double?>? elevation,
+    WidgetStateProperty<BorderSide?>? side,
+    WidgetStateProperty<MouseCursor?>? mouseCursor,
     WidgetStateProperty<Color?>? overlayColor,
     WidgetStateProperty<Color?>? surfaceTintColor,
+    double? iconSize,
+    IconAlignment? iconAlignment,
+    TextStyle? textStyle,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    Size? fixedSize,
+    Size? maximumSize,
+    VisualDensity? visualDensity,
+    MaterialTapTargetSize? tapTargetSize,
+    Duration? animationDuration,
+    bool? enableFeedback,
+    AlignmentGeometry? alignment,
+    InteractiveInkFeatureFactory? splashFactory,
+    ButtonLayerBuilder? backgroundBuilder,
+    ButtonLayerBuilder? foregroundBuilder,
+    M3EMotion? motion,
+    M3EHapticFeedback? haptic,
+    double? hoveredRadius,
+    double? pressedRadius,
     Color? trailingBackgroundColor,
     Color? trailingForegroundColor,
     Color? menuBackgroundColor,
@@ -428,19 +516,31 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
     return M3ESplitButtonDecoration(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       foregroundColor: foregroundColor ?? this.foregroundColor,
-      disabledBackgroundColor:
-          disabledBackgroundColor ?? this.disabledBackgroundColor,
-      disabledForegroundColor:
-          disabledForegroundColor ?? this.disabledForegroundColor,
-      borderSide: borderSide ?? this.borderSide,
-      borderRadius: borderRadius ?? this.borderRadius,
-      haptic: haptic ?? this.haptic,
+      shadowColor: shadowColor ?? this.shadowColor,
+      elevation: elevation ?? this.elevation,
+      side: side ?? this.side,
       mouseCursor: mouseCursor ?? this.mouseCursor,
-      hoveredRadius: hoveredRadius ?? this.hoveredRadius,
-      pressedRadius: pressedRadius ?? this.pressedRadius,
-      size: size ?? this.size,
       overlayColor: overlayColor ?? this.overlayColor,
       surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
+      iconSize: iconSize ?? this.iconSize,
+      iconAlignment: iconAlignment ?? this.iconAlignment,
+      textStyle: textStyle ?? this.textStyle,
+      padding: padding ?? this.padding,
+      minimumSize: minimumSize ?? this.minimumSize,
+      fixedSize: fixedSize ?? this.fixedSize,
+      maximumSize: maximumSize ?? this.maximumSize,
+      visualDensity: visualDensity ?? this.visualDensity,
+      tapTargetSize: tapTargetSize ?? this.tapTargetSize,
+      animationDuration: animationDuration ?? this.animationDuration,
+      enableFeedback: enableFeedback ?? this.enableFeedback,
+      alignment: alignment ?? this.alignment,
+      splashFactory: splashFactory ?? this.splashFactory,
+      backgroundBuilder: backgroundBuilder ?? this.backgroundBuilder,
+      foregroundBuilder: foregroundBuilder ?? this.foregroundBuilder,
+      motion: motion ?? this.motion,
+      haptic: haptic ?? this.haptic,
+      hoveredRadius: hoveredRadius ?? this.hoveredRadius,
+      pressedRadius: pressedRadius ?? this.pressedRadius,
       trailingBackgroundColor:
           trailingBackgroundColor ?? this.trailingBackgroundColor,
       trailingForegroundColor:
@@ -466,17 +566,31 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
       other is M3ESplitButtonDecoration &&
           backgroundColor == other.backgroundColor &&
           foregroundColor == other.foregroundColor &&
-          disabledBackgroundColor == other.disabledBackgroundColor &&
-          disabledForegroundColor == other.disabledForegroundColor &&
-          borderSide == other.borderSide &&
-          borderRadius == other.borderRadius &&
-          haptic == other.haptic &&
+          shadowColor == other.shadowColor &&
+          elevation == other.elevation &&
+          side == other.side &&
           mouseCursor == other.mouseCursor &&
-          hoveredRadius == other.hoveredRadius &&
-          pressedRadius == other.pressedRadius &&
-          size == other.size &&
           overlayColor == other.overlayColor &&
           surfaceTintColor == other.surfaceTintColor &&
+          iconSize == other.iconSize &&
+          iconAlignment == other.iconAlignment &&
+          textStyle == other.textStyle &&
+          padding == other.padding &&
+          minimumSize == other.minimumSize &&
+          fixedSize == other.fixedSize &&
+          maximumSize == other.maximumSize &&
+          visualDensity == other.visualDensity &&
+          tapTargetSize == other.tapTargetSize &&
+          animationDuration == other.animationDuration &&
+          enableFeedback == other.enableFeedback &&
+          alignment == other.alignment &&
+          splashFactory == other.splashFactory &&
+          backgroundBuilder == other.backgroundBuilder &&
+          foregroundBuilder == other.foregroundBuilder &&
+          motion == other.motion &&
+          haptic == other.haptic &&
+          hoveredRadius == other.hoveredRadius &&
+          pressedRadius == other.pressedRadius &&
           trailingBackgroundColor == other.trailingBackgroundColor &&
           trailingForegroundColor == other.trailingForegroundColor &&
           menuBackgroundColor == other.menuBackgroundColor &&
@@ -494,18 +608,31 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
   int get hashCode => Object.hashAll([
     backgroundColor,
     foregroundColor,
-    disabledBackgroundColor,
-    disabledForegroundColor,
-    borderSide,
-    borderSide,
-    borderRadius,
-    haptic,
+    shadowColor,
+    elevation,
+    side,
     mouseCursor,
-    hoveredRadius,
-    pressedRadius,
-    size,
     overlayColor,
     surfaceTintColor,
+    iconSize,
+    iconAlignment,
+    textStyle,
+    padding,
+    minimumSize,
+    fixedSize,
+    maximumSize,
+    visualDensity,
+    tapTargetSize,
+    animationDuration,
+    enableFeedback,
+    alignment,
+    splashFactory,
+    backgroundBuilder,
+    foregroundBuilder,
+    motion,
+    haptic,
+    hoveredRadius,
+    pressedRadius,
     trailingBackgroundColor,
     trailingForegroundColor,
     menuBackgroundColor,

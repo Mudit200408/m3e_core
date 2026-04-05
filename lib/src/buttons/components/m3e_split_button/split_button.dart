@@ -16,8 +16,8 @@ const bool _kDefaultEnableFeedback = true;
 
 /// Controls how the trailing (dropdown) button aligns with the leading button.
 ///
-/// Used by [SplitButtonM3E] to control visual alignment of split segments.
-enum SplitButtonM3ETrailingAlignment {
+/// Used by [M3ESplitButton] to control visual alignment of split segments.
+enum M3ESplitButtonTrailingAlignment {
   /// Align using optical center to compensate for the dropdown arrow icon.
   ///
   /// The trailing button appears visually centered with the leading button.
@@ -37,10 +37,10 @@ enum SplitButtonM3ETrailingAlignment {
 ///
 /// ## Basic usage
 /// ```dart
-/// SplitButtonM3E<int>(
+/// M3ESplitButton<int>(
 ///   items: const [
-///     SplitButtonM3EItem(value: 1, child: Text('Option 1')),
-///     SplitButtonM3EItem(value: 2, child: Text('Option 2')),
+///     M3ESplitButtonItem(value: 1, child: Text('Option 1')),
+///     M3ESplitButtonItem(value: 2, child: Text('Option 2')),
 ///   ],
 ///   onSelected: (value) {},
 ///   onPressed: () {},
@@ -52,8 +52,8 @@ enum SplitButtonM3ETrailingAlignment {
 /// - [SplitButtonMenuStyle.popup]: Spring-animated popup (default)
 /// - [SplitButtonMenuStyle.bottomSheet]: Modal bottom sheet
 /// - [SplitButtonMenuStyle.native]: System popup menu
-class SplitButtonM3E<T> extends StatefulWidget {
-  const SplitButtonM3E({
+class M3ESplitButton<T> extends StatefulWidget {
+  const M3ESplitButton({
     super.key,
     required this.items,
     this.onSelected,
@@ -63,7 +63,7 @@ class SplitButtonM3E<T> extends StatefulWidget {
     this.size = M3EButtonSize.sm,
     this.shape = M3EButtonShape.round,
     this.style = M3EButtonStyle.filled,
-    this.trailingAlignment = SplitButtonM3ETrailingAlignment.opticalCenter,
+    this.trailingAlignment = M3ESplitButtonTrailingAlignment.opticalCenter,
     this.leadingTooltip,
     this.trailingTooltip,
     this.enabled = true,
@@ -86,13 +86,18 @@ class SplitButtonM3E<T> extends StatefulWidget {
        ),
        assert(
          style != M3EButtonStyle.text,
-         'SplitButtonM3E does not support M3EButtonStyle.text.',
+         'M3ESplitButton does not support M3EButtonStyle.text.',
+       ),
+       assert(
+         !enabled || onPressed != null || onSelected != null || menuBuilder != null,
+         'Provide either onPressed, onSelected, or a custom menuBuilder when the split button is enabled.',
        );
+
 
   /// Menu items displayed when the trailing button is pressed.
   ///
-  /// Use [SplitButtonM3EItem] to create items with a value and display widget.
-  final List<SplitButtonM3EItem<T>>? items;
+  /// Use [M3ESplitButtonItem] to create items with a value and display widget.
+  final List<M3ESplitButtonItem<T>>? items;
 
   /// Callback fired when an item is selected from the menu.
   final ValueChanged<T>? onSelected;
@@ -124,8 +129,8 @@ class SplitButtonM3E<T> extends StatefulWidget {
 
   /// How the trailing button aligns with the leading button.
   ///
-  /// See [SplitButtonM3ETrailingAlignment] for alignment options.
-  final SplitButtonM3ETrailingAlignment trailingAlignment;
+  /// See [M3ESplitButtonTrailingAlignment] for alignment options.
+  final M3ESplitButtonTrailingAlignment trailingAlignment;
 
   /// Tooltip for the leading button.
   final String? leadingTooltip;
@@ -186,8 +191,10 @@ class SplitButtonM3E<T> extends StatefulWidget {
   /// See [InteractiveInkFeatureFactory] for available options.
   final InteractiveInkFeatureFactory? splashFactory;
 
-  Color? get decorationBackgroundColor => decoration?.backgroundColor;
-  Color? get decorationForegroundColor => decoration?.foregroundColor;
+  WidgetStateProperty<Color?>? get decorationBackgroundColor =>
+      decoration?.backgroundColor;
+  WidgetStateProperty<Color?>? get decorationForegroundColor =>
+      decoration?.foregroundColor;
   Color? get decorationTrailingBackgroundColor =>
       decoration?.trailingBackgroundColor;
   Color? get decorationTrailingForegroundColor =>
@@ -201,7 +208,8 @@ class SplitButtonM3E<T> extends StatefulWidget {
   double? get decorationGap => decoration?.gap;
   Color? get decorationMenuBackgroundColor => decoration?.menuBackgroundColor;
   Color? get decorationMenuForegroundColor => decoration?.menuForegroundColor;
-  BorderSide? get decorationBorderSide => decoration?.borderSide;
+  WidgetStateProperty<BorderSide?>? get decorationBorderSide =>
+      decoration?.side;
   M3EHapticFeedback get decorationHaptic =>
       decoration?.haptic ?? M3EHapticFeedback.none;
   WidgetStateProperty<Color?>? get decorationOverlayColor =>
@@ -210,11 +218,11 @@ class SplitButtonM3E<T> extends StatefulWidget {
       decoration?.surfaceTintColor;
 
   @override
-  State<SplitButtonM3E<T>> createState() => _SplitButtonM3EState<T>();
+  State<M3ESplitButton<T>> createState() => _M3ESplitButtonState<T>();
 }
 
-class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
-    with M3EBaseButtonState<SplitButtonM3E<T>> {
+class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
+    with M3EBaseButtonState<M3ESplitButton<T>> {
   bool _menuOpen = false;
   bool _trailingPressed = false;
   bool _isTrailingHovered = false;
@@ -272,7 +280,7 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
   }
 
   @override
-  void didUpdateWidget(covariant SplitButtonM3E<T> oldWidget) {
+  void didUpdateWidget(covariant M3ESplitButton<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     handleStatesControllerUpdate(
       oldWidget.statesController,
@@ -427,7 +435,7 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
 
     final trailingIconOffsetBase =
         (widget.trailingAlignment ==
-                SplitButtonM3ETrailingAlignment.opticalCenter &&
+                M3ESplitButtonTrailingAlignment.opticalCenter &&
             !_menuOpen)
         ? _tokens.splitMenuIconOffset(size)
         : 0.0;
@@ -447,8 +455,9 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
       outlineSide: outlineSide,
       radius: leadingRadius,
       customSize: leadingCustomSize,
-      // `focused` here tracks only the leading FocusNode via isFocusedNotifier.
       focused: focused,
+      hovered: leadingHovered,
+      pressed: leadingPressed,
     );
 
     final trailing = _buildTrailingSegment(
@@ -469,8 +478,9 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
       chevronTargetTurns: chevronTargetTurns,
       chevronDxOffset: circleTrailing ? 0.0 : trailingIconOffsetBase,
       customSize: trailingCustomSize,
-      // Use the dedicated trailing focus state, not the shared leading one.
       focused: _isTrailingFocused,
+      hovered: trailingHovered,
+      pressed: trailingPressed,
     );
 
     final theme = Theme.of(context);
@@ -519,6 +529,8 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
     required _CornerRadii radius,
     required M3EButtonSize? customSize,
     required bool focused,
+    required bool hovered,
+    required bool pressed,
   }) {
     final size = widget.size;
     final targetRadius = radius.toBorderRadius(Directionality.of(context));
@@ -581,7 +593,11 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
             statesController: statesController,
             canRequestFocus: false,
             mouseCursor:
-                widget.decoration?.mouseCursor ??
+                widget.decoration?.mouseCursor?.resolve({
+                  if (hovered) WidgetState.hovered,
+                  if (pressed) WidgetState.pressed,
+                  if (focused) WidgetState.focused,
+                }) ??
                 widget.mouseCursor ??
                 SystemMouseCursors.click,
             enableFeedback: widget.enableFeedback,
@@ -640,6 +656,8 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
     required double chevronDxOffset,
     required M3EButtonSize? customSize,
     required bool focused,
+    required bool hovered,
+    required bool pressed,
   }) {
     final targetRadius = radius.toBorderRadius(Directionality.of(context));
     final effectiveWidth = fixedWidth < minTap ? minTap : fixedWidth;
@@ -712,7 +730,11 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
                   }
                 : null,
             mouseCursor:
-                widget.decoration?.mouseCursor ??
+                widget.decoration?.mouseCursor?.resolve({
+                  if (hovered) WidgetState.hovered,
+                  if (pressed) WidgetState.pressed,
+                  if (focused) WidgetState.focused,
+                }) ??
                 widget.mouseCursor ??
                 SystemMouseCursors.click,
             onHover: widget.enabled
@@ -774,9 +796,10 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
     BuildContext context,
   ) {
     Color fgColor =
-        widget.decorationForegroundColor ?? _tokens.foreground(widget.style);
+        widget.decorationForegroundColor?.resolve({}) ??
+        _tokens.foreground(widget.style);
     Color bgColor =
-        widget.decorationBackgroundColor ??
+        widget.decorationBackgroundColor?.resolve({}) ??
         (widget.style == M3EButtonStyle.outlined
             ? Colors.transparent
             : _tokens.container(widget.style));
@@ -784,19 +807,23 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
     BorderSide? outlineSide;
     if (widget.style == M3EButtonStyle.outlined) {
       outlineSide =
-          widget.decorationBorderSide ?? BorderSide(color: _tokens.outline());
+          widget.decorationBorderSide?.resolve({}) ??
+          BorderSide(color: _tokens.outline());
     }
 
     if (!widget.enabled || widget.onPressed == null) {
       final cs = _tokens.c;
       fgColor =
-          widget.decoration?.disabledForegroundColor ??
+          widget.decoration?.foregroundColor?.resolve({WidgetState.disabled}) ??
           cs.onSurface.withValues(
             alpha: ButtonConstants.kDisabledForegroundAlpha,
           );
 
-      if (widget.decoration?.disabledBackgroundColor != null) {
-        bgColor = widget.decoration!.disabledBackgroundColor!;
+      if (widget.decoration?.backgroundColor?.resolve({WidgetState.disabled}) !=
+          null) {
+        bgColor = widget.decoration!.backgroundColor!.resolve({
+          WidgetState.disabled,
+        })!;
       } else {
         bgColor = (widget.style == M3EButtonStyle.outlined)
             ? Colors.transparent
@@ -810,7 +837,8 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
           color: cs.onSurface.withValues(
             alpha: ButtonConstants.kDisabledOutlineAlpha,
           ),
-          width: 1,
+          width: outlineSide.width,
+          style: outlineSide.style,
         );
       }
     }
@@ -897,7 +925,7 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
 
   Future<void> _showSpringPopup(
     BuildContext context,
-    List<SplitButtonM3EItem<T>> items,
+    List<M3ESplitButtonItem<T>> items,
   ) async {
     setState(() => _menuOpen = true);
 
@@ -936,7 +964,7 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
 
   Future<void> _showBottomSheet(
     BuildContext context,
-    List<SplitButtonM3EItem<T>> items,
+    List<M3ESplitButtonItem<T>> items,
   ) async {
     setState(() => _menuOpen = true);
 
@@ -987,7 +1015,7 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
 
   Future<void> _showNativeMenu(
     BuildContext context, {
-    List<SplitButtonM3EItem<T>>? items,
+    List<M3ESplitButtonItem<T>>? items,
   }) async {
     setState(() => _menuOpen = true);
 
@@ -1083,16 +1111,16 @@ class _SplitButtonM3EState<T> extends State<SplitButtonM3E<T>>
   }
 }
 
-/// A selectable option used by [SplitButtonM3E] menus.
-class SplitButtonM3EItem<T> {
-  /// Creates a menu item model for [SplitButtonM3E].
-  const SplitButtonM3EItem({
+/// A selectable option used by [M3ESplitButton] menus.
+class M3ESplitButtonItem<T> {
+  /// Creates a menu item model for [M3ESplitButton].
+  const M3ESplitButtonItem({
     required this.value,
     required this.child,
     this.enabled = true,
   });
 
-  /// Value returned through [SplitButtonM3E.onSelected] when this item is chosen.
+  /// Value returned through [M3ESplitButton.onSelected] when this item is chosen.
   final T value;
 
   /// Content shown in the menu item.
@@ -1219,4 +1247,136 @@ class _CornerRadii {
       bottomEnd: Radius.circular(bottomEnd),
     ).resolve(direction);
   }
+}
+
+// ── Specialized subclasses ────────────────────────────────────────────────────
+
+/// A filled-style [M3ESplitButton].
+///
+/// Equivalent to `M3ESplitButton(style: M3EButtonStyle.filled, ...)`.
+class M3EFilledSplitButton<T> extends M3ESplitButton<T> {
+  const M3EFilledSplitButton({
+    super.key,
+    required super.items,
+    super.onSelected,
+    super.onPressed,
+    super.label,
+    super.leadingIcon,
+    super.size,
+    super.shape,
+    super.trailingAlignment,
+    super.leadingTooltip,
+    super.trailingTooltip,
+    super.enabled,
+    super.menuBuilder,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.selectedValue,
+    super.onMultiSelected,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(style: M3EButtonStyle.filled);
+
+  /// A tonal-style [M3ESplitButton].
+  ///
+  /// Equivalent to `M3ESplitButton(style: M3EButtonStyle.tonal, ...)`.
+  const M3EFilledSplitButton.tonal({
+    super.key,
+    required super.items,
+    super.onSelected,
+    super.onPressed,
+    super.label,
+    super.leadingIcon,
+    super.size,
+    super.shape,
+    super.trailingAlignment,
+    super.leadingTooltip,
+    super.trailingTooltip,
+    super.enabled,
+    super.menuBuilder,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.selectedValue,
+    super.onMultiSelected,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(style: M3EButtonStyle.tonal);
+}
+
+/// An elevated-style [M3ESplitButton].
+///
+/// Equivalent to `M3ESplitButton(style: M3EButtonStyle.elevated, ...)`.
+class M3EElevatedSplitButton<T> extends M3ESplitButton<T> {
+  const M3EElevatedSplitButton({
+    super.key,
+    required super.items,
+    super.onSelected,
+    super.onPressed,
+    super.label,
+    super.leadingIcon,
+    super.size,
+    super.shape,
+    super.trailingAlignment,
+    super.leadingTooltip,
+    super.trailingTooltip,
+    super.enabled,
+    super.menuBuilder,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.selectedValue,
+    super.onMultiSelected,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(style: M3EButtonStyle.elevated);
+}
+
+/// An outlined-style [M3ESplitButton].
+///
+/// Equivalent to `M3ESplitButton(style: M3EButtonStyle.outlined, ...)`.
+class M3EOutlinedSplitButton<T> extends M3ESplitButton<T> {
+  const M3EOutlinedSplitButton({
+    super.key,
+    required super.items,
+    super.onSelected,
+    super.onPressed,
+    super.label,
+    super.leadingIcon,
+    super.size,
+    super.shape,
+    super.trailingAlignment,
+    super.leadingTooltip,
+    super.trailingTooltip,
+    super.enabled,
+    super.menuBuilder,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.selectedValue,
+    super.onMultiSelected,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(style: M3EButtonStyle.outlined);
 }

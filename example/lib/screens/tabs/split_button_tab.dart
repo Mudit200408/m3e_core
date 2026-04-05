@@ -27,37 +27,36 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
-                style: M3EButtonStyle.filled,
+              M3EFilledSplitButton<String>(
                 label: 'Filled',
+                leadingTooltip: 'leading',
+                trailingTooltip: 'trailing',
                 leadingIcon: Icons.save_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'save', child: Text('Save')),
-                  SplitButtonM3EItem(value: 'save_as', child: Text('Save As')),
-                  SplitButtonM3EItem(value: 'export', child: Text('Export')),
+                  M3ESplitButtonItem(value: 'save', child: Text('Save')),
+                  M3ESplitButtonItem(value: 'save_as', child: Text('Save As')),
+                  M3ESplitButtonItem(value: 'export', child: Text('Export')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
-                style: M3EButtonStyle.tonal,
+              M3EFilledSplitButton<String>.tonal(
                 label: 'Tonal',
                 leadingIcon: Icons.share_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'share', child: Text('Share')),
-                  SplitButtonM3EItem(value: 'copy', child: Text('Copy Link')),
-                  SplitButtonM3EItem(value: 'email', child: Text('Email')),
+                  M3ESplitButtonItem(value: 'share', child: Text('Share')),
+                  M3ESplitButtonItem(value: 'copy', child: Text('Copy Link')),
+                  M3ESplitButtonItem(value: 'email', child: Text('Email')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
-                style: M3EButtonStyle.elevated,
+              M3EElevatedSplitButton<String>(
                 label: 'Elevated',
                 leadingIcon: Icons.upload_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'upload', child: Text('Upload')),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(value: 'upload', child: Text('Upload')),
+                  M3ESplitButtonItem(
                     value: 'cloud',
                     child: Text('Cloud Upload'),
                   ),
@@ -65,21 +64,20 @@ class SplitButtonTab extends StatelessWidget {
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
-                style: M3EButtonStyle.outlined,
+              M3EOutlinedSplitButton<String>(
                 label: 'Outlined',
                 items: const [
-                  SplitButtonM3EItem(value: 'option1', child: Text('Option 1')),
-                  SplitButtonM3EItem(value: 'option2', child: Text('Option 2')),
-                  SplitButtonM3EItem(value: 'option3', child: Text('Option 3')),
+                  M3ESplitButtonItem(value: 'option1', child: Text('Option 1')),
+                  M3ESplitButtonItem(value: 'option2', child: Text('Option 2')),
+                  M3ESplitButtonItem(value: 'option3', child: Text('Option 3')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              const SplitButtonM3E<String>(
+              const M3EFilledSplitButton<String>(
                 label: 'Disabled',
                 items: [
-                  SplitButtonM3EItem(value: 'a', child: Text('Option A')),
+                  M3ESplitButtonItem(value: 'a', child: Text('Option A')),
                 ],
                 enabled: false,
               ),
@@ -94,57 +92,57 @@ class SplitButtonTab extends StatelessWidget {
             runSpacing: 10,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 size: M3EButtonSize.xs,
                 style: M3EButtonStyle.tonal,
                 label: 'XS',
                 items: const [
-                  SplitButtonM3EItem(value: 'xs1', child: Text('XS Option 1')),
-                  SplitButtonM3EItem(value: 'xs2', child: Text('XS Option 2')),
+                  M3ESplitButtonItem(value: 'xs1', child: Text('XS Option 1')),
+                  M3ESplitButtonItem(value: 'xs2', child: Text('XS Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 size: M3EButtonSize.sm,
                 style: M3EButtonStyle.tonal,
                 label: 'SM',
                 items: const [
-                  SplitButtonM3EItem(value: 'sm1', child: Text('SM Option 1')),
-                  SplitButtonM3EItem(value: 'sm2', child: Text('SM Option 2')),
+                  M3ESplitButtonItem(value: 'sm1', child: Text('SM Option 1')),
+                  M3ESplitButtonItem(value: 'sm2', child: Text('SM Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 size: M3EButtonSize.md,
                 style: M3EButtonStyle.tonal,
                 label: 'MD',
                 items: const [
-                  SplitButtonM3EItem(value: 'md1', child: Text('MD Option 1')),
-                  SplitButtonM3EItem(value: 'md2', child: Text('MD Option 2')),
+                  M3ESplitButtonItem(value: 'md1', child: Text('MD Option 1')),
+                  M3ESplitButtonItem(value: 'md2', child: Text('MD Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 size: M3EButtonSize.lg,
                 style: M3EButtonStyle.tonal,
                 label: 'LG',
                 items: const [
-                  SplitButtonM3EItem(value: 'lg1', child: Text('LG Option 1')),
-                  SplitButtonM3EItem(value: 'lg2', child: Text('LG Option 2')),
+                  M3ESplitButtonItem(value: 'lg1', child: Text('LG Option 1')),
+                  M3ESplitButtonItem(value: 'lg2', child: Text('LG Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 size: M3EButtonSize.xl,
                 style: M3EButtonStyle.tonal,
                 label: 'XL',
                 items: const [
-                  SplitButtonM3EItem(value: 'xl1', child: Text('XL Option 1')),
-                  SplitButtonM3EItem(value: 'xl2', child: Text('XL Option 2')),
+                  M3ESplitButtonItem(value: 'xl1', child: Text('XL Option 1')),
+                  M3ESplitButtonItem(value: 'xl2', child: Text('XL Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -159,15 +157,15 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 shape: M3EButtonShape.round,
                 label: 'Round',
                 items: const [
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'r1',
                     child: Text('Round Option 1'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'r2',
                     child: Text('Round Option 2'),
                   ),
@@ -175,15 +173,15 @@ class SplitButtonTab extends StatelessWidget {
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 shape: M3EButtonShape.square,
                 label: 'Square',
                 items: const [
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 's1',
                     child: Text('Square Option 1'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 's2',
                     child: Text('Square Option 2'),
                   ),
@@ -201,16 +199,16 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 label: 'With Icon',
                 leadingIcon: Icons.settings_rounded,
 
                 items: const [
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'settings',
                     child: Text('Settings'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'preferences',
                     child: Text('Preferences'),
                   ),
@@ -218,20 +216,20 @@ class SplitButtonTab extends StatelessWidget {
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 leadingIcon: Icons.add_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'add1', child: Text('Add Item')),
-                  SplitButtonM3EItem(value: 'add2', child: Text('Add Another')),
+                  M3ESplitButtonItem(value: 'add1', child: Text('Add Item')),
+                  M3ESplitButtonItem(value: 'add2', child: Text('Add Another')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 label: 'Label Only',
                 items: const [
-                  SplitButtonM3EItem(value: 'opt1', child: Text('Option 1')),
-                  SplitButtonM3EItem(value: 'opt2', child: Text('Option 2')),
+                  M3ESplitButtonItem(value: 'opt1', child: Text('Option 1')),
+                  M3ESplitButtonItem(value: 'opt2', child: Text('Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -250,22 +248,24 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
-                  backgroundColor: cs.primaryContainer,
-                  foregroundColor: cs.onPrimaryContainer,
+                  backgroundColor: WidgetStatePropertyAll(cs.primaryContainer),
+                  foregroundColor: WidgetStatePropertyAll(
+                    cs.onPrimaryContainer,
+                  ),
                   haptic: M3EHapticFeedback.light,
                 ),
                 label: 'Custom BG',
                 leadingIcon: Icons.palette_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'color1', child: Text('Color 1')),
-                  SplitButtonM3EItem(value: 'color2', child: Text('Color 2')),
+                  M3ESplitButtonItem(value: 'color1', child: Text('Color 1')),
+                  M3ESplitButtonItem(value: 'color2', child: Text('Color 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   trailingBackgroundColor: cs.errorContainer,
                   trailingForegroundColor: cs.onErrorContainer,
@@ -273,8 +273,8 @@ class SplitButtonTab extends StatelessWidget {
                 ),
                 label: 'Custom Trailing',
                 items: const [
-                  SplitButtonM3EItem(value: 't1', child: Text('Trailing 1')),
-                  SplitButtonM3EItem(value: 't2', child: Text('Trailing 2')),
+                  M3ESplitButtonItem(value: 't1', child: Text('Trailing 1')),
+                  M3ESplitButtonItem(value: 't2', child: Text('Trailing 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -293,7 +293,7 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   leadingCustomSize: M3EButtonSize.custom(
                     height: 52,
@@ -302,20 +302,20 @@ class SplitButtonTab extends StatelessWidget {
                 ),
                 label: 'Leading Custom',
                 items: const [
-                  SplitButtonM3EItem(value: 'c1', child: Text('Custom 1')),
-                  SplitButtonM3EItem(value: 'c2', child: Text('Custom 2')),
+                  M3ESplitButtonItem(value: 'c1', child: Text('Custom 1')),
+                  M3ESplitButtonItem(value: 'c2', child: Text('Custom 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   trailingCustomSize: M3EButtonSize.custom(width: 60),
                 ),
                 label: 'Trailing Custom',
                 items: const [
-                  SplitButtonM3EItem(value: 'tc1', child: Text('Trailing 1')),
-                  SplitButtonM3EItem(value: 'tc2', child: Text('Trailing 2')),
+                  M3ESplitButtonItem(value: 'tc1', child: Text('Trailing 1')),
+                  M3ESplitButtonItem(value: 'tc2', child: Text('Trailing 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -334,20 +334,20 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.filled,
                 label: 'Popup (Default)',
                 leadingIcon: Icons.arrow_drop_down_rounded,
                 items: const [
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'p1',
                     child: Text('Popup Option 1'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'p2',
                     child: Text('Popup Option 2'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'p3',
                     child: Text('Popup Option 3'),
                   ),
@@ -359,7 +359,7 @@ class SplitButtonTab extends StatelessWidget {
                   ).showSnackBar(SnackBar(content: Text('Selected: $value')));
                 },
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: const M3ESplitButtonDecoration(
                   menuStyle: SplitButtonMenuStyle.bottomSheet,
                 ),
@@ -367,15 +367,15 @@ class SplitButtonTab extends StatelessWidget {
                 label: 'Bottom Sheet',
                 leadingIcon: Icons.keyboard_arrow_down_rounded,
                 items: const [
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'bs1',
                     child: Text('Sheet Option 1'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'bs2',
                     child: Text('Sheet Option 2'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'bs3',
                     child: Text('Sheet Option 3'),
                   ),
@@ -387,7 +387,7 @@ class SplitButtonTab extends StatelessWidget {
                   ).showSnackBar(SnackBar(content: Text('Selected: $value')));
                 },
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: const M3ESplitButtonDecoration(
                   menuStyle: SplitButtonMenuStyle.native,
                 ),
@@ -395,15 +395,15 @@ class SplitButtonTab extends StatelessWidget {
                 label: 'Native',
                 leadingIcon: Icons.menu_rounded,
                 items: const [
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'n1',
                     child: Text('Native Option 1'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'n2',
                     child: Text('Native Option 2'),
                   ),
-                  SplitButtonM3EItem(
+                  M3ESplitButtonItem(
                     value: 'n3',
                     child: Text('Native Option 3'),
                   ),
@@ -429,7 +429,7 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   popupDecoration: M3ESplitButtonPopupDecoration(
                     motion: M3EMotion.custom(200, 0.6),
@@ -441,8 +441,8 @@ class SplitButtonTab extends StatelessWidget {
                 label: 'Bouncy',
                 leadingIcon: Icons.sports_basketball_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'b1', child: Text('Bouncy 1')),
-                  SplitButtonM3EItem(value: 'b2', child: Text('Bouncy 2')),
+                  M3ESplitButtonItem(value: 'b1', child: Text('Bouncy 1')),
+                  M3ESplitButtonItem(value: 'b2', child: Text('Bouncy 2')),
                 ],
                 onPressed: () {},
                 onSelected: (value) {
@@ -451,7 +451,7 @@ class SplitButtonTab extends StatelessWidget {
                   ).showSnackBar(SnackBar(content: Text('Selected: $value')));
                 },
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   popupDecoration: M3ESplitButtonPopupDecoration(
                     motion: M3EMotion.custom(600, 0.95),
@@ -462,8 +462,8 @@ class SplitButtonTab extends StatelessWidget {
                 label: 'Snappy',
                 leadingIcon: Icons.flash_on_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 's1', child: Text('Snappy 1')),
-                  SplitButtonM3EItem(value: 's2', child: Text('Snappy 2')),
+                  M3ESplitButtonItem(value: 's1', child: Text('Snappy 1')),
+                  M3ESplitButtonItem(value: 's2', child: Text('Snappy 2')),
                 ],
                 onPressed: () {},
                 onSelected: (value) {
@@ -486,7 +486,7 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   menuStyle: SplitButtonMenuStyle.bottomSheet,
                   bottomSheetDecoration: M3ESplitButtonBottomSheetDecoration(
@@ -499,9 +499,9 @@ class SplitButtonTab extends StatelessWidget {
                 label: 'With Title',
                 leadingIcon: Icons.folder_open_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'f1', child: Text('Open File')),
-                  SplitButtonM3EItem(value: 'f2', child: Text('Open Folder')),
-                  SplitButtonM3EItem(value: 'f3', child: Text('Open Recent')),
+                  M3ESplitButtonItem(value: 'f1', child: Text('Open File')),
+                  M3ESplitButtonItem(value: 'f2', child: Text('Open Folder')),
+                  M3ESplitButtonItem(value: 'f3', child: Text('Open Recent')),
                 ],
                 onPressed: () {},
                 onSelected: (value) {
@@ -510,7 +510,7 @@ class SplitButtonTab extends StatelessWidget {
                   ).showSnackBar(SnackBar(content: Text('Selected: $value')));
                 },
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 decoration: const M3ESplitButtonDecoration(
                   menuStyle: SplitButtonMenuStyle.bottomSheet,
                   bottomSheetDecoration: M3ESplitButtonBottomSheetDecoration(
@@ -521,9 +521,9 @@ class SplitButtonTab extends StatelessWidget {
                 label: 'No Handle',
                 leadingIcon: Icons.list_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'l1', child: Text('List Item 1')),
-                  SplitButtonM3EItem(value: 'l2', child: Text('List Item 2')),
-                  SplitButtonM3EItem(value: 'l3', child: Text('List Item 3')),
+                  M3ESplitButtonItem(value: 'l1', child: Text('List Item 1')),
+                  M3ESplitButtonItem(value: 'l2', child: Text('List Item 2')),
+                  M3ESplitButtonItem(value: 'l3', child: Text('List Item 3')),
                 ],
                 onPressed: () {},
                 onSelected: (value) {
@@ -538,14 +538,14 @@ class SplitButtonTab extends StatelessWidget {
           ButtonHeader('With MenuBuilder', tt),
           ButtonSub('Custom PopupMenuEntry via menuBuilder callback.', cs, tt),
           const SizedBox(height: 12),
-          SplitButtonM3E<String>(
+          M3ESplitButton<String>(
             style: M3EButtonStyle.filled,
             label: 'Custom Menu',
             leadingIcon: Icons.more_horiz_rounded,
             items: const [
-              SplitButtonM3EItem(value: 'edit', child: Text('Edit')),
-              SplitButtonM3EItem(value: 'delete', child: Text('Delete')),
-              SplitButtonM3EItem(value: 'share', child: Text('Share')),
+              M3ESplitButtonItem(value: 'edit', child: Text('Edit')),
+              M3ESplitButtonItem(value: 'delete', child: Text('Delete')),
+              M3ESplitButtonItem(value: 'share', child: Text('Share')),
             ],
             menuBuilder: (context) => [
               const PopupMenuItem<String>(
@@ -618,13 +618,13 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.filled,
                 label: 'Long Press Me',
                 leadingIcon: Icons.touch_app_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'option1', child: Text('Option 1')),
-                  SplitButtonM3EItem(value: 'option2', child: Text('Option 2')),
+                  M3ESplitButtonItem(value: 'option1', child: Text('Option 1')),
+                  M3ESplitButtonItem(value: 'option2', child: Text('Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -637,13 +637,13 @@ class SplitButtonTab extends StatelessWidget {
                   );
                 },
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.tonal,
                 label: 'Context Menu',
                 leadingIcon: Icons.more_horiz_rounded,
                 items: const [
-                  SplitButtonM3EItem(value: 'edit', child: Text('Edit')),
-                  SplitButtonM3EItem(value: 'delete', child: Text('Delete')),
+                  M3ESplitButtonItem(value: 'edit', child: Text('Edit')),
+                  M3ESplitButtonItem(value: 'delete', child: Text('Delete')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -679,7 +679,7 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.tonal,
                 label: 'With Feedback',
                 leadingIcon: Icons.vibration,
@@ -687,20 +687,20 @@ class SplitButtonTab extends StatelessWidget {
                   haptic: M3EHapticFeedback.light,
                 ),
                 items: const [
-                  SplitButtonM3EItem(value: 'a', child: Text('Option A')),
-                  SplitButtonM3EItem(value: 'b', child: Text('Option B')),
+                  M3ESplitButtonItem(value: 'a', child: Text('Option A')),
+                  M3ESplitButtonItem(value: 'b', child: Text('Option B')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.tonal,
                 label: 'No Feedback',
                 leadingIcon: Icons.touch_app,
                 enableFeedback: false,
                 items: const [
-                  SplitButtonM3EItem(value: 'a', child: Text('Option A')),
-                  SplitButtonM3EItem(value: 'b', child: Text('Option B')),
+                  M3ESplitButtonItem(value: 'a', child: Text('Option A')),
+                  M3ESplitButtonItem(value: 'b', child: Text('Option B')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -715,23 +715,23 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.filled,
                 label: 'Default Ripple',
                 items: const [
-                  SplitButtonM3EItem(value: 'opt1', child: Text('Option 1')),
-                  SplitButtonM3EItem(value: 'opt2', child: Text('Option 2')),
+                  M3ESplitButtonItem(value: 'opt1', child: Text('Option 1')),
+                  M3ESplitButtonItem(value: 'opt2', child: Text('Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.filled,
                 label: 'No Splash',
                 splashFactory: NoSplash.splashFactory,
                 items: const [
-                  SplitButtonM3EItem(value: 'opt1', child: Text('Option 1')),
-                  SplitButtonM3EItem(value: 'opt2', child: Text('Option 2')),
+                  M3ESplitButtonItem(value: 'opt1', child: Text('Option 1')),
+                  M3ESplitButtonItem(value: 'opt2', child: Text('Option 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -750,7 +750,7 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.filled,
                 label: 'Custom Overlay',
                 leadingIcon: Icons.palette_rounded,
@@ -766,13 +766,13 @@ class SplitButtonTab extends StatelessWidget {
                   }),
                 ),
                 items: const [
-                  SplitButtonM3EItem(value: 'c1', child: Text('Custom 1')),
-                  SplitButtonM3EItem(value: 'c2', child: Text('Custom 2')),
+                  M3ESplitButtonItem(value: 'c1', child: Text('Custom 1')),
+                  M3ESplitButtonItem(value: 'c2', child: Text('Custom 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.outlined,
                 label: 'Outlined Overlay',
                 leadingIcon: Icons.brush_rounded,
@@ -788,8 +788,8 @@ class SplitButtonTab extends StatelessWidget {
                   }),
                 ),
                 items: const [
-                  SplitButtonM3EItem(value: 'b1', child: Text('Brush 1')),
-                  SplitButtonM3EItem(value: 'b2', child: Text('Brush 2')),
+                  M3ESplitButtonItem(value: 'b1', child: Text('Brush 1')),
+                  M3ESplitButtonItem(value: 'b2', child: Text('Brush 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -808,7 +808,7 @@ class SplitButtonTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.filled,
                 label: 'Blue Tint',
                 leadingIcon: Icons.water_drop_rounded,
@@ -818,13 +818,13 @@ class SplitButtonTab extends StatelessWidget {
                   ),
                 ),
                 items: const [
-                  SplitButtonM3EItem(value: 't1', child: Text('Tint 1')),
-                  SplitButtonM3EItem(value: 't2', child: Text('Tint 2')),
+                  M3ESplitButtonItem(value: 't1', child: Text('Tint 1')),
+                  M3ESplitButtonItem(value: 't2', child: Text('Tint 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
               ),
-              SplitButtonM3E<String>(
+              M3ESplitButton<String>(
                 style: M3EButtonStyle.elevated,
                 label: 'Tertiary Tint',
                 leadingIcon: Icons.auto_awesome_rounded,
@@ -834,8 +834,8 @@ class SplitButtonTab extends StatelessWidget {
                   ),
                 ),
                 items: const [
-                  SplitButtonM3EItem(value: 'a1', child: Text('Awesome 1')),
-                  SplitButtonM3EItem(value: 'a2', child: Text('Awesome 2')),
+                  M3ESplitButtonItem(value: 'a1', child: Text('Awesome 1')),
+                  M3ESplitButtonItem(value: 'a2', child: Text('Awesome 2')),
                 ],
                 onPressed: () {},
                 onSelected: (_) {},
@@ -869,7 +869,7 @@ class _SplitHoverExampleState extends State<_SplitHoverExample> {
       runSpacing: 10,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        SplitButtonM3E<String>(
+        M3ESplitButton<String>(
           style: M3EButtonStyle.tonal,
           label: _isHovered ? 'Hovering!' : 'Hover over me',
           leadingIcon: _isHovered ? Icons.check_circle : Icons.touch_app,
@@ -877,8 +877,8 @@ class _SplitHoverExampleState extends State<_SplitHoverExample> {
             haptic: M3EHapticFeedback.light,
           ),
           items: const [
-            SplitButtonM3EItem(value: 'h1', child: Text('Hover 1')),
-            SplitButtonM3EItem(value: 'h2', child: Text('Hover 2')),
+            M3ESplitButtonItem(value: 'h1', child: Text('Hover 1')),
+            M3ESplitButtonItem(value: 'h2', child: Text('Hover 2')),
           ],
           onPressed: () {},
           onSelected: (_) {},
@@ -922,7 +922,7 @@ class _SelectionStateExampleState extends State<_SelectionStateExample> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SplitButtonM3E<String>(
+        M3ESplitButton<String>(
           decoration: M3ESplitButtonDecoration(
             popupDecoration: M3ESplitButtonPopupDecoration(
               selectedColor: cs.primaryContainer,
@@ -933,9 +933,9 @@ class _SelectionStateExampleState extends State<_SelectionStateExample> {
           label: _selectedValue ?? 'Select',
           selectedValue: _selectedValue,
           items: const [
-            SplitButtonM3EItem(value: 'save', child: Text('Save')),
-            SplitButtonM3EItem(value: 'save_as', child: Text('Save As')),
-            SplitButtonM3EItem(value: 'export', child: Text('Export')),
+            M3ESplitButtonItem(value: 'save', child: Text('Save')),
+            M3ESplitButtonItem(value: 'save_as', child: Text('Save As')),
+            M3ESplitButtonItem(value: 'export', child: Text('Export')),
           ],
           onPressed: () {},
           onSelected: (value) {
@@ -970,7 +970,7 @@ class _MultiSelectExampleState extends State<_MultiSelectExample> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SplitButtonM3E<String>(
+        M3ESplitButton<String>(
           decoration: M3ESplitButtonDecoration(
             menuStyle: SplitButtonMenuStyle.bottomSheet,
             bottomSheetDecoration: M3ESplitButtonBottomSheetDecoration(
@@ -991,10 +991,10 @@ class _MultiSelectExampleState extends State<_MultiSelectExample> {
               : 'Install to ${_selectedDevices.length} Devices',
           leadingIcon: Icons.install_desktop_rounded,
           items: const [
-            SplitButtonM3EItem(value: 'phone', child: Text('Phone')),
-            SplitButtonM3EItem(value: 'tablet', child: Text('Tablet')),
-            SplitButtonM3EItem(value: 'tv', child: Text('TV')),
-            SplitButtonM3EItem(value: 'watch', child: Text('Watch')),
+            M3ESplitButtonItem(value: 'phone', child: Text('Phone')),
+            M3ESplitButtonItem(value: 'tablet', child: Text('Tablet')),
+            M3ESplitButtonItem(value: 'tv', child: Text('TV')),
+            M3ESplitButtonItem(value: 'watch', child: Text('Watch')),
           ],
           onPressed: () {
             ScaffoldMessenger.of(

@@ -312,8 +312,11 @@ mixin _ToggleGroupOverflowPresenterMixin on State<M3EToggleButtonGroup> {
     final itemRadius = dec.selectedBorderRadius ?? dec.outerRadius;
 
     final fgColor = selected
-        ? (widget.decoration?.checkedForegroundColor ?? cs.onSecondaryContainer)
-        : (widget.decoration?.foregroundColor ?? cs.onSurface);
+        ? (widget.decoration?.foregroundColor?.resolve({
+                WidgetState.selected,
+              }) ??
+              cs.onSecondaryContainer)
+        : (widget.decoration?.foregroundColor?.resolve({}) ?? cs.onSurface);
 
     final bgColor = selected
         ? (dec.selectedBackgroundColor ?? cs.secondaryContainer)
@@ -578,8 +581,11 @@ mixin _ToggleGroupOverflowPresenterMixin on State<M3EToggleButtonGroup> {
     final itemRadius = dec.selectedBorderRadius ?? dec.outerRadius;
 
     final fgColor = selected
-        ? (widget.decoration?.checkedForegroundColor ?? cs.onSecondaryContainer)
-        : (widget.decoration?.foregroundColor ?? cs.onSurface);
+        ? (widget.decoration?.foregroundColor?.resolve({
+                WidgetState.selected,
+              }) ??
+              cs.onSecondaryContainer)
+        : (widget.decoration?.foregroundColor?.resolve({}) ?? cs.onSurface);
 
     final bgColor = selected
         ? (dec.selectedBackgroundColor ?? cs.secondaryContainer)

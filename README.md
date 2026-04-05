@@ -19,7 +19,7 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 - [m3e_dismissible](https://pub.dev/packages/m3e_dismissible) - Swipe-to-dismiss with "neighbour pull" physics.
 - [m3e_expandable](https://pub.dev/packages/m3e_expandable) - Spring-animated expandable card lists.
 - [m3e_dropdown_menu](https://pub.dev/packages/m3e_dropdown_menu) - Fluid dropdown with search and chip tags.
-- [m3e_buttons](https://pub.dev/packages/m3e_core) - Expressive button system with neighbor squish and shape morphing.
+- [m3e_buttons](https://pub.dev/packages/m3e_buttons) - Expressive button system with neighbor squish and shape morphing.
 - [flutter_m3shapes_extended](https://pub.dev/packages/flutter_m3shapes_extended) - Full suite of M3 expressive shapes.
 
 ---

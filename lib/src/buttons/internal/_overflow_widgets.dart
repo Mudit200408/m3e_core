@@ -29,22 +29,32 @@ class OverflowMenuItem extends StatelessWidget {
     final cs = theme.colorScheme;
 
     final fgColor = selected
-        ? (action.decoration?.checkedForegroundColor ??
-              groupDecoration?.checkedForegroundColor ??
+        ? (action.decoration?.foregroundColor?.resolve({
+                WidgetState.selected,
+              }) ??
+              groupDecoration?.foregroundColor?.resolve({
+                WidgetState.selected,
+              }) ??
               cs.onSecondaryContainer)
-        : (action.decoration?.foregroundColor ??
-              groupDecoration?.foregroundColor ??
+        : (action.decoration?.foregroundColor?.resolve({}) ??
+              groupDecoration?.foregroundColor?.resolve({}) ??
               cs.onSurface);
 
     final bgColor = selected
-        ? (action.decoration?.checkedBackgroundColor ??
-              groupDecoration?.checkedBackgroundColor ??
+        ? (action.decoration?.backgroundColor?.resolve({
+                WidgetState.selected,
+              }) ??
+              groupDecoration?.backgroundColor?.resolve({
+                WidgetState.selected,
+              }) ??
               cs.secondaryContainer)
         : Colors.transparent;
 
     final effectiveColor = action.enabled
         ? fgColor
-        : (action.decoration?.disabledForegroundColor ??
+        : (action.decoration?.foregroundColor?.resolve({
+                WidgetState.disabled,
+              }) ??
               fgColor.withValues(
                 alpha: ButtonConstants.kDisabledForegroundAlpha,
               ));

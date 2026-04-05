@@ -313,7 +313,6 @@ class M3EButtonTokensAdapter {
   double connectedPressedInnerRadius() => 4.0;
 
   /// Default hovered inner corner radius for connected buttons.
-  double connectedHoveredInnerRadius() => 6.0;
 
   /// Minimum touch target height for standard buttons.
   double minWidthFloor() => _cachedMinWidthFloor ?? 48.0;

@@ -214,13 +214,13 @@ Widget _buildLeading(
   final Widget? icon = action.icon;
   if (icon == null) return const SizedBox.shrink();
 
-  final color =
-      action.decoration?.foregroundColor ??
-      groupDecoration?.foregroundColor ??
+  final Color color =
+      action.decoration?.foregroundColor?.resolve({}) ??
+      groupDecoration?.foregroundColor?.resolve({}) ??
       cs.onSurface;
-  final effectiveColor = action.enabled
+  final Color effectiveColor = action.enabled
       ? color
-      : (action.decoration?.disabledForegroundColor ??
+      : (action.decoration?.foregroundColor?.resolve({WidgetState.disabled}) ??
             color.withValues(alpha: ButtonConstants.kDisabledForegroundAlpha));
 
   return IconTheme.merge(
@@ -236,13 +236,13 @@ Widget _buildTitle(
   ColorScheme cs,
 ) {
   final theme = Theme.of(context);
-  final color =
-      action.decoration?.foregroundColor ??
-      groupDecoration?.foregroundColor ??
+  final Color color =
+      action.decoration?.foregroundColor?.resolve({}) ??
+      groupDecoration?.foregroundColor?.resolve({}) ??
       cs.onSurface;
-  final effectiveColor = action.enabled
+  final Color effectiveColor = action.enabled
       ? color
-      : (action.decoration?.disabledForegroundColor ??
+      : (action.decoration?.foregroundColor?.resolve({WidgetState.disabled}) ??
             color.withValues(alpha: ButtonConstants.kDisabledForegroundAlpha));
 
   final Widget label =

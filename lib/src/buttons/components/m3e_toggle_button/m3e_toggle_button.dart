@@ -39,7 +39,7 @@ final SpringMotion _kPressedRadiusMotion = M3EMotion.expressiveEffectsFast
 class M3EToggleButton extends StatefulWidget {
   const M3EToggleButton({
     super.key,
-    required this.onCheckedChange,
+    this.onCheckedChange,
     this.icon,
     this.checkedIcon,
     this.label,
@@ -58,6 +58,7 @@ class M3EToggleButton extends StatefulWidget {
     this.autofocus = false,
     this.onFocusChange,
     this.semanticLabel,
+    this.tooltip,
     this.onLongPress,
     this.onHover,
     this.enableFeedback = _kDefaultEnableFeedback,
@@ -80,7 +81,7 @@ class M3EToggleButton extends StatefulWidget {
   final bool? checked;
 
   /// Callback fired when the checked state changes.
-  final ValueChanged<bool> onCheckedChange;
+  final ValueChanged<bool>? onCheckedChange;
 
   /// Visual style of the toggle button.
   ///
@@ -121,13 +122,12 @@ class M3EToggleButton extends StatefulWidget {
 
   // ── Decoration property helpers ───────────────────────────────────────────
 
-  Color? get decorationBackgroundColor => decoration?.backgroundColor;
-  Color? get decorationForegroundColor => decoration?.foregroundColor;
-  Color? get decorationCheckedBackgroundColor =>
-      decoration?.checkedBackgroundColor;
-  Color? get decorationCheckedForegroundColor =>
-      decoration?.checkedForegroundColor;
-  BorderSide? get decorationBorderSide => decoration?.borderSide;
+  WidgetStateProperty<Color?>? get decorationBackgroundColor =>
+      decoration?.backgroundColor;
+  WidgetStateProperty<Color?>? get decorationForegroundColor =>
+      decoration?.foregroundColor;
+  WidgetStateProperty<BorderSide?>? get decorationBorderSide =>
+      decoration?.side;
   M3EMotion? get decorationMotion => decoration?.motion;
   M3EHapticFeedback get decorationHaptic =>
       decoration?.haptic ?? M3EHapticFeedback.none;
@@ -157,6 +157,9 @@ class M3EToggleButton extends StatefulWidget {
 
   /// Accessibility label. Merged on top of the button's own semantics.
   final String? semanticLabel;
+
+  /// Tooltip text.
+  final String? tooltip;
 
   /// Callback invoked when the button is long-pressed.
   final VoidCallback? onLongPress;
@@ -269,8 +272,6 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
         oldWidget.checked != widget.checked ||
         oldWidget.decoration?.foregroundColor !=
             widget.decoration?.foregroundColor ||
-        oldWidget.decoration?.checkedForegroundColor !=
-            widget.decoration?.checkedForegroundColor ||
         oldWidget.style != widget.style) {
       updateLabelStyle(context);
     }
@@ -293,7 +294,7 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
     }
     final newChecked = !_isChecked;
     if (widget.checked == null) setState(() => _localChecked = newChecked);
-    widget.onCheckedChange(newChecked);
+    widget.onCheckedChange?.call(newChecked);
   }
 
   @override
@@ -352,8 +353,8 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
           ).resolve(Directionality.of(context));
 
           final double hoverInnerRad =
-              widget.decoration?.connectedHoveredInnerRadius ??
-              _tokens.connectedHoveredInnerRadius();
+              widget.decoration?.hoveredRadius ??
+              _tokens.hoveredRadius(widget.size);
           final BorderRadius hoverRadius = BorderRadiusDirectional.horizontal(
             start: Radius.circular(
               widget.isFirstInGroup ? outerRad : hoverInnerRad,
@@ -502,10 +503,15 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
         );
     }
 
+    Widget result = button;
+    if (widget.tooltip != null) {
+      result = Tooltip(message: widget.tooltip!, child: result);
+    }
+
     return Semantics(
       label: widget.semanticLabel,
       checked: _isChecked,
-      child: button,
+      child: result,
     );
   }
 
@@ -522,48 +528,28 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
 
     switch (widget.style) {
       case M3EButtonStyle.filled:
-        bgColor = checked
-            ? (widget.decorationCheckedBackgroundColor ?? cs.primary)
-            : (widget.decorationBackgroundColor ?? cs.surfaceContainerHighest);
-        fgColor = checked
-            ? (widget.decorationCheckedForegroundColor ?? cs.onPrimary)
-            : (widget.decorationForegroundColor ?? cs.onSurfaceVariant);
+        bgColor = checked ? cs.primary : cs.surfaceContainerHighest;
+        fgColor = checked ? cs.onPrimary : cs.onSurfaceVariant;
         break;
 
       case M3EButtonStyle.elevated:
-        bgColor = checked
-            ? (widget.decorationCheckedBackgroundColor ?? cs.primary)
-            : (widget.decorationBackgroundColor ?? cs.surfaceContainerLow);
-        fgColor = checked
-            ? (widget.decorationCheckedForegroundColor ?? cs.onPrimary)
-            : (widget.decorationForegroundColor ?? cs.primary);
+        bgColor = checked ? cs.primary : cs.surfaceContainerLow;
+        fgColor = checked ? cs.onPrimary : cs.primary;
         break;
 
       case M3EButtonStyle.tonal:
-        bgColor = checked
-            ? (widget.decorationCheckedBackgroundColor ?? cs.secondaryContainer)
-            : (widget.decorationBackgroundColor ?? cs.surfaceContainerHighest);
-        fgColor = checked
-            ? (widget.decorationCheckedForegroundColor ??
-                  cs.onSecondaryContainer)
-            : (widget.decorationForegroundColor ?? cs.onSurfaceVariant);
+        bgColor = checked ? cs.secondaryContainer : cs.surfaceContainerHighest;
+        fgColor = checked ? cs.onSecondaryContainer : cs.onSurfaceVariant;
         break;
 
       case M3EButtonStyle.outlined:
-        bgColor = checked
-            ? (widget.decorationCheckedBackgroundColor ?? cs.secondaryContainer)
-            : (widget.decorationBackgroundColor ?? Colors.transparent);
-        fgColor = checked
-            ? (widget.decorationCheckedForegroundColor ??
-                  cs.onSecondaryContainer)
-            : (widget.decorationForegroundColor ?? cs.onSurface);
+        bgColor = checked ? cs.secondaryContainer : Colors.transparent;
+        fgColor = checked ? cs.onSecondaryContainer : cs.onSurface;
         break;
 
       case M3EButtonStyle.text:
-        bgColor = widget.decorationBackgroundColor ?? Colors.transparent;
-        fgColor = checked
-            ? (widget.decorationCheckedForegroundColor ?? cs.primary)
-            : (widget.decorationForegroundColor ?? cs.onSurface);
+        bgColor = Colors.transparent;
+        fgColor = checked ? cs.primary : cs.onSurface;
         break;
     }
 
@@ -571,29 +557,43 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
         widget.style == M3EButtonStyle.outlined ||
         widget.style == M3EButtonStyle.text;
 
-    final outlineColor = widget.style == M3EButtonStyle.outlined
-        ? (widget.decorationForegroundColor ?? tokens.outline())
-        : null;
-
     return ButtonStyle(
       alignment: _kAlignmentCenter,
       textStyle: WidgetStateProperty.all(labelStyle),
       minimumSize: WidgetStateProperty.all(Size(0, _measurements.height)),
       padding: padding,
       foregroundColor: WidgetStateProperty.resolveWith((states) {
+        final activeStates = checked
+            ? {...states, WidgetState.selected}
+            : states;
+
+        if (widget.decoration?.foregroundColor != null) {
+          final color = widget.decoration!.foregroundColor!.resolve(
+            activeStates,
+          );
+          if (color != null) return color;
+        }
+
         if (states.contains(WidgetState.disabled)) {
-          return widget.decoration?.disabledForegroundColor ??
-              cs.onSurface.withValues(
-                alpha: ButtonConstants.kDisabledForegroundAlpha,
-              );
+          return cs.onSurface.withValues(
+            alpha: ButtonConstants.kDisabledForegroundAlpha,
+          );
         }
         return fgColor;
       }),
       backgroundColor: WidgetStateProperty.resolveWith((states) {
+        final activeStates = checked
+            ? {...states, WidgetState.selected}
+            : states;
+
+        if (widget.decoration?.backgroundColor != null) {
+          final color = widget.decoration!.backgroundColor!.resolve(
+            activeStates,
+          );
+          if (color != null) return color;
+        }
+
         if (states.contains(WidgetState.disabled)) {
-          if (widget.decoration?.disabledBackgroundColor != null) {
-            return widget.decoration!.disabledBackgroundColor!;
-          }
           return transparent
               ? Colors.transparent
               : cs.onSurface.withValues(
@@ -606,24 +606,37 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
       elevation: WidgetStateProperty.resolveWith((states) {
         return tokens.elevation(widget.style, states);
       }),
-      side: outlineColor != null
-          ? WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.disabled)) {
-                return BorderSide(
-                  color: cs.onSurface.withValues(
-                    alpha: ButtonConstants.kDisabledOutlineAlpha,
-                  ),
-                  width: 1,
-                );
-              }
-              return BorderSide(color: outlineColor, width: 1);
-            })
-          : WidgetStateProperty.all(BorderSide.none),
-      mouseCursor: WidgetStatePropertyAll<MouseCursor?>(
-        widget.decoration?.mouseCursor ??
-            widget.mouseCursor ??
-            SystemMouseCursors.click,
-      ),
+      side: WidgetStateProperty.resolveWith((states) {
+        final activeStates = checked
+            ? {...states, WidgetState.selected}
+            : states;
+        if (widget.decoration?.side != null) {
+          final s = widget.decoration!.side!.resolve(activeStates);
+          if (s != null) return s;
+        }
+        final isOutlined = widget.style == M3EButtonStyle.outlined;
+        if (!isOutlined) return BorderSide.none;
+
+        if (states.contains(WidgetState.disabled)) {
+          return BorderSide(
+            color: cs.onSurface.withValues(
+              alpha: ButtonConstants.kDisabledOutlineAlpha,
+            ),
+            width: 1,
+          );
+        }
+        return BorderSide(color: tokens.outline(), width: 1);
+      }),
+      mouseCursor: WidgetStateProperty.resolveWith((states) {
+        if (widget.decoration?.mouseCursor != null) {
+          final cursor = widget.decoration!.mouseCursor!.resolve(states);
+          if (cursor != null) return cursor;
+        }
+        if (states.contains(WidgetState.disabled)) {
+          return SystemMouseCursors.basic;
+        }
+        return widget.mouseCursor ?? SystemMouseCursors.click;
+      }),
       animationDuration: _kDurationZero,
       visualDensity: _kVisualDensityStandard,
       splashFactory: widget.splashFactory ?? _kDefaultSplashFactory,
@@ -844,4 +857,187 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
   }
 
   double _lerp(double a, double b, double t) => a + (b - a) * t;
+}
+
+// ── Specialized subclasses ────────────────────────────────────────────────────
+
+/// A filled-style [M3EToggleButton].
+///
+/// Equivalent to `M3EToggleButton(style: M3EButtonStyle.filled, ...)`.
+///
+/// The group-connectivity parameters (`isGroupConnected`, `isFirstInGroup`,
+/// `isLastInGroup`) are intentionally hidden — they are managed automatically
+/// by [M3EToggleButtonGroup] and should not be set by consumers.
+class M3EFilledToggleButton extends M3EToggleButton {
+  const M3EFilledToggleButton({
+    super.key,
+    super.onCheckedChange,
+    super.icon,
+    super.checkedIcon,
+    super.label,
+    super.checkedLabel,
+    super.checked,
+    super.size,
+    super.enabled,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.semanticLabel,
+    super.tooltip,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(
+         style: M3EButtonStyle.filled,
+         isGroupConnected: false,
+         isFirstInGroup: true,
+         isLastInGroup: true,
+       );
+
+  /// A tonal-style [M3EToggleButton].
+  ///
+  /// Equivalent to `M3EToggleButton(style: M3EButtonStyle.tonal, ...)`.
+  const M3EFilledToggleButton.tonal({
+    super.key,
+    super.onCheckedChange,
+    super.icon,
+    super.checkedIcon,
+    super.label,
+    super.checkedLabel,
+    super.checked,
+    super.size,
+    super.enabled,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.semanticLabel,
+    super.tooltip,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(
+         style: M3EButtonStyle.tonal,
+         isGroupConnected: false,
+         isFirstInGroup: true,
+         isLastInGroup: true,
+       );
+}
+
+/// An elevated-style [M3EToggleButton].
+///
+/// Equivalent to `M3EToggleButton(style: M3EButtonStyle.elevated, ...)`.
+///
+/// The group-connectivity parameters are intentionally hidden — they are managed
+/// automatically by [M3EToggleButtonGroup].
+class M3EElevatedToggleButton extends M3EToggleButton {
+  const M3EElevatedToggleButton({
+    super.key,
+    super.onCheckedChange,
+    super.icon,
+    super.checkedIcon,
+    super.label,
+    super.checkedLabel,
+    super.checked,
+    super.size,
+    super.enabled,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.semanticLabel,
+    super.tooltip,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(
+         style: M3EButtonStyle.elevated,
+         isGroupConnected: false,
+         isFirstInGroup: true,
+         isLastInGroup: true,
+       );
+}
+
+/// An outlined-style [M3EToggleButton].
+///
+/// Equivalent to `M3EToggleButton(style: M3EButtonStyle.outlined, ...)`.
+///
+/// The group-connectivity parameters are intentionally hidden — they are managed
+/// automatically by [M3EToggleButtonGroup].
+class M3EOutlinedToggleButton extends M3EToggleButton {
+  const M3EOutlinedToggleButton({
+    super.key,
+    super.onCheckedChange,
+    super.icon,
+    super.checkedIcon,
+    super.label,
+    super.checkedLabel,
+    super.checked,
+    super.size,
+    super.enabled,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.semanticLabel,
+    super.tooltip,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(
+         style: M3EButtonStyle.outlined,
+         isGroupConnected: false,
+         isFirstInGroup: true,
+         isLastInGroup: true,
+       );
+}
+
+/// A text-style [M3EToggleButton].
+///
+/// Equivalent to `M3EToggleButton(style: M3EButtonStyle.text, ...)`.
+///
+/// The group-connectivity parameters are intentionally hidden — they are managed
+/// automatically by [M3EToggleButtonGroup].
+class M3ETextToggleButton extends M3EToggleButton {
+  const M3ETextToggleButton({
+    super.key,
+    super.onCheckedChange,
+    super.icon,
+    super.checkedIcon,
+    super.label,
+    super.checkedLabel,
+    super.checked,
+    super.size,
+    super.enabled,
+    super.decoration,
+    super.mouseCursor,
+    super.statesController,
+    super.focusNode,
+    super.autofocus,
+    super.onFocusChange,
+    super.semanticLabel,
+    super.tooltip,
+    super.onLongPress,
+    super.onHover,
+    super.enableFeedback,
+    super.splashFactory,
+  }) : super(
+         style: M3EButtonStyle.text,
+         isGroupConnected: false,
+         isFirstInGroup: true,
+         isLastInGroup: true,
+       );
 }

@@ -6,7 +6,7 @@ import '../style/m3e_split_button_decoration.dart';
 
 Future<Object?> showSplitButtonBottomSheet<T>({
   required BuildContext context,
-  required List<SplitButtonM3EItem<T>> items,
+  required List<M3ESplitButtonItem<T>> items,
   required M3ESplitButtonBottomSheetDecoration decoration,
   required Color foregroundColor,
   required double iconSize,
@@ -37,7 +37,7 @@ Future<Object?> showSplitButtonBottomSheet<T>({
 
 Future<T?> _showSingleSelectBottomSheet<T>({
   required BuildContext context,
-  required List<SplitButtonM3EItem<T>> items,
+  required List<M3ESplitButtonItem<T>> items,
   required M3ESplitButtonBottomSheetDecoration decoration,
   required Color foregroundColor,
   required double iconSize,
@@ -92,7 +92,7 @@ Future<T?> _showSingleSelectBottomSheet<T>({
 
 Future<List<T>?> _showMultiSelectBottomSheet<T>({
   required BuildContext context,
-  required List<SplitButtonM3EItem<T>> items,
+  required List<M3ESplitButtonItem<T>> items,
   required M3ESplitButtonBottomSheetDecoration decoration,
   required Color foregroundColor,
   required double iconSize,
@@ -134,7 +134,7 @@ class _MultiSelectBottomSheet<T> extends StatefulWidget {
   });
 
   final BuildContext context;
-  final List<SplitButtonM3EItem<T>> items;
+  final List<M3ESplitButtonItem<T>> items;
   final M3ESplitButtonBottomSheetDecoration decoration;
   final Color foregroundColor;
   final double iconSize;
@@ -242,7 +242,7 @@ class _MultiSelectBottomSheetState<T>
 
   Widget _buildMultiSelectItem({
     required BuildContext context,
-    required SplitButtonM3EItem<T> item,
+    required M3ESplitButtonItem<T> item,
     required bool isSelected,
     M3ESplitButtonCheckboxStyle? checkboxStyle,
     bool autofocus = false,
@@ -324,7 +324,7 @@ class _MultiSelectBottomSheetState<T>
   }
 
   double _resolveCheckboxSize(
-    SplitButtonM3EItem<T> item,
+    M3ESplitButtonItem<T> item,
     Widget child,
     BuildContext context,
   ) {
@@ -405,7 +405,7 @@ class _MultiSelectBottomSheetState<T>
 
 Widget _buildBottomSheetItem<T>({
   required BuildContext context,
-  required SplitButtonM3EItem<T> item,
+  required M3ESplitButtonItem<T> item,
   required Color foregroundColor,
   required double iconSize,
   bool autofocus = false,

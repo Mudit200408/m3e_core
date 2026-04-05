@@ -10,7 +10,7 @@ import 'button_constants.dart';
 
 Future<T?> showSplitButtonPopup<T>({
   required BuildContext context,
-  required List<SplitButtonM3EItem<T>> items,
+  required List<M3ESplitButtonItem<T>> items,
   required M3ESplitButtonPopupDecoration decoration,
   required Color foregroundColor,
   required double iconSize,
@@ -62,7 +62,7 @@ class _PopupOverlay<T> extends StatefulWidget {
     this.selectedValue,
   });
 
-  final List<SplitButtonM3EItem<T>> items;
+  final List<M3ESplitButtonItem<T>> items;
   final Color foregroundColor;
   final double iconSize;
   final M3ESplitButtonPopupDecoration decoration;
@@ -283,7 +283,7 @@ class _PopupOverlayState<T> extends State<_PopupOverlay<T>> {
     );
   }
 
-  Widget _buildPopupItem(SplitButtonM3EItem<T> item, int index) {
+  Widget _buildPopupItem(M3ESplitButtonItem<T> item, int index) {
     final bool isFirstEnabled =
         _keyboardActivated &&
         item.enabled &&

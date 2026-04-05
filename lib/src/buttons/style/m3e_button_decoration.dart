@@ -8,19 +8,17 @@ import 'm3e_motion.dart';
 /// Pass an instance to [M3EButton.decoration] to customize colors, shape,
 /// motion, and haptic feedback without subclassing.
 ///
-/// All fields are optional; null means "use the token default for this style
-/// and size". Combine with [copyWith] to build incremental overrides.
+/// Use [M3EButtonDecoration.styleFrom] for a seamless drop-in replacement
+/// experience when migrating from Flutter's standard `ElevatedButton.styleFrom()` API.
 ///
-/// This class is `@immutable`. Create a new instance (or use [copyWith])
-/// rather than modifying an existing one. Equality is value-based so the
-/// same logical decoration produces a stable layout signature.
+/// This class is `@immutable`.
 ///
 /// ## Example
 /// ```dart
 /// M3EButton(
-///   decoration: M3EButtonDecoration(
+///   decoration: M3EButtonDecoration.styleFrom(
 ///     backgroundColor: Colors.blue,
-///     foregroundColor: Colors.white,
+///     disabledBackgroundColor: Colors.grey,
 ///     motion: M3EMotion.custom(1600, 0.95),
 ///   ),
 ///   onPressed: () {},
@@ -33,22 +31,73 @@ import 'm3e_motion.dart';
 @immutable
 class M3EButtonDecoration {
   /// Background color of the button.
-  final Color? backgroundColor;
+  final WidgetStateProperty<Color?>? backgroundColor;
 
   /// Foreground (text/icon) color of the button.
-  final Color? foregroundColor;
+  final WidgetStateProperty<Color?>? foregroundColor;
 
-  /// Background color of the button when disabled.
-  final Color? disabledBackgroundColor;
+  /// Custom shadow color.
+  final WidgetStateProperty<Color?>? shadowColor;
 
-  /// Foreground color of the button when disabled.
-  final Color? disabledForegroundColor;
+  /// Custom elevation.
+  final WidgetStateProperty<double?>? elevation;
 
   /// Custom border side.
-  final BorderSide? borderSide;
+  final WidgetStateProperty<BorderSide?>? side;
 
-  /// Custom corner radius.
-  final BorderRadius? borderRadius;
+  /// Custom mouse cursor.
+  final WidgetStateProperty<MouseCursor?>? mouseCursor;
+
+  /// The color of the overlay that appears behind the button.
+  final WidgetStateProperty<Color?>? overlayColor;
+
+  /// The color of the surface tint overlay.
+  final WidgetStateProperty<Color?>? surfaceTintColor;
+
+  /// Custom icon size.
+  final double? iconSize;
+
+  /// The alignment of the icon within the button.
+  final IconAlignment? iconAlignment;
+
+  /// Custom text style.
+  final TextStyle? textStyle;
+
+  /// Custom padding.
+  final EdgeInsetsGeometry? padding;
+
+  /// Custom minimum size.
+  final Size? minimumSize;
+
+  /// Custom fixed size.
+  final Size? fixedSize;
+
+  /// Custom maximum size.
+  final Size? maximumSize;
+
+  /// Custom visual density.
+  final VisualDensity? visualDensity;
+
+  /// Custom tap target size.
+  final MaterialTapTargetSize? tapTargetSize;
+
+  /// Custom animation duration.
+  final Duration? animationDuration;
+
+  /// Whether to enable feedback.
+  final bool? enableFeedback;
+
+  /// Custom alignment.
+  final AlignmentGeometry? alignment;
+
+  /// Custom splash factory.
+  final InteractiveInkFeatureFactory? splashFactory;
+
+  /// Custom background builder.
+  final ButtonLayerBuilder? backgroundBuilder;
+
+  /// Custom foreground builder.
+  final ButtonLayerBuilder? foregroundBuilder;
 
   /// Spring physics configuration.
   final M3EMotion? motion;
@@ -56,81 +105,197 @@ class M3EButtonDecoration {
   /// Haptic feedback level.
   final M3EHapticFeedback? haptic;
 
-  /// Custom size override.
-  final M3EButtonSize? size;
-
   /// Custom corner radius when hovered.
   final double? hoveredRadius;
 
   /// Custom corner radius when pressed.
   final double? pressedRadius;
 
-  /// Custom mouse cursor.
-  final MouseCursor? mouseCursor;
-
-  /// The color of the overlay that appears behind the button.
-  ///
-  /// This is used to show pressed/hovered states.
-  final WidgetStateProperty<Color?>? overlayColor;
-
-  /// The color of the surface tint overlay.
-  ///
-  /// Only applies to filled and tonal button styles.
-  final WidgetStateProperty<Color?>? surfaceTintColor;
-
   const M3EButtonDecoration({
     this.backgroundColor,
     this.foregroundColor,
-    this.disabledBackgroundColor,
-    this.disabledForegroundColor,
-    this.borderSide,
-    this.borderRadius,
+    this.shadowColor,
+    this.elevation,
+    this.side,
+    this.mouseCursor,
+    this.overlayColor,
+    this.surfaceTintColor,
+    this.iconSize,
+    this.iconAlignment,
+    this.textStyle,
+    this.padding,
+    this.minimumSize,
+    this.fixedSize,
+    this.maximumSize,
+    this.visualDensity,
+    this.tapTargetSize,
+    this.animationDuration,
+    this.enableFeedback,
+    this.alignment,
+    this.splashFactory,
+    this.backgroundBuilder,
+    this.foregroundBuilder,
     this.motion,
     this.haptic,
     this.hoveredRadius,
     this.pressedRadius,
-    this.mouseCursor,
-    this.size,
-    this.overlayColor,
-    this.surfaceTintColor,
   });
 
-  /// Creates a copy of this decoration with the given fields replaced.
-  ///
-  /// All null parameters will use the current decoration's values.
-  M3EButtonDecoration copyWith({
-    Color? backgroundColor,
+  /// Factory constructor to seamlessly migrate from Flutter's official `ButtonStyle` / `styleFrom()`.
+  /// Flat colors are automatically converted into robust `WidgetStateProperty` wrappers.
+  static M3EButtonDecoration styleFrom({
     Color? foregroundColor,
-    Color? disabledBackgroundColor,
+    Color? backgroundColor,
     Color? disabledForegroundColor,
-    BorderSide? borderSide,
-    BorderRadius? borderRadius,
+    Color? disabledBackgroundColor,
+    Color? shadowColor,
+    Color? surfaceTintColor,
+    Color? overlayColor,
+    double? iconSize,
+    IconAlignment? iconAlignment,
+    double? elevation,
+    TextStyle? textStyle,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    Size? fixedSize,
+    Size? maximumSize,
+    BorderSide? side,
+    MouseCursor? enabledMouseCursor,
+    MouseCursor? disabledMouseCursor,
+    VisualDensity? visualDensity,
+    MaterialTapTargetSize? tapTargetSize,
+    Duration? animationDuration,
+    bool? enableFeedback,
+    AlignmentGeometry? alignment,
+    InteractiveInkFeatureFactory? splashFactory,
+    ButtonLayerBuilder? backgroundBuilder,
+    ButtonLayerBuilder? foregroundBuilder,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
     double? hoveredRadius,
     double? pressedRadius,
-    MouseCursor? mouseCursor,
-    M3EButtonSize? size,
+  }) {
+    final WidgetStateProperty<Color?>? backgroundColorProp =
+        (backgroundColor == null && disabledBackgroundColor == null)
+        ? null
+        : _StyleFromColorProperty(backgroundColor, disabledBackgroundColor);
+
+    final WidgetStateProperty<Color?>? foregroundColorProp =
+        (foregroundColor == null && disabledForegroundColor == null)
+        ? null
+        : _StyleFromColorProperty(foregroundColor, disabledForegroundColor);
+
+    final WidgetStateProperty<Color?>? shadowColorProp = shadowColor == null
+        ? null
+        : WidgetStatePropertyAll<Color?>(shadowColor);
+    final WidgetStateProperty<Color?>? surfaceTintColorProp =
+        surfaceTintColor == null
+        ? null
+        : WidgetStatePropertyAll<Color?>(surfaceTintColor);
+    final WidgetStateProperty<Color?>? overlayColorProp = overlayColor == null
+        ? null
+        : WidgetStatePropertyAll<Color?>(overlayColor);
+    final WidgetStateProperty<double?>? elevationProp = elevation == null
+        ? null
+        : WidgetStatePropertyAll<double?>(elevation);
+    final WidgetStateProperty<BorderSide?>? sideProp = side == null
+        ? null
+        : WidgetStatePropertyAll<BorderSide?>(side);
+
+    final WidgetStateProperty<MouseCursor?>? mouseCursorProp =
+        (enabledMouseCursor == null && disabledMouseCursor == null)
+        ? null
+        : _StyleFromCursorProperty(enabledMouseCursor, disabledMouseCursor);
+
+    return M3EButtonDecoration(
+      backgroundColor: backgroundColorProp,
+      foregroundColor: foregroundColorProp,
+      shadowColor: shadowColorProp,
+      surfaceTintColor: surfaceTintColorProp,
+      overlayColor: overlayColorProp,
+      elevation: elevationProp,
+      side: sideProp,
+      mouseCursor: mouseCursorProp,
+      iconSize: iconSize,
+      iconAlignment: iconAlignment,
+      textStyle: textStyle,
+      padding: padding,
+      minimumSize: minimumSize,
+      fixedSize: fixedSize,
+      maximumSize: maximumSize,
+      visualDensity: visualDensity,
+      tapTargetSize: tapTargetSize,
+      animationDuration: animationDuration,
+      enableFeedback: enableFeedback,
+      alignment: alignment,
+      splashFactory: splashFactory,
+      backgroundBuilder: backgroundBuilder,
+      foregroundBuilder: foregroundBuilder,
+      motion: motion,
+      haptic: haptic,
+      hoveredRadius: hoveredRadius,
+      pressedRadius: pressedRadius,
+    );
+  }
+
+  /// Creates a copy of this decoration with the given fields replaced.
+  M3EButtonDecoration copyWith({
+    WidgetStateProperty<Color?>? backgroundColor,
+    WidgetStateProperty<Color?>? foregroundColor,
+    WidgetStateProperty<Color?>? shadowColor,
+    WidgetStateProperty<double?>? elevation,
+    WidgetStateProperty<BorderSide?>? side,
+    WidgetStateProperty<MouseCursor?>? mouseCursor,
     WidgetStateProperty<Color?>? overlayColor,
     WidgetStateProperty<Color?>? surfaceTintColor,
+    double? iconSize,
+    IconAlignment? iconAlignment,
+    TextStyle? textStyle,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    Size? fixedSize,
+    Size? maximumSize,
+    VisualDensity? visualDensity,
+    MaterialTapTargetSize? tapTargetSize,
+    Duration? animationDuration,
+    bool? enableFeedback,
+    AlignmentGeometry? alignment,
+    InteractiveInkFeatureFactory? splashFactory,
+    ButtonLayerBuilder? backgroundBuilder,
+    ButtonLayerBuilder? foregroundBuilder,
+    M3EMotion? motion,
+    M3EHapticFeedback? haptic,
+    double? hoveredRadius,
+    double? pressedRadius,
   }) {
     return M3EButtonDecoration(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       foregroundColor: foregroundColor ?? this.foregroundColor,
-      disabledBackgroundColor:
-          disabledBackgroundColor ?? this.disabledBackgroundColor,
-      disabledForegroundColor:
-          disabledForegroundColor ?? this.disabledForegroundColor,
-      borderSide: borderSide ?? this.borderSide,
-      borderRadius: borderRadius ?? this.borderRadius,
+      shadowColor: shadowColor ?? this.shadowColor,
+      elevation: elevation ?? this.elevation,
+      side: side ?? this.side,
+      mouseCursor: mouseCursor ?? this.mouseCursor,
+      overlayColor: overlayColor ?? this.overlayColor,
+      surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
+      iconSize: iconSize ?? this.iconSize,
+      iconAlignment: iconAlignment ?? this.iconAlignment,
+      textStyle: textStyle ?? this.textStyle,
+      padding: padding ?? this.padding,
+      minimumSize: minimumSize ?? this.minimumSize,
+      fixedSize: fixedSize ?? this.fixedSize,
+      maximumSize: maximumSize ?? this.maximumSize,
+      visualDensity: visualDensity ?? this.visualDensity,
+      tapTargetSize: tapTargetSize ?? this.tapTargetSize,
+      animationDuration: animationDuration ?? this.animationDuration,
+      enableFeedback: enableFeedback ?? this.enableFeedback,
+      alignment: alignment ?? this.alignment,
+      splashFactory: splashFactory ?? this.splashFactory,
+      backgroundBuilder: backgroundBuilder ?? this.backgroundBuilder,
+      foregroundBuilder: foregroundBuilder ?? this.foregroundBuilder,
       motion: motion ?? this.motion,
       haptic: haptic ?? this.haptic,
       hoveredRadius: hoveredRadius ?? this.hoveredRadius,
       pressedRadius: pressedRadius ?? this.pressedRadius,
-      mouseCursor: mouseCursor ?? this.mouseCursor,
-      size: size ?? this.size,
-      overlayColor: overlayColor ?? this.overlayColor,
-      surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
     );
   }
 
@@ -140,87 +305,84 @@ class M3EButtonDecoration {
       other is M3EButtonDecoration &&
           backgroundColor == other.backgroundColor &&
           foregroundColor == other.foregroundColor &&
-          disabledBackgroundColor == other.disabledBackgroundColor &&
-          disabledForegroundColor == other.disabledForegroundColor &&
-          borderSide == other.borderSide &&
-          borderRadius == other.borderRadius &&
+          shadowColor == other.shadowColor &&
+          elevation == other.elevation &&
+          side == other.side &&
+          mouseCursor == other.mouseCursor &&
+          overlayColor == other.overlayColor &&
+          surfaceTintColor == other.surfaceTintColor &&
+          iconSize == other.iconSize &&
+          iconAlignment == other.iconAlignment &&
+          textStyle == other.textStyle &&
+          padding == other.padding &&
+          minimumSize == other.minimumSize &&
+          fixedSize == other.fixedSize &&
+          maximumSize == other.maximumSize &&
+          visualDensity == other.visualDensity &&
+          tapTargetSize == other.tapTargetSize &&
+          animationDuration == other.animationDuration &&
+          enableFeedback == other.enableFeedback &&
+          alignment == other.alignment &&
+          splashFactory == other.splashFactory &&
+          backgroundBuilder == other.backgroundBuilder &&
+          foregroundBuilder == other.foregroundBuilder &&
           motion == other.motion &&
           haptic == other.haptic &&
           hoveredRadius == other.hoveredRadius &&
-          pressedRadius == other.pressedRadius &&
-          mouseCursor == other.mouseCursor &&
-          size == other.size &&
-          overlayColor == other.overlayColor &&
-          surfaceTintColor == other.surfaceTintColor;
+          pressedRadius == other.pressedRadius;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     backgroundColor,
     foregroundColor,
-    disabledBackgroundColor,
-    disabledForegroundColor,
-    borderSide,
-    borderRadius,
+    shadowColor,
+    elevation,
+    side,
+    mouseCursor,
+    overlayColor,
+    surfaceTintColor,
+    iconSize,
+    iconAlignment,
+    textStyle,
+    padding,
+    minimumSize,
+    fixedSize,
+    maximumSize,
+    visualDensity,
+    tapTargetSize,
+    animationDuration,
+    enableFeedback,
+    alignment,
+    splashFactory,
+    backgroundBuilder,
+    foregroundBuilder,
     motion,
     haptic,
     hoveredRadius,
     pressedRadius,
-    mouseCursor,
-    size,
-    overlayColor,
-    surfaceTintColor,
-  );
+  ]);
 }
 
-/// Styling overrides for [M3EToggleButton].
-///
-/// Pass an instance to [M3EToggleButton.decoration] to customize colors,
-/// motion, radii, and haptic feedback without subclassing.
-///
-/// All fields are optional; null means "use the token default for this style
-/// and size". Combine with [copyWith] to build incremental overrides.
-///
-/// This class is `@immutable`. Create a new instance (or use [copyWith])
-/// rather than modifying an existing one. Equality is value-based so the
-/// same logical decoration produces a stable layout signature.
-///
-/// ## Example
-/// ```dart
-/// M3EToggleButton(
-///   decoration: M3EToggleButtonDecoration(
-///     checkedBackgroundColor: Colors.blue,
-///     checkedForegroundColor: Colors.white,
-///     haptic: M3EHapticFeedback.light,
-///   ),
-///   onCheckedChange: (checked) {},
-///   child: const Icon(Icons.favorite),
-/// )
-/// ```
-///
-/// See also:
-/// - [M3EButtonDecoration] for standard button styling
+/// Styling overrides for [M3EToggleButton] and [M3EToggleButtonGroup].
 @immutable
 class M3EToggleButtonDecoration {
-  /// Background color of the button.
-  final Color? backgroundColor;
+  /// Background color of the button via WidgetStateProperty.
+  final WidgetStateProperty<Color?>? backgroundColor;
 
-  /// Foreground (text/icon) color of the button.
-  final Color? foregroundColor;
+  /// Foreground (text/icon) color via WidgetStateProperty.
+  final WidgetStateProperty<Color?>? foregroundColor;
 
-  /// Background color when checked.
-  final Color? checkedBackgroundColor;
+  /// Custom border side via WidgetStateProperty.
+  final WidgetStateProperty<BorderSide?>? side;
 
-  /// Foreground color when checked.
-  final Color? checkedForegroundColor;
+  /// Custom mouse cursor.
+  final WidgetStateProperty<MouseCursor?>? mouseCursor;
 
-  /// Background color when disabled.
-  final Color? disabledBackgroundColor;
+  /// The color of the overlay that appears behind the button.
+  final WidgetStateProperty<Color?>? overlayColor;
 
-  /// Foreground color when disabled.
-  final Color? disabledForegroundColor;
-
-  /// Custom border side.
-  final BorderSide? borderSide;
+  /// The color of the surface tint overlay.
+  final WidgetStateProperty<Color?>? surfaceTintColor;
 
   /// Spring physics configuration.
   final M3EMotion? motion;
@@ -243,33 +405,13 @@ class M3EToggleButtonDecoration {
   /// Inner corner radius for connected button groups.
   final double? connectedInnerRadius;
 
-  /// Hovered inner corner radius for connected button groups.
-  final double? connectedHoveredInnerRadius;
-
-  /// Custom size override.
-  final M3EButtonSize? size;
-
-  /// Custom mouse cursor.
-  final MouseCursor? mouseCursor;
-
-  /// The color of the overlay that appears behind the button.
-  ///
-  /// This is used to show pressed/hovered states.
-  final WidgetStateProperty<Color?>? overlayColor;
-
-  /// The color of the surface tint overlay.
-  ///
-  /// Only applies to filled and tonal button styles.
-  final WidgetStateProperty<Color?>? surfaceTintColor;
-
   const M3EToggleButtonDecoration({
     this.backgroundColor,
     this.foregroundColor,
-    this.checkedBackgroundColor,
-    this.checkedForegroundColor,
-    this.disabledBackgroundColor,
-    this.disabledForegroundColor,
-    this.borderSide,
+    this.side,
+    this.mouseCursor,
+    this.overlayColor,
+    this.surfaceTintColor,
     this.motion,
     this.haptic,
     this.checkedRadius,
@@ -277,24 +419,19 @@ class M3EToggleButtonDecoration {
     this.pressedRadius,
     this.hoveredRadius,
     this.connectedInnerRadius,
-    this.connectedHoveredInnerRadius,
-    this.mouseCursor,
-    this.size,
-    this.overlayColor,
-    this.surfaceTintColor,
   });
 
-  /// Creates a copy of this decoration with the given fields replaced.
-  ///
-  /// All null parameters will use the current decoration's values.
-  M3EToggleButtonDecoration copyWith({
+  /// Factory constructor to seamlessly migrate from Flutter's official `ButtonStyle` / `styleFrom()`.
+  /// Flat colors are automatically converted into robust `WidgetStateProperty` wrappers, with
+  /// `checked` state elegantly mapping into `WidgetState.selected`.
+  static M3EToggleButtonDecoration styleFrom({
     Color? backgroundColor,
     Color? foregroundColor,
     Color? checkedBackgroundColor,
     Color? checkedForegroundColor,
     Color? disabledBackgroundColor,
     Color? disabledForegroundColor,
-    BorderSide? borderSide,
+    BorderSide? side,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
     double? checkedRadius,
@@ -302,24 +439,89 @@ class M3EToggleButtonDecoration {
     double? pressedRadius,
     double? hoveredRadius,
     double? connectedInnerRadius,
-    double? connectedHoveredInnerRadius,
-    MouseCursor? mouseCursor,
-    M3EButtonSize? size,
+    MouseCursor? enabledMouseCursor,
+    MouseCursor? disabledMouseCursor,
+    Color? overlayColor,
+    Color? surfaceTintColor,
+  }) {
+    final WidgetStateProperty<Color?>? backgroundColorProp =
+        (backgroundColor == null &&
+            disabledBackgroundColor == null &&
+            checkedBackgroundColor == null)
+        ? null
+        : _ToggleStyleFromColorProperty(
+            backgroundColor,
+            disabledBackgroundColor,
+            checkedBackgroundColor,
+          );
+
+    final WidgetStateProperty<Color?>? foregroundColorProp =
+        (foregroundColor == null &&
+            disabledForegroundColor == null &&
+            checkedForegroundColor == null)
+        ? null
+        : _ToggleStyleFromColorProperty(
+            foregroundColor,
+            disabledForegroundColor,
+            checkedForegroundColor,
+          );
+
+    final WidgetStateProperty<BorderSide?>? sideProp = side == null
+        ? null
+        : WidgetStatePropertyAll<BorderSide?>(side);
+    final WidgetStateProperty<Color?>? overlayColorProp = overlayColor == null
+        ? null
+        : WidgetStatePropertyAll<Color?>(overlayColor);
+    final WidgetStateProperty<Color?>? surfaceTintColorProp =
+        surfaceTintColor == null
+        ? null
+        : WidgetStatePropertyAll<Color?>(surfaceTintColor);
+
+    final WidgetStateProperty<MouseCursor?>? mouseCursorProp =
+        (enabledMouseCursor == null && disabledMouseCursor == null)
+        ? null
+        : _StyleFromCursorProperty(enabledMouseCursor, disabledMouseCursor);
+
+    return M3EToggleButtonDecoration(
+      backgroundColor: backgroundColorProp,
+      foregroundColor: foregroundColorProp,
+      side: sideProp,
+      motion: motion,
+      haptic: haptic,
+      checkedRadius: checkedRadius,
+      uncheckedRadius: uncheckedRadius,
+      pressedRadius: pressedRadius,
+      hoveredRadius: hoveredRadius,
+      connectedInnerRadius: connectedInnerRadius,
+      mouseCursor: mouseCursorProp,
+      overlayColor: overlayColorProp,
+      surfaceTintColor: surfaceTintColorProp,
+    );
+  }
+
+  /// Creates a copy of this decoration with the given fields replaced.
+  M3EToggleButtonDecoration copyWith({
+    WidgetStateProperty<Color?>? backgroundColor,
+    WidgetStateProperty<Color?>? foregroundColor,
+    WidgetStateProperty<BorderSide?>? side,
+    WidgetStateProperty<MouseCursor?>? mouseCursor,
     WidgetStateProperty<Color?>? overlayColor,
     WidgetStateProperty<Color?>? surfaceTintColor,
+    M3EMotion? motion,
+    M3EHapticFeedback? haptic,
+    double? checkedRadius,
+    double? uncheckedRadius,
+    double? pressedRadius,
+    double? hoveredRadius,
+    double? connectedInnerRadius,
   }) {
     return M3EToggleButtonDecoration(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       foregroundColor: foregroundColor ?? this.foregroundColor,
-      checkedBackgroundColor:
-          checkedBackgroundColor ?? this.checkedBackgroundColor,
-      checkedForegroundColor:
-          checkedForegroundColor ?? this.checkedForegroundColor,
-      disabledBackgroundColor:
-          disabledBackgroundColor ?? this.disabledBackgroundColor,
-      disabledForegroundColor:
-          disabledForegroundColor ?? this.disabledForegroundColor,
-      borderSide: borderSide ?? this.borderSide,
+      side: side ?? this.side,
+      mouseCursor: mouseCursor ?? this.mouseCursor,
+      overlayColor: overlayColor ?? this.overlayColor,
+      surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
       motion: motion ?? this.motion,
       haptic: haptic ?? this.haptic,
       checkedRadius: checkedRadius ?? this.checkedRadius,
@@ -327,12 +529,6 @@ class M3EToggleButtonDecoration {
       pressedRadius: pressedRadius ?? this.pressedRadius,
       hoveredRadius: hoveredRadius ?? this.hoveredRadius,
       connectedInnerRadius: connectedInnerRadius ?? this.connectedInnerRadius,
-      connectedHoveredInnerRadius:
-          connectedHoveredInnerRadius ?? this.connectedHoveredInnerRadius,
-      mouseCursor: mouseCursor ?? this.mouseCursor,
-      size: size ?? this.size,
-      overlayColor: overlayColor ?? this.overlayColor,
-      surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
     );
   }
 
@@ -342,33 +538,26 @@ class M3EToggleButtonDecoration {
       other is M3EToggleButtonDecoration &&
           backgroundColor == other.backgroundColor &&
           foregroundColor == other.foregroundColor &&
-          checkedBackgroundColor == other.checkedBackgroundColor &&
-          checkedForegroundColor == other.checkedForegroundColor &&
-          disabledBackgroundColor == other.disabledBackgroundColor &&
-          disabledForegroundColor == other.disabledForegroundColor &&
-          borderSide == other.borderSide &&
+          side == other.side &&
+          mouseCursor == other.mouseCursor &&
+          overlayColor == other.overlayColor &&
+          surfaceTintColor == other.surfaceTintColor &&
           motion == other.motion &&
           haptic == other.haptic &&
           checkedRadius == other.checkedRadius &&
           uncheckedRadius == other.uncheckedRadius &&
           pressedRadius == other.pressedRadius &&
           hoveredRadius == other.hoveredRadius &&
-          connectedInnerRadius == other.connectedInnerRadius &&
-          connectedHoveredInnerRadius == other.connectedHoveredInnerRadius &&
-          mouseCursor == other.mouseCursor &&
-          size == other.size &&
-          overlayColor == other.overlayColor &&
-          surfaceTintColor == other.surfaceTintColor;
+          connectedInnerRadius == other.connectedInnerRadius;
 
   @override
   int get hashCode => Object.hashAll([
     backgroundColor,
     foregroundColor,
-    checkedBackgroundColor,
-    checkedForegroundColor,
-    disabledBackgroundColor,
-    disabledForegroundColor,
-    borderSide,
+    side,
+    mouseCursor,
+    overlayColor,
+    surfaceTintColor,
     motion,
     haptic,
     checkedRadius,
@@ -376,10 +565,58 @@ class M3EToggleButtonDecoration {
     pressedRadius,
     hoveredRadius,
     connectedInnerRadius,
-    connectedHoveredInnerRadius,
-    mouseCursor,
-    size,
-    overlayColor,
-    surfaceTintColor,
   ]);
+}
+
+@immutable
+class _StyleFromColorProperty implements WidgetStateProperty<Color?> {
+  const _StyleFromColorProperty(this.color, this.disabledColor);
+  final Color? color;
+  final Color? disabledColor;
+
+  @override
+  Color? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) {
+      return disabledColor;
+    }
+    return color;
+  }
+}
+
+@immutable
+class _StyleFromCursorProperty implements WidgetStateProperty<MouseCursor?> {
+  const _StyleFromCursorProperty(this.enabledCursor, this.disabledCursor);
+  final MouseCursor? enabledCursor;
+  final MouseCursor? disabledCursor;
+
+  @override
+  MouseCursor? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) {
+      return disabledCursor;
+    }
+    return enabledCursor;
+  }
+}
+
+@immutable
+class _ToggleStyleFromColorProperty implements WidgetStateProperty<Color?> {
+  const _ToggleStyleFromColorProperty(
+    this.color,
+    this.disabledColor,
+    this.checkedColor,
+  );
+  final Color? color;
+  final Color? disabledColor;
+  final Color? checkedColor;
+
+  @override
+  Color? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) {
+      return disabledColor;
+    }
+    if (states.contains(WidgetState.selected)) {
+      return checkedColor ?? color;
+    }
+    return color;
+  }
 }

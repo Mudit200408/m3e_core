@@ -11,7 +11,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:m3e_core/m3e_core.dart';
 import 'package:m3e_core/src/buttons/core/m3e_button_group_provider.dart';
-import 'package:m3e_core/src/buttons/internal/_overflow_strategy.dart';
 import 'package:m3e_core/src/buttons/internal/_tokens_adapter.dart';
 import 'package:m3e_core/src/buttons/internal/button_constants.dart';
 import 'package:motor/motor.dart';
@@ -67,6 +66,7 @@ class M3EToggleButtonGroupAction {
     this.autofocus = false,
     this.onFocusChange,
     this.semanticLabel,
+    this.tooltip,
     this.enableFeedback,
   }) : assert(
          icon != null || label != null,
@@ -120,6 +120,9 @@ class M3EToggleButtonGroupAction {
   /// Accessibility label for this action.
   final String? semanticLabel;
 
+  /// Tooltip text shown when hovering over this specific button.
+  final String? tooltip;
+
   /// Whether to show a ripple/splash effect and haptic feedback on press.
   ///
   /// Falls back to the group's [enableFeedback] if null.
@@ -153,7 +156,7 @@ class M3EToggleButtonGroupAction {
 ///   actions: [
 ///     M3EToggleButtonGroupAction(
 ///       icon: const Icon(Icons.format_bold),
-///       label: const Text('Bold'),
+///       child: const Text('Bold'),
 ///       onCheckedChange: (v) {},
 ///     ),
 ///   ],
@@ -382,7 +385,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
   late List<FocusNode?> _focusNodes;
   late int _layoutSignature;
   late int _focusNodeSignature;
-  late final M3EButtonGroupOverflowController _overflowController;
+  late final M3EToggleButtonGroupOverflowController _overflowController;
   late final _ToggleGroupPressCoordinator _pressCoordinator;
   late final _ToggleGroupMeasurementOrchestrator _measurement;
   int? _lastOverflowSelectionIndex;
@@ -466,7 +469,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
     super.initState();
     _measurement = _ToggleGroupMeasurementOrchestrator();
     _pressCoordinator = _ToggleGroupPressCoordinator(isMounted: () => mounted);
-    _overflowController = M3EButtonGroupOverflowController();
+    _overflowController = M3EToggleButtonGroupOverflowController();
     _overflowController.stableAllOverflowMeasured.addListener(
       _handleOverflowChange,
     );
@@ -506,21 +509,20 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
     _cachedDecorations = List.generate(widget.actions.length, (i) {
       final action = widget.actions[i];
       return M3EToggleButtonDecoration(
-        size: action.decoration?.size ?? widget.decoration?.size,
         backgroundColor:
             action.decoration?.backgroundColor ??
             widget.decoration?.backgroundColor,
         foregroundColor:
             action.decoration?.foregroundColor ??
             widget.decoration?.foregroundColor,
-        checkedBackgroundColor:
-            action.decoration?.checkedBackgroundColor ??
-            widget.decoration?.checkedBackgroundColor,
-        checkedForegroundColor:
-            action.decoration?.checkedForegroundColor ??
-            widget.decoration?.checkedForegroundColor,
-        borderSide:
-            action.decoration?.borderSide ?? widget.decoration?.borderSide,
+        side: action.decoration?.side ?? widget.decoration?.side,
+        overlayColor:
+            action.decoration?.overlayColor ?? widget.decoration?.overlayColor,
+        surfaceTintColor:
+            action.decoration?.surfaceTintColor ??
+            widget.decoration?.surfaceTintColor,
+        mouseCursor:
+            action.decoration?.mouseCursor ?? widget.decoration?.mouseCursor,
         motion: action.decoration?.motion ?? widget.decoration?.motion,
         haptic:
             action.decoration?.haptic ??
@@ -535,6 +537,9 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
         pressedRadius:
             action.decoration?.pressedRadius ??
             widget.decoration?.pressedRadius,
+        hoveredRadius:
+            action.decoration?.hoveredRadius ??
+            widget.decoration?.hoveredRadius,
         connectedInnerRadius:
             action.decoration?.connectedInnerRadius ??
             widget.decoration?.connectedInnerRadius,
@@ -556,10 +561,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
   void _updateIconOnlyNaturalSizeCache() {
     final tokens = M3EButtonTokensAdapter(context);
     tokens.didChangeDependencies();
-    final m = tokens.measurements(
-      _mapSize(widget.size),
-      override: widget.decoration?.size,
-    );
+    final m = tokens.measurements(_mapSize(widget.size));
     _iconOnlyNaturalSizeCache = m.height;
   }
 
@@ -619,8 +621,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
       _initMeasurementState();
       _scheduleMeasurementIfNeeded();
     }
-    if (old.size != widget.size ||
-        old.decoration?.size != widget.decoration?.size) {
+    if (old.size != widget.size) {
       _updateIconOnlyNaturalSizeCache();
     }
     if (_overflowController.windowStartIndex.value >= widget.actions.length) {
@@ -1125,9 +1126,10 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
             // Estimate the trigger. If the strategy provides an explicit extent, use it.
             // Otherwise, we can't reliably predict the size of a custom strategy's trigger
             // until it's built, so we fall back to a standard icon-only measurement.
-            triggerExtent = M3EButtonGroupOverflowController.roundConsumed(
-              strategy.triggerExtent ?? _defaultOverflowTriggerExtent(),
-            );
+            triggerExtent =
+                M3EToggleButtonGroupOverflowController.roundConsumed(
+                  strategy.triggerExtent ?? _defaultOverflowTriggerExtent(),
+                );
 
             visibleCount = _overflowController.computeVisibleCountForMenu(
               maxMain: maxMain,
@@ -1353,7 +1355,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
         final visibleCount = _overflowController.computeVisibleCountForMenu(
           maxMain: maxMain,
           itemExtents: itemExtents,
-          triggerExtent: M3EButtonGroupOverflowController.roundConsumed(
+          triggerExtent: M3EToggleButtonGroupOverflowController.roundConsumed(
             _defaultOverflowTriggerExtent(),
           ),
           separatorExtent: () => _separatorMainExtent(spacing),
@@ -1433,9 +1435,10 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
             final pagingWindow = _overflowController.computePagingWindow(
               maxMain: maxMain,
               itemExtents: itemExtents,
-              triggerExtent: M3EButtonGroupOverflowController.roundConsumed(
-                _defaultOverflowTriggerExtent(),
-              ),
+              triggerExtent:
+                  M3EToggleButtonGroupOverflowController.roundConsumed(
+                    _defaultOverflowTriggerExtent(),
+                  ),
               separatorBetweenItems: (_) => _separatorMainExtent(spacing),
               separatorBeforeOverflow: (isFirst) =>
                   isFirst ? 0.0 : _separatorMainExtent(spacing),
@@ -1543,7 +1546,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
   }
 
   double _separatorMainExtent(double spacing) =>
-      M3EButtonGroupOverflowController.roundConsumed(
+      M3EToggleButtonGroupOverflowController.roundConsumed(
         widget._connected ? ButtonGroupTokens.kConnectedGap : spacing,
       );
 
@@ -1559,7 +1562,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
 
   double _itemMainExtentForOverflow(BuildContext context, int index) {
     if (widget.direction == Axis.horizontal) {
-      return M3EButtonGroupOverflowController.roundConsumed(
+      return M3EToggleButtonGroupOverflowController.roundConsumed(
         _naturalSizeForButton(context, index),
       );
     }
@@ -1567,22 +1570,20 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
     tokens.didChangeDependencies();
     final measurements = tokens.measurements(
       _mapSize(widget.size, actionWidth: widget.actions[index].width),
-      override:
-          widget.actions[index].decoration?.size ?? widget.decoration?.size,
     );
-    return M3EButtonGroupOverflowController.roundConsumed(measurements.height);
+    return M3EToggleButtonGroupOverflowController.roundConsumed(
+      measurements.height,
+    );
   }
 
   double _defaultOverflowTriggerExtent() {
     if (widget.direction == Axis.vertical) return _iconOnlyNaturalSizeCache;
-    return M3EButtonGroupOverflowController.roundConsumed(
-      (widget.decoration?.size?.width ?? 0.0) > _iconOnlyNaturalSizeCache
-          ? widget.decoration!.size!.width!
-          : _iconOnlyNaturalSizeCache,
+    return M3EToggleButtonGroupOverflowController.roundConsumed(
+      _iconOnlyNaturalSizeCache,
     );
   }
 
-  int _pagingScopeCount(ButtonGroupOverflowPagingWindow window) {
+  int _pagingScopeCount(M3EToggleButtonGroupOverflowPagingWindow window) {
     int count = window.end >= window.start
         ? (window.end - window.start + 1)
         : 0;
@@ -1763,6 +1764,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
         action.onFocusChange?.call(focused);
       },
       semanticLabel: action.semanticLabel,
+      tooltip: action.tooltip,
       onCheckedChange: (val) {
         // Multi-select mode
         if (widget.onSelectedIndicesChanged != null) {

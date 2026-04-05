@@ -233,7 +233,7 @@ class _ToggleGroupMeasurementOrchestrator {
 
   void initMeasurementState({
     required int actionCount,
-    required M3EButtonGroupOverflowController overflowController,
+    required M3EToggleButtonGroupOverflowController overflowController,
   }) {
     uncheckedKeys = List.generate(actionCount, (_) => GlobalKey());
     checkedKeys = List.generate(actionCount, (_) => GlobalKey());

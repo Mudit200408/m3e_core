@@ -6,11 +6,11 @@
 import 'package:flutter/widgets.dart';
 
 // ---------------------------------------------------------------------------
-// M3EButtonGroupOverflowController
+// M3EToggleButtonGroupOverflowController
 // ---------------------------------------------------------------------------
 
-class ButtonGroupOverflowPagingWindow {
-  const ButtonGroupOverflowPagingWindow({
+class M3EToggleButtonGroupOverflowPagingWindow {
+  const M3EToggleButtonGroupOverflowPagingWindow({
     required this.start,
     required this.end,
     required this.needsBack,
@@ -28,9 +28,9 @@ class ButtonGroupOverflowPagingWindow {
 /// This controller holds the state of the overflow window and measurement
 /// stability, allowing descendants to react to changes in the overflow
 /// layout.
-class M3EButtonGroupOverflowController {
+class M3EToggleButtonGroupOverflowController {
   /// Creates a reactive overflow controller.
-  M3EButtonGroupOverflowController({
+  M3EToggleButtonGroupOverflowController({
     int windowStartIndex = 0,
     bool stableAllOverflowMeasured = false,
   }) : windowStartIndex = ValueNotifier<int>(windowStartIndex),
@@ -98,7 +98,7 @@ class M3EButtonGroupOverflowController {
 
   /// Computes the paging window based on the current [windowStartIndex] and
   /// available space.
-  ButtonGroupOverflowPagingWindow computePagingWindow({
+  M3EToggleButtonGroupOverflowPagingWindow computePagingWindow({
     required double maxMain,
     required List<double> itemExtents,
     required double triggerExtent,
@@ -143,7 +143,7 @@ class M3EButtonGroupOverflowController {
       }
     }
 
-    final window = ButtonGroupOverflowPagingWindow(
+    final window = M3EToggleButtonGroupOverflowPagingWindow(
       start: windowStart,
       end: windowEnd,
       needsBack: needsBack,
@@ -163,7 +163,7 @@ class M3EButtonGroupOverflowController {
 // M3EButtonGroupProvider
 // ---------------------------------------------------------------------------
 
-/// Inherited widget for sharing the [M3EButtonGroupOverflowController].
+/// Inherited widget for sharing the [M3EToggleButtonGroupOverflowController].
 ///
 /// [M3EToggleButtonGroup] inserts this widget to provide its reactive
 /// overflow state to internal components like the paging controls and
@@ -177,19 +177,19 @@ class M3EButtonGroupProvider extends InheritedWidget {
   });
 
   /// The reactive overflow controller.
-  final M3EButtonGroupOverflowController controller;
+  final M3EToggleButtonGroupOverflowController controller;
 
-  /// Returns the [M3EButtonGroupOverflowController] from the nearest [M3EButtonGroupProvider].
-  static M3EButtonGroupOverflowController? maybeOf(BuildContext context) {
+  /// Returns the [M3EToggleButtonGroupOverflowController] from the nearest [M3EButtonGroupProvider].
+  static M3EToggleButtonGroupOverflowController? maybeOf(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<M3EButtonGroupProvider>()
         ?.controller;
   }
 
-  /// Returns the nearest [M3EButtonGroupOverflowController].
+  /// Returns the nearest [M3EToggleButtonGroupOverflowController].
   ///
   /// Throws a [FlutterError] if no provider is found.
-  static M3EButtonGroupOverflowController of(BuildContext context) {
+  static M3EToggleButtonGroupOverflowController of(BuildContext context) {
     final controller = maybeOf(context);
     assert(controller != null, '''
 M3EButtonGroupProvider.of() called but no M3EButtonGroupProvider was found in the

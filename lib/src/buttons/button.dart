@@ -7,6 +7,7 @@ export 'core/m3e_button_group_scope.dart';
 export 'components/m3e_toggle_button/m3e_toggle_button_group.dart';
 export 'components/m3e_button/m3e_button.dart';
 export 'components/m3e_toggle_button/m3e_toggle_button.dart';
-export 'components/m3e_split_button/split_button_m3e.dart';
+export 'components/m3e_split_button/m3e_split_button.dart';
+export 'internal/_overflow_strategy.dart';
 export 'style/button_tokens_adapter.dart';
 export 'style/m3e_motion.dart';
