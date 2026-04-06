@@ -87,7 +87,12 @@ class M3EButton extends StatefulWidget {
       onHover: onHover,
       enableFeedback: enableFeedback,
       splashFactory: splashFactory,
-      child: _M3EButtonIconLayout(icon: icon, label: label, size: size),
+      child: _M3EButtonIconLayout(
+        icon: icon,
+        label: label,
+        size: size,
+        iconAlignment: decoration?.iconAlignment ?? IconAlignment.start,
+      ),
     );
   }
 
@@ -188,37 +193,44 @@ class _M3EButtonIconLayout extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.size,
+    required this.iconAlignment,
   });
 
   final Widget icon;
   final Widget label;
   final M3EButtonSize size;
+  final IconAlignment iconAlignment;
 
   @override
   Widget build(BuildContext context) {
     final tokens = M3EButtonTokensAdapter(context);
     final m = tokens.measurements(size);
+    final children = <Widget>[
+      RepaintBoundary(
+        child: IconTheme.merge(
+          data: IconThemeData(size: m.iconSize),
+          child: icon,
+        ),
+      ),
+      SizedBox(width: m.iconGap),
+      Flexible(
+        child: DefaultTextStyle.merge(
+          maxLines: 2,
+          softWrap: false,
+          overflow: TextOverflow.ellipsis,
+          child: label,
+        ),
+      ),
+    ];
+
+    if (iconAlignment == IconAlignment.end) {
+      children.setAll(0, [children[2], children[1], children[0]]);
+    }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        RepaintBoundary(
-          child: IconTheme.merge(
-            data: IconThemeData(size: m.iconSize),
-            child: icon,
-          ),
-        ),
-        SizedBox(width: m.iconGap),
-        Flexible(
-          child: DefaultTextStyle.merge(
-            maxLines: 2,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            child: label,
-          ),
-        ),
-      ],
+      children: children,
     );
   }
 }
@@ -329,6 +341,7 @@ class _M3EButtonState extends State<M3EButton>
       iconSize: dec?.iconSize != null
           ? WidgetStateProperty.all(dec!.iconSize!)
           : null,
+      iconAlignment: dec?.iconAlignment,
       shadowColor: dec?.shadowColor,
       visualDensity: dec?.visualDensity ?? _kVisualDensityStandard,
       tapTargetSize: dec?.tapTargetSize,
@@ -798,7 +811,12 @@ class _M3EFilledButtonIcon extends M3EButton implements M3EFilledButton {
     super.splashFactory,
   }) : super(
          style: M3EButtonStyle.filled,
-         child: _M3EButtonIconLayout(icon: icon, label: label, size: size),
+         child: _M3EButtonIconLayout(
+           icon: icon,
+           label: label,
+           size: size,
+           iconAlignment: decoration?.iconAlignment ?? IconAlignment.start,
+         ),
        );
 }
 
@@ -825,7 +843,12 @@ class _M3EFilledButtonTonalIcon extends M3EButton implements M3EFilledButton {
     super.splashFactory,
   }) : super(
          style: M3EButtonStyle.tonal,
-         child: _M3EButtonIconLayout(icon: icon, label: label, size: size),
+         child: _M3EButtonIconLayout(
+           icon: icon,
+           label: label,
+           size: size,
+           iconAlignment: decoration?.iconAlignment ?? IconAlignment.start,
+         ),
        );
 }
 
@@ -920,7 +943,12 @@ class _M3EElevatedButtonIcon extends M3EButton implements M3EElevatedButton {
     super.splashFactory,
   }) : super(
          style: M3EButtonStyle.elevated,
-         child: _M3EButtonIconLayout(icon: icon, label: label, size: size),
+         child: _M3EButtonIconLayout(
+           icon: icon,
+           label: label,
+           size: size,
+           iconAlignment: decoration?.iconAlignment ?? IconAlignment.start,
+         ),
        );
 }
 
@@ -1015,7 +1043,12 @@ class _M3EOutlinedButtonIcon extends M3EButton implements M3EOutlinedButton {
     super.splashFactory,
   }) : super(
          style: M3EButtonStyle.outlined,
-         child: _M3EButtonIconLayout(icon: icon, label: label, size: size),
+         child: _M3EButtonIconLayout(
+           icon: icon,
+           label: label,
+           size: size,
+           iconAlignment: decoration?.iconAlignment ?? IconAlignment.start,
+         ),
        );
 }
 
@@ -1110,6 +1143,11 @@ class _M3ETextButtonIcon extends M3EButton implements M3ETextButton {
     super.splashFactory,
   }) : super(
          style: M3EButtonStyle.text,
-         child: _M3EButtonIconLayout(icon: icon, label: label, size: size),
+         child: _M3EButtonIconLayout(
+           icon: icon,
+           label: label,
+           size: size,
+           iconAlignment: decoration?.iconAlignment ?? IconAlignment.start,
+         ),
        );
 }

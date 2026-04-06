@@ -279,6 +279,74 @@ class SplitButtonTab extends StatelessWidget {
                 onPressed: () {},
                 onSelected: (_) {},
               ),
+              M3ESplitButton<String>(
+                decoration: M3ESplitButtonDecoration(
+                  backgroundBuilder: (context, states, child) {
+                    final pressed = states.contains(WidgetState.pressed);
+                    return DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            pressed ? cs.primary : cs.primaryContainer,
+                            pressed ? cs.tertiary : cs.secondaryContainer,
+                          ],
+                        ),
+                      ),
+                      child: child,
+                    );
+                  },
+                ),
+                label: 'Gradient BG',
+                leadingIcon: Icons.gradient_rounded,
+                items: const [
+                  M3ESplitButtonItem(value: 'g1', child: Text('Gradient 1')),
+                  M3ESplitButtonItem(value: 'g2', child: Text('Gradient 2')),
+                ],
+                onPressed: () {},
+                onSelected: (_) {},
+              ),
+              M3ESplitButton<String>(
+                decoration: M3ESplitButtonDecoration(
+                  foregroundBuilder: (context, states, child) {
+                    return Stack(
+                      fit: StackFit.passthrough,
+                      children: [
+                        child ?? const SizedBox.shrink(),
+                        IgnorePointer(
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              margin: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: cs.inverseSurface,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                'fg',
+                                style: tt.labelSmall?.copyWith(
+                                  color: cs.onInverseSurface,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                label: 'Foreground Badge',
+                leadingIcon: Icons.bookmark_rounded,
+                items: const [
+                  M3ESplitButtonItem(value: 'f1', child: Text('Badge 1')),
+                  M3ESplitButtonItem(value: 'f2', child: Text('Badge 2')),
+                ],
+                onPressed: () {},
+                onSelected: (_) {},
+              ),
             ],
           ),
 

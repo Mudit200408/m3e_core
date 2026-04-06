@@ -536,6 +536,12 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
   }) {
     final size = widget.size;
     final targetRadius = radius.toBorderRadius(Directionality.of(context));
+    final segmentStates = _segmentStates(
+      focused: focused,
+      hovered: hovered,
+      pressed: pressed,
+    );
+    final hasBackgroundBuilder = widget.decoration?.backgroundBuilder != null;
 
     // FocusRing must wrap only the AnimatedContainer (exact visual height),
     // NOT Center(AnimatedContainer). Inside FocusRing's Stack the ring is
@@ -551,7 +557,7 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
       curve: Curves.easeOut,
       height: height,
       decoration: BoxDecoration(
-        color: color,
+        color: hasBackgroundBuilder ? Colors.transparent : color,
         borderRadius: targetRadius,
         border: outlineSide != null ? Border.fromBorderSide(outlineSide) : null,
         boxShadow: (elevation != null && elevation > 0)
@@ -595,25 +601,26 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
             statesController: statesController,
             canRequestFocus: false,
             mouseCursor:
-                widget.decoration?.mouseCursor?.resolve({
-                  if (hovered) WidgetState.hovered,
-                  if (pressed) WidgetState.pressed,
-                  if (focused) WidgetState.focused,
-                }) ??
+                widget.decoration?.mouseCursor?.resolve({...segmentStates}) ??
                 widget.mouseCursor ??
                 SystemMouseCursors.click,
             enableFeedback: widget.enableFeedback,
             splashFactory: widget.splashFactory ?? InkRipple.splashFactory,
-            child: SizedBox(
-              height: height,
-              child: Center(
-                child: _LeadingContent(
-                  size: size,
-                  icon: widget.leadingIcon,
-                  label: widget.label,
-                  color: onColor,
-                  tokens: _tokens,
-                  customSize: customSize,
+            child: _applyDecorationLayers(
+              context: context,
+              states: segmentStates,
+              radius: targetRadius,
+              child: SizedBox(
+                height: height,
+                child: Center(
+                  child: _LeadingContent(
+                    size: size,
+                    icon: widget.leadingIcon,
+                    label: widget.label,
+                    color: onColor,
+                    tokens: _tokens,
+                    customSize: customSize,
+                  ),
                 ),
               ),
             ),
@@ -663,6 +670,13 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
   }) {
     final targetRadius = radius.toBorderRadius(Directionality.of(context));
     final effectiveWidth = fixedWidth < minTap ? minTap : fixedWidth;
+    final segmentStates = _segmentStates(
+      focused: focused,
+      hovered: hovered,
+      pressed: pressed,
+      selected: _menuOpen,
+    );
+    final hasBackgroundBuilder = widget.decoration?.backgroundBuilder != null;
 
     // AnimatedRotation + AnimatedContainer both use the same Duration/Curve
     // so they start and finish in the same frame — structurally impossible
@@ -692,7 +706,7 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
       width: effectiveWidth,
       height: height,
       decoration: BoxDecoration(
-        color: color,
+        color: hasBackgroundBuilder ? Colors.transparent : color,
         borderRadius: targetRadius,
         border: outlineSide != null ? Border.fromBorderSide(outlineSide) : null,
         boxShadow: (elevation != null && elevation > 0)
@@ -732,11 +746,7 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
                   }
                 : null,
             mouseCursor:
-                widget.decoration?.mouseCursor?.resolve({
-                  if (hovered) WidgetState.hovered,
-                  if (pressed) WidgetState.pressed,
-                  if (focused) WidgetState.focused,
-                }) ??
+                widget.decoration?.mouseCursor?.resolve({...segmentStates}) ??
                 widget.mouseCursor ??
                 SystemMouseCursors.click,
             onHover: widget.enabled
@@ -759,12 +769,17 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
             canRequestFocus: false,
             enableFeedback: widget.enableFeedback,
             splashFactory: widget.splashFactory ?? InkRipple.splashFactory,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: trailingLeftPad,
-                right: trailingRightPad,
+            child: _applyDecorationLayers(
+              context: context,
+              states: segmentStates,
+              radius: targetRadius,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: trailingLeftPad,
+                  right: trailingRightPad,
+                ),
+                child: Center(child: chevron),
               ),
-              child: Center(child: chevron),
             ),
           ),
         ),
@@ -792,6 +807,46 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
 
     if (widget.trailingTooltip == null) return wrapped;
     return Tooltip(message: widget.trailingTooltip!, child: wrapped);
+  }
+
+  Set<WidgetState> _segmentStates({
+    required bool focused,
+    required bool hovered,
+    required bool pressed,
+    bool selected = false,
+  }) {
+    return {
+      if (!widget.enabled) WidgetState.disabled,
+      if (focused) WidgetState.focused,
+      if (hovered) WidgetState.hovered,
+      if (pressed) WidgetState.pressed,
+      if (selected) WidgetState.selected,
+    };
+  }
+
+  Widget _applyDecorationLayers({
+    required BuildContext context,
+    required Set<WidgetState> states,
+    required BorderRadius radius,
+    required Widget child,
+  }) {
+    Widget result = child;
+
+    if (widget.decoration?.backgroundBuilder != null) {
+      result = ClipRRect(
+        borderRadius: radius,
+        child: widget.decoration!.backgroundBuilder!(context, states, result),
+      );
+    }
+
+    if (widget.decoration?.foregroundBuilder != null) {
+      result = ClipRRect(
+        borderRadius: radius,
+        child: widget.decoration!.foregroundBuilder!(context, states, result),
+      );
+    }
+
+    return result;
   }
 
   (Color, Color, BorderSide?, double?) _resolveColorsAndShapes(
