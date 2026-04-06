@@ -1,6 +1,6 @@
 # M3E Core
 [![Flutter](https://img.shields.io/badge/Flutter-%230175C2?style=flat-square&logo=flutter)](https://flutter.dev)
-[![Pub Version](https://img.shields.io/pub/v/m3e_buttons?style=flat-square)](https://pub.dev/packages/m3e_buttons)
+[![Pub Version](https://img.shields.io/pub/v/m3e_core?style=flat-square)](https://pub.dev/packages/m3e_core)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 [![Material 3 Expressive](https://img.shields.io/badge/Material%203-Expressive-purple?style=flat-square)](https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration)
 
@@ -70,7 +70,22 @@ A wide variety of predefined Material 3 expressive shapes (Gem, Slanted, Flower,
 
 ---
 
-### 🎯 Check the [Example](https://github.com/Mudit200408/m3e_core/tree/main/example) App for more details. 
+### 🎯 Check the [Example](https://github.com/Mudit200408/m3e_core/tree/main/example) App for more details.
+
+## Demo Deployment
+
+This repo includes a GitHub Pages workflow that builds and deploys the Flutter web example from `example/`.
+
+To enable it:
+
+1. Push this repo to GitHub.
+2. In GitHub, open `Settings` -> `Pages`.
+3. Set `Source` to `GitHub Actions`.
+4. Push to `main` or run the `Deploy Example To GitHub Pages` workflow manually.
+
+The demo will be published at:
+
+`https://<your-github-username>.github.io/m3e_core/`
 
 ---
 
