@@ -1,3 +1,6 @@
+# 0.0.5
+- Update `M3EButton` to v0.0.3.
+
 # 0.0.4
 - Update `M3EButton` to v0.0.2.
 - Fix the documentation link

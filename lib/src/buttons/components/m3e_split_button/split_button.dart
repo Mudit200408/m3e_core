@@ -214,6 +214,7 @@ class M3ESplitButton<T> extends StatefulWidget {
       decoration?.side;
   M3EHapticFeedback get decorationHaptic =>
       decoration?.haptic ?? M3EHapticFeedback.none;
+  double? get decorationBorderRadius => decoration?.borderRadius;
   WidgetStateProperty<Color?>? get decorationOverlayColor =>
       decoration?.overlayColor;
   WidgetStateProperty<Color?>? get decorationSurfaceTintColor =>
@@ -334,14 +335,25 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
         ? leadingHeight
         : trailingHeight;
     final minTap = _kSplitMinTapTarget;
-    final outerRadius = widget.shape == M3EButtonShape.round
-        ? maxSegmentHeight / 2
-        : _tokens.splitOuterRadiusSquare(size);
-    final pressedRadius = _tokens.splitPressedRadius(size);
-    final innerRadius = _tokens.splitInnerCornerRadius(size);
-    final hoveredInnerRadius = _tokens.splitHoveredInnerCornerRadius(size);
+    final double? explicitBorderRadius = widget.decorationBorderRadius;
+    final outerRadius =
+        explicitBorderRadius ??
+        (widget.shape == M3EButtonShape.round
+            ? maxSegmentHeight / 2
+            : _tokens.splitOuterRadiusSquare(size));
+    final pressedRadius =
+        widget.decoration?.pressedRadius ??
+        explicitBorderRadius ??
+        _tokens.splitPressedRadius(size);
+    final innerRadius =
+        explicitBorderRadius ?? _tokens.splitInnerCornerRadius(size);
+    final hoveredInnerRadius =
+        widget.decoration?.hoveredRadius ??
+        explicitBorderRadius ??
+        _tokens.splitHoveredInnerCornerRadius(size);
     final trailingSelectedRadius =
         widget.decoration?.trailingSelectedRadius ??
+        explicitBorderRadius ??
         trailingHeight *
             (_tokens.splitTrailingInnerSelectedCornerPercent / 100);
 
@@ -397,7 +409,10 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
         size == M3EButtonSize.lg ||
         size == M3EButtonSize.xl;
     final bool circleTrailing =
-        widget.shape == M3EButtonShape.round && allowCircle && _menuOpen;
+        explicitBorderRadius == null &&
+        widget.shape == M3EButtonShape.round &&
+        allowCircle &&
+        _menuOpen;
 
     final trailingFixedWidth = circleTrailing
         ? trailingHeight

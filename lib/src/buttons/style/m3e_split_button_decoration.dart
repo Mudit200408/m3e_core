@@ -335,6 +335,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
     super.foregroundBuilder,
     super.motion,
     super.haptic,
+    super.borderRadius,
     super.hoveredRadius,
     super.pressedRadius,
     this.trailingBackgroundColor,
@@ -380,6 +381,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
     ButtonLayerBuilder? foregroundBuilder,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
+    double? borderRadius,
     double? hoveredRadius,
     double? pressedRadius,
     Color? trailingBackgroundColor,
@@ -424,6 +426,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
       foregroundBuilder: foregroundBuilder,
       motion: motion,
       haptic: haptic,
+      borderRadius: borderRadius,
       hoveredRadius: hoveredRadius,
       pressedRadius: pressedRadius,
     );
@@ -498,6 +501,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
     ButtonLayerBuilder? foregroundBuilder,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
+    double? borderRadius,
     double? hoveredRadius,
     double? pressedRadius,
     Color? trailingBackgroundColor,
@@ -539,6 +543,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
       foregroundBuilder: foregroundBuilder ?? this.foregroundBuilder,
       motion: motion ?? this.motion,
       haptic: haptic ?? this.haptic,
+      borderRadius: borderRadius ?? this.borderRadius,
       hoveredRadius: hoveredRadius ?? this.hoveredRadius,
       pressedRadius: pressedRadius ?? this.pressedRadius,
       trailingBackgroundColor:
@@ -589,6 +594,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
           foregroundBuilder == other.foregroundBuilder &&
           motion == other.motion &&
           haptic == other.haptic &&
+          borderRadius == other.borderRadius &&
           hoveredRadius == other.hoveredRadius &&
           pressedRadius == other.pressedRadius &&
           trailingBackgroundColor == other.trailingBackgroundColor &&
@@ -631,6 +637,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
     foregroundBuilder,
     motion,
     haptic,
+    borderRadius,
     hoveredRadius,
     pressedRadius,
     trailingBackgroundColor,

@@ -179,6 +179,7 @@ class M3EButton extends StatefulWidget {
   WidgetStateProperty<MouseCursor?>? get decorationMouseCursor =>
       decoration?.mouseCursor;
   double? get decorationPressedRadius => decoration?.pressedRadius;
+  double? get decorationBorderRadius => decoration?.borderRadius;
   WidgetStateProperty<Color?>? get decorationOverlayColor =>
       decoration?.overlayColor;
   WidgetStateProperty<Color?>? get decorationSurfaceTintColor =>
@@ -433,20 +434,27 @@ class _M3EButtonState extends State<M3EButton>
     );
 
     final BorderRadius fullyRound = BorderRadius.circular(m.height / 2);
+    final double? explicitBorderRadius = widget.decorationBorderRadius;
     final double tokenPressed = _tokens.pressedRadius(widget.size);
-    final BorderRadius defaultShape = widget.shape == M3EButtonShape.round
+    final BorderRadius defaultShape = explicitBorderRadius != null
+        ? BorderRadius.circular(explicitBorderRadius)
+        : widget.shape == M3EButtonShape.round
         ? fullyRound
         : BorderRadius.circular(_tokens.squareRadius(widget.size));
 
     final double? explicitPressed = widget.decorationPressedRadius;
     final BorderRadius pressedShape = explicitPressed != null
         ? BorderRadius.circular(explicitPressed)
+        : explicitBorderRadius != null
+        ? BorderRadius.circular(explicitBorderRadius)
         : BorderRadius.circular(tokenPressed);
 
     final double tokenHovered = _tokens.hoveredRadius(widget.size);
     final double? defaultExplicitHovered = widget.decoration?.hoveredRadius;
     final BorderRadius hoveredShape = defaultExplicitHovered != null
         ? BorderRadius.circular(defaultExplicitHovered)
+        : explicitBorderRadius != null
+        ? BorderRadius.circular(explicitBorderRadius)
         : BorderRadius.circular(tokenHovered);
 
     final baseStyle = _buildBaseStyle();
