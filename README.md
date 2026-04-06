@@ -70,22 +70,15 @@ A wide variety of predefined Material 3 expressive shapes (Gem, Slanted, Flower,
 
 ---
 
-### 🎯 Check the [Example](https://github.com/Mudit200408/m3e_core/tree/main/example) App for more details.
+## Live Demo
 
-## Demo Deployment
+Try the hosted example app here:
 
-This repo includes a GitHub Pages workflow that builds and deploys the Flutter web example from `example/`.
+https://mudit200408.github.io/m3e_core/
 
-To enable it:
+Browse the example source here:
 
-1. Push this repo to GitHub.
-2. In GitHub, open `Settings` -> `Pages`.
-3. Set `Source` to `GitHub Actions`.
-4. Push to `main` or run the `Deploy Example To GitHub Pages` workflow manually.
-
-The demo will be published at:
-
-`https://<your-github-username>.github.io/m3e_core/`
+[Example App](https://github.com/Mudit200408/m3e_core/tree/main/example)
 
 ---
 
