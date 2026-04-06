@@ -122,11 +122,31 @@ class _ButtonTab extends StatelessWidget {
             runSpacing: 10,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              M3EFilledButton.tonal(child: const Text('XS'), onPressed: () {}),
-              M3EFilledButton.tonal(child: const Text('SM'), onPressed: () {}),
-              M3EFilledButton.tonal(child: const Text('MD'), onPressed: () {}),
-              M3EFilledButton.tonal(child: const Text('LG'), onPressed: () {}),
-              M3EFilledButton.tonal(child: const Text('XL'), onPressed: () {}),
+              M3EFilledButton.tonal(
+                size: M3EButtonSize.xs,
+                child: const Text('XS'),
+                onPressed: () {},
+              ),
+              M3EFilledButton.tonal(
+                size: M3EButtonSize.sm,
+                child: const Text('SM'),
+                onPressed: () {},
+              ),
+              M3EFilledButton.tonal(
+                size: M3EButtonSize.md,
+                child: const Text('MD'),
+                onPressed: () {},
+              ),
+              M3EFilledButton.tonal(
+                size: M3EButtonSize.lg,
+                child: const Text('LG'),
+                onPressed: () {},
+              ),
+              M3EFilledButton.tonal(
+                size: M3EButtonSize.xl,
+                child: const Text('XL'),
+                onPressed: () {},
+              ),
             ],
           ),
 
@@ -729,6 +749,7 @@ class _ToggleButtonTabState extends State<_ToggleButtonTab> {
               _Labelled(
                 'xs',
                 M3EFilledToggleButton.tonal(
+                  size: M3EButtonSize.xs,
                   icon: const Icon(Icons.music_note_rounded),
                   onCheckedChange: (_) {},
                 ),
@@ -736,6 +757,7 @@ class _ToggleButtonTabState extends State<_ToggleButtonTab> {
               _Labelled(
                 'sm',
                 M3EFilledToggleButton.tonal(
+                  size: M3EButtonSize.sm,
                   icon: const Icon(Icons.music_note_rounded),
                   onCheckedChange: (_) {},
                 ),
@@ -743,6 +765,7 @@ class _ToggleButtonTabState extends State<_ToggleButtonTab> {
               _Labelled(
                 'md',
                 M3EFilledToggleButton.tonal(
+                  size: M3EButtonSize.md,
                   icon: const Icon(Icons.music_note_rounded),
                   onCheckedChange: (_) {},
                 ),
@@ -750,6 +773,7 @@ class _ToggleButtonTabState extends State<_ToggleButtonTab> {
               _Labelled(
                 'lg',
                 M3EFilledToggleButton.tonal(
+                  size: M3EButtonSize.lg,
                   icon: const Icon(Icons.music_note_rounded),
                   onCheckedChange: (_) {},
                 ),
@@ -757,6 +781,7 @@ class _ToggleButtonTabState extends State<_ToggleButtonTab> {
               _Labelled(
                 'xl',
                 M3EFilledToggleButton.tonal(
+                  size: M3EButtonSize.xl,
                   icon: const Icon(Icons.music_note_rounded),
                   onCheckedChange: (_) {},
                 ),
