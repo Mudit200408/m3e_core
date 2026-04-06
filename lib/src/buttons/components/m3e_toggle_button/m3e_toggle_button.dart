@@ -131,6 +131,7 @@ class M3EToggleButton extends StatefulWidget {
   M3EMotion? get decorationMotion => decoration?.motion;
   M3EHapticFeedback get decorationHaptic =>
       decoration?.haptic ?? M3EHapticFeedback.none;
+  double? get decorationBorderRadius => decoration?.borderRadius;
   double? get decorationCheckedRadius => decoration?.checkedRadius;
   double? get decorationUncheckedRadius => decoration?.uncheckedRadius;
   double? get decorationPressedRadius => decoration?.pressedRadius;
@@ -303,17 +304,20 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
     final checked = _isChecked;
 
     final double halfHeight = m.height / 2;
+    final double? explicitBorderRadius = widget.decorationBorderRadius;
     final double squareRad = _tokens.squareRadius(widget.size);
     final double pressRad = _tokens.pressedRadius(widget.size);
     final BorderRadius fullyRound = BorderRadius.circular(halfHeight);
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
-    final double outerRad = halfHeight;
+    final double outerRad = explicitBorderRadius ?? halfHeight;
     final double innerRad =
+        explicitBorderRadius ??
         widget.decorationConnectedInnerRadius ??
         ButtonGroupTokens.kConnectedInnerRadius;
     final double pressInnerRad =
         widget.decorationPressedRadius ??
+        explicitBorderRadius ??
         ButtonGroupTokens.kConnectedPressedInnerRadius;
 
     final bool freezeStart = widget.isFirstInGroup;
@@ -323,13 +327,18 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
 
     final BorderRadius restingShape = widget.decorationUncheckedRadius != null
         ? BorderRadius.circular(widget.decorationUncheckedRadius!)
+        : explicitBorderRadius != null
+        ? BorderRadius.circular(explicitBorderRadius)
         : fullyRound;
     final BorderRadius squareShape = BorderRadius.circular(
-      widget.decorationCheckedRadius ?? squareRad,
+      widget.decorationCheckedRadius ?? explicitBorderRadius ?? squareRad,
     );
     final BorderRadius pressSquish = BorderRadius.circular(
-      widget.decorationPressedRadius ?? pressRad,
+      widget.decorationPressedRadius ?? explicitBorderRadius ?? pressRad,
     );
+    final BorderRadius checkedConnectedShape = explicitBorderRadius != null
+        ? BorderRadius.circular(explicitBorderRadius)
+        : fullyRound;
 
     final double hPad = _hasLabel ? m.hPadding : m.hPadding / 2;
 
@@ -354,6 +363,7 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
 
           final double hoverInnerRad =
               widget.decoration?.hoveredRadius ??
+              explicitBorderRadius ??
               _tokens.hoveredRadius(widget.size);
           final BorderRadius hoverRadius = BorderRadiusDirectional.horizontal(
             start: Radius.circular(
@@ -369,12 +379,14 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
               : (effectivelyEnabled && hovered)
               ? hoverRadius
               : checked
-              ? fullyRound
+              ? checkedConnectedShape
               : restingRadius;
         } else {
           final BorderRadius hoverShape =
               widget.decoration?.hoveredRadius != null
               ? BorderRadius.circular(widget.decoration!.hoveredRadius!)
+              : explicitBorderRadius != null
+              ? BorderRadius.circular(explicitBorderRadius)
               : BorderRadius.circular(_tokens.hoveredRadius(widget.size));
 
           targetRadius = (effectivelyEnabled && pressed)

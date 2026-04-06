@@ -105,6 +105,11 @@ class M3EButtonDecoration {
   /// Haptic feedback level.
   final M3EHapticFeedback? haptic;
 
+  /// Default corner radius for the button.
+  ///
+  /// When set, this overrides any shape-derived resting radius.
+  final double? borderRadius;
+
   /// Custom corner radius when hovered.
   final double? hoveredRadius;
 
@@ -137,6 +142,7 @@ class M3EButtonDecoration {
     this.foregroundBuilder,
     this.motion,
     this.haptic,
+    this.borderRadius,
     this.hoveredRadius,
     this.pressedRadius,
   });
@@ -172,6 +178,7 @@ class M3EButtonDecoration {
     ButtonLayerBuilder? foregroundBuilder,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
+    double? borderRadius,
     double? hoveredRadius,
     double? pressedRadius,
   }) {
@@ -233,6 +240,7 @@ class M3EButtonDecoration {
       foregroundBuilder: foregroundBuilder,
       motion: motion,
       haptic: haptic,
+      borderRadius: borderRadius,
       hoveredRadius: hoveredRadius,
       pressedRadius: pressedRadius,
     );
@@ -265,6 +273,7 @@ class M3EButtonDecoration {
     ButtonLayerBuilder? foregroundBuilder,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
+    double? borderRadius,
     double? hoveredRadius,
     double? pressedRadius,
   }) {
@@ -294,6 +303,7 @@ class M3EButtonDecoration {
       foregroundBuilder: foregroundBuilder ?? this.foregroundBuilder,
       motion: motion ?? this.motion,
       haptic: haptic ?? this.haptic,
+      borderRadius: borderRadius ?? this.borderRadius,
       hoveredRadius: hoveredRadius ?? this.hoveredRadius,
       pressedRadius: pressedRadius ?? this.pressedRadius,
     );
@@ -328,6 +338,7 @@ class M3EButtonDecoration {
           foregroundBuilder == other.foregroundBuilder &&
           motion == other.motion &&
           haptic == other.haptic &&
+          borderRadius == other.borderRadius &&
           hoveredRadius == other.hoveredRadius &&
           pressedRadius == other.pressedRadius;
 
@@ -358,6 +369,7 @@ class M3EButtonDecoration {
     foregroundBuilder,
     motion,
     haptic,
+    borderRadius,
     hoveredRadius,
     pressedRadius,
   ]);
@@ -390,6 +402,11 @@ class M3EToggleButtonDecoration {
   /// Haptic feedback level.
   final M3EHapticFeedback? haptic;
 
+  /// Default corner radius for the button.
+  ///
+  /// When set, this overrides the default checked/unchecked shape tokens.
+  final double? borderRadius;
+
   /// Corner radius when checked.
   final double? checkedRadius;
 
@@ -414,6 +431,7 @@ class M3EToggleButtonDecoration {
     this.surfaceTintColor,
     this.motion,
     this.haptic,
+    this.borderRadius,
     this.checkedRadius,
     this.uncheckedRadius,
     this.pressedRadius,
@@ -434,6 +452,7 @@ class M3EToggleButtonDecoration {
     BorderSide? side,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
+    double? borderRadius,
     double? checkedRadius,
     double? uncheckedRadius,
     double? pressedRadius,
@@ -488,6 +507,7 @@ class M3EToggleButtonDecoration {
       side: sideProp,
       motion: motion,
       haptic: haptic,
+      borderRadius: borderRadius,
       checkedRadius: checkedRadius,
       uncheckedRadius: uncheckedRadius,
       pressedRadius: pressedRadius,
@@ -509,6 +529,7 @@ class M3EToggleButtonDecoration {
     WidgetStateProperty<Color?>? surfaceTintColor,
     M3EMotion? motion,
     M3EHapticFeedback? haptic,
+    double? borderRadius,
     double? checkedRadius,
     double? uncheckedRadius,
     double? pressedRadius,
@@ -524,6 +545,7 @@ class M3EToggleButtonDecoration {
       surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
       motion: motion ?? this.motion,
       haptic: haptic ?? this.haptic,
+      borderRadius: borderRadius ?? this.borderRadius,
       checkedRadius: checkedRadius ?? this.checkedRadius,
       uncheckedRadius: uncheckedRadius ?? this.uncheckedRadius,
       pressedRadius: pressedRadius ?? this.pressedRadius,
@@ -544,6 +566,7 @@ class M3EToggleButtonDecoration {
           surfaceTintColor == other.surfaceTintColor &&
           motion == other.motion &&
           haptic == other.haptic &&
+          borderRadius == other.borderRadius &&
           checkedRadius == other.checkedRadius &&
           uncheckedRadius == other.uncheckedRadius &&
           pressedRadius == other.pressedRadius &&
@@ -560,6 +583,7 @@ class M3EToggleButtonDecoration {
     surfaceTintColor,
     motion,
     haptic,
+    borderRadius,
     checkedRadius,
     uncheckedRadius,
     pressedRadius,

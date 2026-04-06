@@ -151,6 +151,7 @@ class _ButtonTab extends StatelessWidget {
                 decoration: const M3EButtonDecoration(
                   pressedRadius: 8,
                   hoveredRadius: 12,
+                  borderRadius: 16,
                 ),
                 child: const Text('borderRadius: 16'),
                 onPressed: () {},
