@@ -89,10 +89,12 @@ class M3ESplitButton<T> extends StatefulWidget {
          'M3ESplitButton does not support M3EButtonStyle.text.',
        ),
        assert(
-         !enabled || onPressed != null || onSelected != null || menuBuilder != null,
+         !enabled ||
+             onPressed != null ||
+             onSelected != null ||
+             menuBuilder != null,
          'Provide either onPressed, onSelected, or a custom menuBuilder when the split button is enabled.',
        );
-
 
   /// Menu items displayed when the trailing button is pressed.
   ///

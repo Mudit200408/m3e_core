@@ -478,9 +478,10 @@ class _M3EButtonState extends State<M3EButton>
         );
 
         final dec = widget.decoration;
-        final hasDecorationSize = dec?.fixedSize != null || 
-                                  dec?.minimumSize != null || 
-                                  dec?.maximumSize != null;
+        final hasDecorationSize =
+            dec?.fixedSize != null ||
+            dec?.minimumSize != null ||
+            dec?.maximumSize != null;
         final fixedWidth = hasDecorationSize ? null : widget.size.width;
 
         if (fixedWidth != null) {
@@ -632,7 +633,7 @@ class _M3EButtonState extends State<M3EButton>
     if (widget.tooltip != null) {
       result = Tooltip(message: widget.tooltip!, child: result);
     }
-    
+
     if (widget.semanticLabel != null) {
       result = Semantics(label: widget.semanticLabel, child: result);
     }

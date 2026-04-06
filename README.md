@@ -28,7 +28,7 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 
 ```yaml
 dependencies:
-  m3e_core: ^0.0.3
+  m3e_core: ^0.0.4
 ```
 
 ```dart
@@ -62,7 +62,7 @@ A robust button system featuring:
 - **Neighbor Squish**: Adjacent buttons compress when one is pressed.
 - **Shape Morphing**: Smooth transitions between different shapes (e.g., pill to square).
 - **Overflow Management**: Supports scroll, menu, and paging for constrained spaces.
-[Detailed Documentation →](https://pub.dev/packages/m3e_core)
+[Detailed Documentation →](https://pub.dev/packages/m3e_buttons)
 
 ### 6. M3 Shapes Extended
 A wide variety of predefined Material 3 expressive shapes (Gem, Slanted, Flower, etc.) for visual elements or clipping.

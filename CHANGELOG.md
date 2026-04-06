@@ -1,3 +1,7 @@
+# 0.0.4
+- Update `M3EButton` to v0.0.2.
+- Fix the documentation link
+
 ## 0.0.3
 - Adds `M3EButton` for M3E buttons.
 - Update the documentation to make it more readable
