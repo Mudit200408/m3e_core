@@ -6,17 +6,17 @@ import 'package:m3e_core/m3e_core.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 M3EDismissibleCardStyle getDismissStyle() => M3EDismissibleCardStyle(
-  hapticOnTap: 1,
-  hapticOnThreshold: 1,
+  hapticOnTap: M3EHapticFeedback.light,
+  hapticOnThreshold: M3EHapticFeedback.light,
   backgroundBorderRadius: 100,
   secondaryBackgroundBorderRadius: 100,
   collapseSpeed: 60,
   dismissHapticStream: true,
   dismissThreshold: 0.3,
   background: Container(
-    color: const Color.fromARGB(255, 80, 218, 87),
+    color: const Color(0xFF87d292),
     alignment: Alignment.center,
-    child: const Icon(Icons.archive, color: Colors.white, size: 28),
+    child: const Icon(Icons.archive, color: Colors.black, size: 28),
   ),
   secondaryBackground: Container(
     color: Colors.red.shade600,
@@ -24,6 +24,106 @@ M3EDismissibleCardStyle getDismissStyle() => M3EDismissibleCardStyle(
     child: const Icon(Icons.delete, color: Colors.white, size: 28),
   ),
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rich Expandable Items (with complex widget bodies)
+// ─────────────────────────────────────────────────────────────────────────────
+
+List<Widget> _buildStatCards() {
+  return [
+    _buildStatCard(Icons.speed, '42', 'Points'),
+    _buildStatCard(Icons.check_circle, '18', 'Done'),
+    _buildStatCard(Icons.bug_report, '3', 'Bugs'),
+  ];
+}
+
+Widget _buildStatCard(IconData icon, String value, String label) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon, size: 28),
+      const SizedBox(height: 4),
+      Text(
+        value,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      Text(label, style: const TextStyle(fontSize: 12)),
+    ],
+  );
+}
+
+final List<Map<String, dynamic>> richExpandableItemsData = [
+  {
+    'title': 'Sprint velocity',
+    'subtitle': 'Current sprint metrics and team performance',
+    'body': Builder(
+      builder: (context) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: _buildStatCards(),
+        );
+      },
+    ),
+  },
+  {
+    'title': 'Deployment approval',
+    'subtitle': 'Production deploy pending review',
+    'body': Builder(
+      builder: (context) {
+        return Row(
+          children: [
+            FilledButton(onPressed: () {}, child: const Text('Approve')),
+            const SizedBox(width: 8),
+            OutlinedButton(onPressed: () {}, child: const Text('Reject')),
+          ],
+        );
+      },
+    ),
+  },
+  {
+    'title': 'Feature flags',
+    'subtitle': 'Active feature toggles for this environment',
+    'body': Builder(
+      builder: (context) {
+        return const Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            Chip(label: Text('dark-mode')),
+            Chip(label: Text('new-onboarding')),
+            Chip(label: Text('ai-chat-v2')),
+          ],
+        );
+      },
+    ),
+  },
+  {
+    'title': 'Quick feedback',
+    'subtitle': 'Provide feedback on the latest update',
+    'body': Builder(
+      builder: (context) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const TextField(
+              decoration: InputDecoration(
+                hintText: 'What did you think?',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.send),
+              label: const Text('Submit Feedback'),
+            ),
+          ],
+        );
+      },
+    ),
+  },
+];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared item data model

@@ -132,29 +132,4 @@ class M3EButtonSize {
   String toString() => 'M3EButtonSize.$name';
 }
 
-/// Haptic feedback intensity levels for button interactions.
-///
-/// Use with [M3EButtonDecoration.haptic] or [M3EToggleButtonDecoration.haptic]
-/// to provide tactile feedback when buttons are pressed.
-///
-/// ## Levels
-/// - [none] — No haptic feedback (default)
-/// - [light] — Light tap feedback for subtle interactions
-/// - [medium] — Medium impact for standard button presses
 /// - [heavy] — Heavy impact for significant actions
-enum M3EHapticFeedback {
-  /// No haptic feedback.
-  none(0),
-
-  /// Light tap feedback.
-  light(1),
-
-  /// Medium impact feedback.
-  medium(2),
-
-  /// Heavy impact feedback.
-  heavy(3);
-
-  final int value;
-  const M3EHapticFeedback(this.value);
-}

@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import '../../internal/_button_motion.dart';
 import '../../internal/button_constants.dart';
 import '../../internal/m3e_base_button_state.dart';
+import '../../../common/m3e_common.dart';
 import '../../style/button_tokens_adapter.dart';
 import '../../style/m3e_button_decoration.dart';
 import '../../style/m3e_button_enums.dart';
-import '../../style/m3e_motion.dart';
 
 const Alignment _kAlignmentCenter = Alignment.center;
 const VisualDensity _kVisualDensityStandard = VisualDensity.standard;
@@ -126,9 +126,6 @@ class M3EButton extends StatefulWidget {
   final WidgetStatesController? statesController;
 
   /// Optional decoration that bundles styling properties together.
-  ///
-  /// When provided, decoration values take precedence over individual flat
-  /// parameters (e.g. [backgroundColor], [foregroundColor], etc.).
   final M3EButtonDecoration? decoration;
 
   /// External focus node for keyboard navigation.

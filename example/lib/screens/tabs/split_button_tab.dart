@@ -500,7 +500,7 @@ class SplitButtonTab extends StatelessWidget {
               M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   popupDecoration: M3ESplitButtonPopupDecoration(
-                    motion: M3EMotion.custom(200, 0.6),
+                    motion: M3EMotion.custom(stiffness: 200, damping: 0.6),
                     elevation: 8,
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
@@ -522,7 +522,7 @@ class SplitButtonTab extends StatelessWidget {
               M3ESplitButton<String>(
                 decoration: M3ESplitButtonDecoration(
                   popupDecoration: M3ESplitButtonPopupDecoration(
-                    motion: M3EMotion.custom(600, 0.95),
+                    motion: M3EMotion.custom(stiffness: 600, damping: 0.95),
                     elevation: 2,
                   ),
                 ),
@@ -559,7 +559,7 @@ class SplitButtonTab extends StatelessWidget {
                   menuStyle: SplitButtonMenuStyle.bottomSheet,
                   bottomSheetDecoration: M3ESplitButtonBottomSheetDecoration(
                     title: Text('Select Action'),
-                    motion: M3EMotion.custom(1200, 0.8),
+                    motion: M3EMotion.custom(stiffness: 1200, damping: 0.8),
                     showDragHandle: true,
                   ),
                 ),

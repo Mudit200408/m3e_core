@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:motor/motor.dart';
 
 import '../style/m3e_button_enums.dart';
-import '../style/m3e_motion.dart';
+import '../../common/m3e_common.dart';
 
 /// Shared lifecycle infrastructure for [M3EButton] and [M3EToggleButton].
 ///

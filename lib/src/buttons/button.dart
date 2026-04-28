@@ -10,4 +10,3 @@ export 'components/m3e_toggle_button/m3e_toggle_button.dart';
 export 'components/m3e_split_button/m3e_split_button.dart';
 export 'internal/_overflow_strategy.dart';
 export 'style/button_tokens_adapter.dart';
-export 'style/m3e_motion.dart';

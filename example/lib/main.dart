@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'screens/dropdown_m3e_screen.dart';
-import 'screens/button_m3e_screen.dart';
-import 'screens/expandable_m3e_screen.dart';
+import 'screens/m3e_dropdown_screen.dart';
+import 'screens/m3e_button_screen.dart';
+import 'screens/m3e_expandable_screen.dart';
 import 'screens/m3e_card_screen.dart';
-import 'screens/dismissible_m3e_screen.dart';
+import 'screens/m3e_dismissible_screen.dart';
 
 void main() {
   runApp(const MyApp());

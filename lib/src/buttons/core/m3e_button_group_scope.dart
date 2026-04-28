@@ -14,7 +14,7 @@ import '../style/m3e_button_group_enums.dart';
 
 /// Provides group-level configuration to every descendant button.
 ///
-/// [M3EButtonGroup] and [M3EToggleButtonGroup] insert this widget at their
+/// [M3EToggleButtonGroup] inserts this widget at its
 /// root. Individual buttons call [M3EButtonGroupScope.maybeOf] to read the
 /// group's [type], [shape], [size], [density], and [direction] so they can
 /// adapt their appearance without needing explicit props drilled through every

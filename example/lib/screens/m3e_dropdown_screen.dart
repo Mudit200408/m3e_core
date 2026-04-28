@@ -37,19 +37,23 @@ class _DropdownM3EScreenState extends State<DropdownM3EScreen> {
               M3EDropdownMenu<String>(
                 items: fruitItems,
                 singleSelect: true,
-                stiffness: 400,
-                damping: 0.6,
-                fieldDecoration: M3EDropdownFieldDecoration(
+                openMotion: M3EMotion.custom(stiffness: 400, damping: 0.6),
+                fieldStyle: M3EDropdownFieldStyle(
                   borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  expandedBorderRadius: BorderRadius.circular(28),
+                  selectedBorderRadius: 99,
+                  hoverRadius: 10,
+                  pressedRadius: 6,
                   hintText: 'Choose a fruit',
                 ),
-                dropdownDecoration: const M3EDropdownDecoration(
-                  containerRadius: 18,
-                ),
-                itemDecoration: const M3EDropdownItemDecoration(
+                dropdownStyle: const M3EDropdownStyle(containerRadius: 18),
+                itemStyle: M3EDropdownItemStyle(
                   outerRadius: 18,
-                  innerRadius: 6,
+                  innerRadius: 10,
+                  hoverRadius: 12,
+                  pressedRadius: 6,
+                  selectedBorderRadius: 99,
+                  splashColor: Colors.purple,
+                  splashFactory: InkSplash.splashFactory,
                 ),
                 onSelectionChanged: (items) {
                   debugPrint('Single: ${items.map((e) => e.label)}');
@@ -69,30 +73,27 @@ class _DropdownM3EScreenState extends State<DropdownM3EScreen> {
                 searchEnabled: true,
                 showChipAnimation: true,
                 maxSelections: 7,
-                stiffness: 500,
-                damping: 0.6,
-                fieldDecoration: M3EDropdownFieldDecoration(
+                openMotion: M3EMotion.custom(stiffness: 500, damping: 0.6),
+                fieldStyle: M3EDropdownFieldStyle(
                   hintText: 'Pick up to 4 fruits',
                   border: BorderSide(color: cs.outline),
                   showClearIcon: true,
                 ),
-                chipDecoration: M3EChipDecoration(
+                chipStyle: M3EChipStyle(
                   maxDisplayCount: 3,
                   borderRadius: BorderRadius.circular(33),
-                  openStiffness: 600,
-                  openDamping: 0.7,
-                  closeDamping: 0.4,
-                  closeStiffness: 700,
+                  openMotion: M3EMotion.custom(stiffness: 600, damping: 0.7),
+                  closeMotion: M3EMotion.custom(stiffness: 700, damping: 0.4),
                   labelStyle: const TextStyle(fontSize: 14),
                 ),
-                searchDecoration: M3ESearchDecoration(
+                searchStyle: M3ESearchStyle(
                   hintText: 'Search fruits…',
                   fillColor: Colors.black,
                   filled: true,
                   contentPadding: const EdgeInsets.all(12),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                itemDecoration: M3EDropdownItemDecoration(
+                itemStyle: M3EDropdownItemStyle(
                   outerRadius: 24,
                   innerRadius: 8,
                   selectedIcon: Icon(
@@ -130,19 +131,24 @@ class _DropdownM3EScreenState extends State<DropdownM3EScreen> {
                   return null;
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                dropdownDecoration: const M3EDropdownDecoration(
+                dropdownStyle: const M3EDropdownStyle(
                   containerRadius: 24,
                   contentPadding: EdgeInsets.all(12),
                   header: Text("THIS IS HEADER"),
                   footer: Text("THIS IS FOOTER"),
                 ),
-                fieldDecoration: M3EDropdownFieldDecoration(
+                fieldStyle: M3EDropdownFieldStyle(
                   hintText: 'Required fruit',
                   borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  expandedBorderRadius: BorderRadius.circular(28),
+                  selectedBorderRadius: 28,
                   padding: const EdgeInsets.all(12),
+                  errorBorder: const BorderSide(color: Colors.red, width: 2),
+                  errorStyle: const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                itemDecoration: const M3EDropdownItemDecoration(
+                itemStyle: const M3EDropdownItemStyle(
                   outerRadius: 24,
                   selectedBorderRadius: 24,
                   itemPadding: EdgeInsets.all(14),
@@ -175,7 +181,7 @@ class _DropdownM3EScreenState extends State<DropdownM3EScreen> {
               M3EDropdownMenu<String>(
                 items: fruitItems,
                 showChipAnimation: true,
-                haptic: 1,
+                haptic: M3EHapticFeedback.light,
                 selectedItemBuilder: (item) {
                   return Chip(
                     avatar: Icon(
@@ -187,11 +193,9 @@ class _DropdownM3EScreenState extends State<DropdownM3EScreen> {
                     backgroundColor: cs.primaryContainer,
                   );
                 },
-                chipDecoration: const M3EChipDecoration(
-                  openStiffness: 600,
-                  openDamping: 0.7,
-                  closeDamping: 0.4,
-                  closeStiffness: 700,
+                chipStyle: M3EChipStyle(
+                  openMotion: M3EMotion.custom(stiffness: 600, damping: 0.7),
+                  closeMotion: M3EMotion.custom(stiffness: 700, damping: 0.4),
                 ),
                 onSelectionChanged: (items) {
                   debugPrint('Custom: ${items.map((e) => e.label)}');
@@ -216,7 +220,7 @@ class _DropdownM3EScreenState extends State<DropdownM3EScreen> {
                   );
                 },
                 singleSelect: true,
-                fieldDecoration: const M3EDropdownFieldDecoration(
+                fieldStyle: const M3EDropdownFieldStyle(
                   hintText: 'Loading users…',
                 ),
                 onSelectionChanged: (items) {

@@ -9,10 +9,10 @@ import 'package:motor/motor.dart';
 import '../../internal/_tokens_adapter.dart';
 import '../../internal/_button_motion.dart';
 import '../../internal/m3e_base_button_state.dart';
+import '../../../common/m3e_common.dart';
 import '../../style/button_tokens_adapter.dart';
 import '../../style/m3e_button_decoration.dart';
 import '../../style/m3e_button_enums.dart';
-import '../../style/m3e_motion.dart';
 import '../../internal/button_constants.dart';
 
 const Alignment _kAlignmentCenter = Alignment.center;
@@ -112,9 +112,6 @@ class M3EToggleButton extends StatefulWidget {
   final bool isLastInGroup;
 
   /// Optional decoration that bundles styling properties together.
-  ///
-  /// When provided, decoration values take precedence over individual flat
-  /// parameters (e.g. [backgroundColor], [foregroundColor], etc.).
   final M3EToggleButtonDecoration? decoration;
 
   /// Optional mouse cursor to show when hovering over the button.
@@ -856,7 +853,7 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
     // than structural motion so collapse remains visible and continuous.
     final damping = base.damping < 1.05 ? 1.05 : base.damping;
     final stiffness = base.stiffness * 0.5;
-    return M3EMotion.custom(stiffness, damping).toMotion();
+    return M3EMotion.custom(stiffness: stiffness, damping: damping).toMotion();
   }
 
   double _boundedProgress(double t) => t.clamp(0.0, 1.0);

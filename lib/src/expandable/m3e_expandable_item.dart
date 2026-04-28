@@ -1,64 +1,29 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:motor/motor.dart';
 
-/// Signature for building the header (collapsed view) of an expandable item.
-///
-/// [index] is the item position, [isExpanded] indicates the current state.
+import 'm3e_expandable_shared.dart';
+import 'm3e_expandable_style.dart';
+import '../common/m3e_common.dart';
+import 'utils/measure_size.dart';
+
 typedef M3EExpandableHeaderBuilder =
-    Widget Function(BuildContext context, int index, bool isExpanded);
+    Widget Function(BuildContext context, int index, double progress);
 
-/// Signature for building the body (expanded content) of an expandable item.
 typedef M3EExpandableBodyBuilder =
-    Widget Function(BuildContext context, int index);
+    Widget Function(BuildContext context, int index, double progress);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// M3EExpandableItem — self-contained animated expandable card
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Internal widget that manages its own [SingleMotionController]s for
-/// expand/collapse, arrow rotation, and border-radius morphing.
-///
-/// By keeping animation state local, parent lists only need to track a
-/// `Set<int>` of expanded indices and pass a simple `isExpanded` boolean.
 class M3EExpandableItem extends StatefulWidget {
   final int index;
   final int totalCount;
   final bool isExpanded;
   final M3EExpandableHeaderBuilder headerBuilder;
   final M3EExpandableBodyBuilder bodyBuilder;
-
-  // Shape
-  final double outerRadius;
-  final double innerRadius;
-  final double gap;
-  final BorderRadius? selectedBorderRadius;
-  final EdgeInsetsGeometry? margin;
-  final EdgeInsetsGeometry? headerPadding;
-  final EdgeInsetsGeometry? bodyPadding;
-  final BorderSide? border;
-  final double elevation;
-  final Color? color;
-
-  // Icon
-  final bool showArrow;
-  final Widget? trailingIcon;
-
-  // Animation
-  final double openStiffness;
-  final double openDamping;
-  final double closeStiffness;
-  final double closeDamping;
-
-  // Haptics
-  final int haptic;
-  final Color? splashColor;
-  final Color? highlightColor;
-  final InteractiveInkFeatureFactory? splashFactory;
-  final bool enableFeedback;
-
+  final M3EExpandableStyle decoration;
+  final M3EMotion expandMotion;
+  final M3EMotion collapseMotion;
   final VoidCallback onToggle;
 
-  /// Creates an [M3EExpandableItem].
   const M3EExpandableItem({
     super.key,
     required this.index,
@@ -66,27 +31,9 @@ class M3EExpandableItem extends StatefulWidget {
     required this.isExpanded,
     required this.headerBuilder,
     required this.bodyBuilder,
-    required this.outerRadius,
-    required this.innerRadius,
-    required this.gap,
-    required this.selectedBorderRadius,
-    required this.margin,
-    required this.headerPadding,
-    required this.bodyPadding,
-    required this.border,
-    required this.elevation,
-    required this.color,
-    required this.showArrow,
-    required this.trailingIcon,
-    required this.openStiffness,
-    required this.openDamping,
-    required this.closeStiffness,
-    required this.closeDamping,
-    required this.haptic,
-    required this.splashColor,
-    required this.highlightColor,
-    required this.splashFactory,
-    required this.enableFeedback,
+    required this.decoration,
+    required this.expandMotion,
+    required this.collapseMotion,
     required this.onToggle,
   });
 
@@ -97,28 +44,21 @@ class M3EExpandableItem extends StatefulWidget {
 class _M3EExpandableItemState extends State<M3EExpandableItem>
     with TickerProviderStateMixin {
   late final SingleMotionController _expandCtrl;
-  late final SingleMotionController _arrowCtrl;
-  late final SingleMotionController _radiusCtrl;
+
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  double? _collapsedHeight;
+  double? _expandedHeight;
 
   @override
   void initState() {
     super.initState();
-    final stiffness = widget.isExpanded
-        ? widget.openStiffness
-        : widget.closeStiffness;
-    final damping = widget.isExpanded
-        ? widget.openDamping
-        : widget.closeDamping;
-    final motion = MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-      stiffness: stiffness,
-      damping: damping,
-    );
+    final motion = widget.isExpanded
+        ? widget.expandMotion.toMotion()
+        : widget.collapseMotion.toMotion();
 
     _expandCtrl = SingleMotionController(motion: motion, vsync: this)
-      ..value = widget.isExpanded ? 1.0 : 0.0;
-    _arrowCtrl = SingleMotionController(motion: motion, vsync: this)
-      ..value = widget.isExpanded ? 1.0 : 0.0;
-    _radiusCtrl = SingleMotionController(motion: motion, vsync: this)
       ..value = widget.isExpanded ? 1.0 : 0.0;
   }
 
@@ -127,178 +67,455 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.isExpanded != widget.isExpanded) {
-      final stiffness = widget.isExpanded
-          ? widget.openStiffness
-          : widget.closeStiffness;
-      final damping = widget.isExpanded
-          ? widget.openDamping
-          : widget.closeDamping;
-
-      final motion = MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-        stiffness: stiffness,
-        damping: damping,
-      );
+      final motion = widget.isExpanded
+          ? widget.expandMotion.toMotion()
+          : widget.collapseMotion.toMotion();
 
       _expandCtrl.motion = motion;
-      _arrowCtrl.motion = motion;
-      _radiusCtrl.motion = motion;
-
-      final target = widget.isExpanded ? 1.0 : 0.0;
-      _expandCtrl.animateTo(target);
-      _arrowCtrl.animateTo(target);
-      _radiusCtrl.animateTo(target);
+      _expandCtrl.animateTo(widget.isExpanded ? 1.0 : 0.0);
     }
   }
+
+  void _handleHoverChanged(bool hovering) =>
+      setState(() => _isHovered = hovering);
+  void _handleTapDown() => setState(() => _isPressed = true);
+  void _handleTapUp() => setState(() => _isPressed = false);
+  void _handleTapCancel() => setState(() => _isPressed = false);
 
   @override
   void dispose() {
     _expandCtrl.dispose();
-    _arrowCtrl.dispose();
-    _radiusCtrl.dispose();
     super.dispose();
   }
 
-  BorderRadius _calculateRadius() {
+  BorderRadius _buildEffectiveRadius() {
+    final d = widget.decoration;
     final isFirst = widget.index == 0;
     final isLast = widget.index == widget.totalCount - 1;
     final isSingle = widget.totalCount == 1;
 
-    if (isSingle) return BorderRadius.circular(widget.outerRadius);
+    if (widget.isExpanded && d.expandedRadius != null) {
+      return BorderRadius.circular(d.expandedRadius!);
+    }
+
+    if (isSingle) return BorderRadius.circular(d.outerRadius);
+
+    final effectiveInnerRadius = _isPressed
+        ? d.pressedRadius
+        : (_isHovered ? d.hoverRadius : d.innerRadius);
+
     if (isFirst) {
       return BorderRadius.vertical(
-        top: Radius.circular(widget.outerRadius),
-        bottom: Radius.circular(widget.innerRadius),
+        top: Radius.circular(d.outerRadius),
+        bottom: Radius.circular(effectiveInnerRadius),
       );
     }
     if (isLast) {
       return BorderRadius.vertical(
-        top: Radius.circular(widget.innerRadius),
-        bottom: Radius.circular(widget.outerRadius),
+        top: Radius.circular(effectiveInnerRadius),
+        bottom: Radius.circular(d.outerRadius),
       );
     }
-    return BorderRadius.circular(widget.innerRadius);
+    return BorderRadius.circular(effectiveInnerRadius);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final d = widget.decoration;
     final isLast = widget.index == widget.totalCount - 1;
-    final borderRadius = _calculateRadius();
 
-    // Build trailing widget
-    Widget? trailing;
-    if (widget.trailingIcon != null) {
-      trailing = widget.trailingIcon;
-    } else if (widget.showArrow) {
-      trailing = AnimatedBuilder(
-        animation: _arrowCtrl,
-        builder: (context, child) {
-          final angle = _arrowCtrl.value * 3.14159265;
-          return Transform.rotate(
-            angle: angle,
-            child: Icon(Icons.keyboard_arrow_down_rounded, color: cs.onSurface),
-          );
-        },
-      );
-    }
+    final canTapHeader = d.tapHeaderToToggle;
+    final canTapBody =
+        (widget.isExpanded && d.tapBodyToCollapse) ||
+        (!widget.isExpanded && d.tapBodyToExpand);
+    final entireCardTappable = !d.tapIconToToggle && canTapHeader && canTapBody;
+
+    final outerTap = entireCardTappable ? widget.onToggle : null;
+    final headerTap =
+        (!entireCardTappable && canTapHeader && !d.tapIconToToggle)
+        ? widget.onToggle
+        : null;
+
+    final String? outerTooltip = entireCardTappable
+        ? (widget.isExpanded ? d.collapseTooltip : d.expandTooltip)
+        : null;
 
     return RepaintBoundary(
       child: Padding(
-        padding: widget.margin ?? EdgeInsets.zero,
+        padding: d.margin ?? EdgeInsets.zero,
         child: Padding(
-          padding: EdgeInsets.only(bottom: isLast ? 0 : widget.gap),
-          child: AnimatedBuilder(
-            animation: _radiusCtrl,
-            builder: (context, child) {
-              final t = _radiusCtrl.value.clamp(0.0, 1.0);
-              final effectiveRadius = widget.selectedBorderRadius != null
-                  ? BorderRadius.lerp(
-                      borderRadius,
-                      widget.selectedBorderRadius,
-                      t,
-                    )!
-                  : borderRadius;
-              return Material(
-                elevation: widget.elevation,
-                color: widget.color ?? cs.surfaceContainerHighest,
-                shape: RoundedRectangleBorder(
-                  borderRadius: effectiveRadius,
-                  side: widget.border ?? BorderSide.none,
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: child,
-              );
-            },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header — always visible
-                InkWell(
-                  splashColor: widget.splashColor,
-                  highlightColor: widget.highlightColor,
-                  splashFactory: widget.splashFactory,
-                  enableFeedback: widget.enableFeedback,
-                  onTap: widget.onToggle,
-                  child: Padding(
-                    padding: widget.headerPadding ?? const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: widget.headerBuilder(
-                            context,
-                            widget.index,
-                            widget.isExpanded,
-                          ),
-                        ),
-                        ?trailing,
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Body — animated expand / collapse
-                AnimatedBuilder(
-                  animation: _expandCtrl,
-                  builder: (context, child) {
-                    // The spring can overshoot past 1.0 which creates the
-                    // subtle "push down then up" effect.
-                    final progress = _expandCtrl.value.clamp(0.0, 1.5);
-
-                    if (progress <= 0.001) {
-                      return const SizedBox.shrink();
-                    }
-
-                    return ClipRect(
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        heightFactor: progress.clamp(0.0, 1.0),
-                        child: Opacity(
-                          opacity: progress.clamp(0.0, 1.0),
-                          child: Transform.translate(
-                            // Overshoot creates a small downward push
-                            offset: Offset(
-                              0,
-                              (progress > 1.0) ? (progress - 1.0) * 6 : 0,
-                            ),
-                            child: child,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding:
-                        widget.bodyPadding ??
-                        const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: widget.bodyBuilder(context, widget.index),
-                  ),
-                ),
-              ],
-            ),
+          padding: EdgeInsets.only(bottom: isLast ? 0 : d.gap),
+          child: _buildAnimatedContainer(
+            cs,
+            d,
+            outerTap,
+            headerTap,
+            outerTooltip,
           ),
         ),
       ),
     );
   }
+
+  Widget _buildAnimatedContainer(
+    ColorScheme cs,
+    M3EExpandableStyle d,
+    VoidCallback? outerTap,
+    VoidCallback? headerTap,
+    String? outerTooltip,
+  ) {
+    Widget content = AnimatedBuilder(
+      animation: _expandCtrl,
+      builder: (context, child) {
+        final progress = _expandCtrl.value;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildHeader(
+              d,
+              progress,
+              headerTap,
+              isEntirelyTappable: outerTap != null,
+            ),
+            _buildExpandableBody(
+              d,
+              progress,
+              isEntirelyTappable: outerTap != null,
+            ),
+          ],
+        );
+      },
+    );
+
+    content = _buildInteractionWrapper(
+      d,
+      onTap: outerTap,
+      tooltip: outerTooltip,
+      child: content,
+    );
+
+    return TweenAnimationBuilder<BorderRadius?>(
+      duration: const Duration(milliseconds: 40),
+      curve: Curves.easeOut,
+      tween: BorderRadiusTween(
+        begin: _buildEffectiveRadius(),
+        end: _buildEffectiveRadius(),
+      ),
+      builder: (context, animatedRadius, child) {
+        return Material(
+          elevation: d.elevation,
+          color: d.color ?? cs.surfaceContainerHighest,
+          shape: RoundedRectangleBorder(
+            borderRadius: animatedRadius ?? _buildEffectiveRadius(),
+            side: d.border ?? BorderSide.none,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: child,
+        );
+      },
+      child: content,
+    );
+  }
+
+  Widget _buildHeader(
+    M3EExpandableStyle d,
+    double progress,
+    VoidCallback? onTap, {
+    required bool isEntirelyTappable,
+  }) {
+    final headerContent = Padding(
+      padding: d.headerPadding ?? const EdgeInsets.fromLTRB(16, 14, 16, 2),
+      child: Row(
+        crossAxisAlignment: d.headerAlignment == CrossAxisAlignment.stretch
+            ? CrossAxisAlignment.center
+            : d.headerAlignment,
+        textBaseline: d.headerAlignment == CrossAxisAlignment.baseline
+            ? TextBaseline.alphabetic
+            : null,
+        children: [
+          if (d.iconPlacement == IconPlacement.left) ...[
+            _buildIcon(d, progress, widget.onToggle),
+            Expanded(
+              child: widget.headerBuilder(context, widget.index, progress),
+            ),
+          ] else ...[
+            Expanded(
+              child: widget.headerBuilder(context, widget.index, progress),
+            ),
+            _buildIcon(d, progress, widget.onToggle),
+          ],
+        ],
+      ),
+    );
+
+    final String? headerTooltip = (d.tapHeaderToToggle && !isEntirelyTappable)
+        ? (widget.isExpanded ? d.collapseTooltip : d.expandTooltip)
+        : null;
+
+    return _buildInteractionWrapper(
+      d,
+      onTap: onTap,
+      isHeader: true,
+      semanticLabel: 'Item ${widget.index + 1} of ${widget.totalCount}',
+      semanticHint: widget.isExpanded ? 'Collapse' : 'Expand',
+      isExpanded: widget.isExpanded,
+      tooltip: headerTooltip,
+      child: headerContent,
+    );
+  }
+
+  Widget _buildIcon(
+    M3EExpandableStyle d,
+    double progress,
+    VoidCallback onToggle,
+  ) {
+    if (d.expandIcon == null && d.collapseIcon == null) {
+      return const SizedBox.shrink();
+    }
+
+    final bool isExpanded = progress >= 0.5;
+    final Widget? icon = isExpanded ? d.collapseIcon : d.expandIcon;
+
+    if (icon == null) return const SizedBox.shrink();
+
+    // Preserve the rotation logic:
+    // If expanding (progress 0->1), rotate towards iconRotationAngle.
+    // If collapsing, rotate back.
+    final double angle = d.iconRotationAngle * progress;
+
+    final String? tooltip = d.tapIconToToggle
+        ? (isExpanded ? d.collapseTooltip : d.expandTooltip)
+        : null;
+
+    Widget iconWidget = Padding(
+      padding: d.iconPadding,
+      child: Transform.rotate(angle: angle, child: icon),
+    );
+
+    if (d.tapIconToToggle) {
+      iconWidget = _buildInteractionWrapper(
+        d,
+        onTap: onToggle,
+        isHeader: true,
+        isIcon: true,
+        semanticLabel: isExpanded ? 'Collapse button' : 'Expand button',
+        isExpanded: isExpanded,
+        tooltip: tooltip,
+        child: iconWidget,
+      );
+    } else {
+      // If the whole header is tappable, we hide the icon from semantics to avoid duplicate announcements
+      iconWidget = ExcludeSemantics(child: iconWidget);
+    }
+
+    return iconWidget;
+  }
+
+  Widget _buildExpandableBody(
+    M3EExpandableStyle d,
+    double progress, {
+    required bool isEntirelyTappable,
+  }) {
+    final effectivePadding =
+        d.bodyPadding ?? const EdgeInsets.fromLTRB(16, 0, 16, 20);
+    final resolvedPadding = effectivePadding.resolve(
+      Directionality.of(context),
+    );
+    final contentShift = math.min(12.0, resolvedPadding.bottom * 0.6 + 4.0);
+
+    final needsMeasurement =
+        _collapsedHeight == null || _expandedHeight == null;
+    final clampedProgress = progress.clamp(0.0, 1.0);
+    final contentCollapsed = _collapsedHeight ?? 0.0;
+    final contentExpanded = _expandedHeight ?? 200.0;
+
+    final paddingVertical = effectivePadding.vertical;
+    final totalCollapsed = contentCollapsed > 0
+        ? contentCollapsed + paddingVertical
+        : 0.0;
+    final totalExpanded = contentExpanded > 0
+        ? contentExpanded + paddingVertical
+        : 0.0;
+
+    final bodyHeight = math.max(
+      0.0,
+      totalCollapsed + (totalExpanded - totalCollapsed) * progress,
+    );
+    final translationY = -(1.0 - clampedProgress) * contentShift;
+
+    return Stack(
+      children: [
+        if (needsMeasurement)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: Offstage(
+              offstage: true,
+              child: Padding(
+                padding: effectivePadding,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_collapsedHeight == null)
+                      MeasureSize(
+                        onChange: (size) =>
+                            setState(() => _collapsedHeight = size.height),
+                        child: widget.bodyBuilder(context, widget.index, 0.0),
+                      ),
+                    if (_expandedHeight == null)
+                      MeasureSize(
+                        onChange: (size) =>
+                            setState(() => _expandedHeight = size.height),
+                        child: widget.bodyBuilder(context, widget.index, 1.0),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        if (bodyHeight > 0)
+          SizedBox(
+            height: bodyHeight,
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              padding: effectivePadding,
+              child: SizedBox(
+                width: double.infinity,
+                child: Builder(
+                  builder: (context) {
+                    final isExpanded = progress > 0.5;
+                    final canTapBody =
+                        (isExpanded && d.tapBodyToCollapse) ||
+                        (!isExpanded && d.tapBodyToExpand);
+                    final tapCallback =
+                        (!isEntirelyTappable &&
+                            canTapBody &&
+                            !d.tapIconToToggle)
+                        ? widget.onToggle
+                        : null;
+
+                    final String? bodyTooltip = (tapCallback != null)
+                        ? (isExpanded ? d.collapseTooltip : d.expandTooltip)
+                        : null;
+
+                    return _buildInteractionWrapper(
+                      d,
+                      onTap: tapCallback,
+                      tooltip: bodyTooltip,
+                      child: Align(
+                        alignment: d.bodyAlignment,
+                        child: Transform.translate(
+                          offset: Offset(0, translationY),
+                          child: widget.bodyBuilder(
+                            context,
+                            widget.index,
+                            progress,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          )
+        else
+          const SizedBox.shrink(),
+      ],
+    );
+  }
+
+  Widget _buildInteractionWrapper(
+    M3EExpandableStyle d, {
+    required Widget child,
+    required VoidCallback? onTap,
+    bool isHeader = false,
+    bool isIcon = false,
+    String? semanticLabel,
+    String? semanticHint,
+    bool? isExpanded,
+    String? tooltip,
+  }) {
+    Widget result = child;
+
+    if (tooltip != null) {
+      result = Tooltip(message: tooltip, child: result);
+    }
+
+    if (onTap == null) {
+      return Semantics(
+        label: semanticLabel,
+        expanded: isExpanded,
+        child: result,
+      );
+    }
+
+    if (!d.useInkWell) {
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: onTap,
+        onTapDown: isHeader ? (_) => _handleTapDown() : null,
+        onTapUp: isHeader ? (_) => _handleTapUp() : null,
+        onTapCancel: isHeader ? () => _handleTapCancel() : null,
+        child: Semantics(
+          label: semanticLabel,
+          hint: semanticHint,
+          expanded: isExpanded,
+          button: true,
+          onTap: onTap,
+          child: result,
+        ),
+      );
+    }
+
+    return InkWell(
+      customBorder: isIcon ? const CircleBorder() : null,
+      splashColor: d.splashColor,
+      highlightColor: d.highlightColor,
+      splashFactory: d.splashFactory,
+      enableFeedback: d.enableFeedback,
+      onTap: onTap,
+      onHover: isHeader ? (h) => _handleHoverChanged(h) : null,
+      onTapDown: isHeader ? (_) => _handleTapDown() : null,
+      onTapUp: isHeader ? (_) => _handleTapUp() : null,
+      onTapCancel: isHeader ? () => _handleTapCancel() : null,
+      child: Semantics(
+        label: semanticLabel,
+        hint: semanticHint,
+        expanded: isExpanded,
+        button: true,
+        onTap: onTap,
+        child: result,
+      ),
+    );
+  }
+}
+
+Widget buildM3EExpandableItem({
+  required int index,
+  required int totalCount,
+  required bool isExpanded,
+  required M3EExpandableHeaderBuilder headerBuilder,
+  required M3EExpandableBodyBuilder bodyBuilder,
+  required M3EExpandableStyle decoration,
+  required M3EMotion expandMotion,
+  required M3EMotion collapseMotion,
+  required VoidCallback onToggle,
+}) {
+  return M3EExpandableItem(
+    index: index,
+    totalCount: totalCount,
+    isExpanded: isExpanded,
+    headerBuilder: headerBuilder,
+    bodyBuilder: bodyBuilder,
+    decoration: decoration,
+    expandMotion: expandMotion,
+    collapseMotion: collapseMotion,
+    onToggle: onToggle,
+  );
 }

@@ -8,8 +8,8 @@ import '../../internal/button_constants.dart';
 import '../../internal/m3e_base_button_state.dart';
 import '../../style/button_tokens_adapter.dart';
 import '../../style/m3e_button_enums.dart';
+import '../../../common/m3e_common.dart';
 import '../../style/m3e_split_button_decoration.dart';
-import '../../style/m3e_motion.dart';
 
 const double _kSplitMinTapTarget = 48.0;
 const bool _kDefaultEnableFeedback = true;

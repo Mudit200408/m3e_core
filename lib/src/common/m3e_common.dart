@@ -1,16 +1,62 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:motor/motor.dart';
 
-/// Spring animation configuration for Material 3 Expressive buttons.
+/// Haptic feedback intensity levels for Material 3 Expressive components.
 ///
-/// Use with [M3EButtonDecoration.motion] or [M3EToggleButtonDecoration.motion]
-/// to customize the spring physics for button animations.
+/// ## Levels
+/// - [none] — No haptic feedback (default)
+/// - [light] — Light tap feedback for subtle interactions
+/// - [medium] — Medium impact for standard button presses
+/// - [heavy] — Heavy impact for significant actions
+enum M3EHapticFeedback {
+  /// No haptic feedback.
+  none(0),
+
+  /// Light tap feedback.
+  light(1),
+
+  /// Medium impact feedback.
+  medium(2),
+
+  /// Heavy impact feedback.
+  heavy(3);
+
+  final int value;
+  const M3EHapticFeedback(this.value);
+
+  /// Helper function to apply haptic feedback based on [M3EHapticFeedback].
+  void apply() {
+    applyHaptic(this);
+  }
+}
+
+/// Helper function to apply haptic feedback based on [M3EHapticFeedback].
+void applyHaptic(M3EHapticFeedback haptic) {
+  switch (haptic) {
+    case M3EHapticFeedback.light:
+      HapticFeedback.lightImpact();
+      break;
+    case M3EHapticFeedback.medium:
+      HapticFeedback.mediumImpact();
+      break;
+    case M3EHapticFeedback.heavy:
+      HapticFeedback.heavyImpact();
+      break;
+    case M3EHapticFeedback.none:
+      break;
+  }
+}
+
+/// Spring animation configuration for Material 3 Expressive components.
+///
+/// Use to customize the spring physics for component animations.
 ///
 /// ## Motion Presets
 ///
 /// The class provides two families of presets:
-/// - **Spatial** motions: animate the button's shape (border radius) during press
-/// - **Effects** motions: animate opacity/scale effects during press
+/// - **Spatial** motions: animate shapes (like border radius)
+/// - **Effects** motions: animate opacity/scale effects
 ///
 /// Each family has three speed variants:
 /// - **Fast**: Snappy, responsive animations
@@ -21,14 +67,8 @@ import 'package:motor/motor.dart';
 ///
 /// Use [M3EMotion.custom] to create a custom spring with specific physics:
 /// ```dart
-/// M3EButtonDecoration(
-///   motion: M3EMotion.custom(stiffness: 1600, damping: 0.85),
-/// )
+/// M3EMotion.custom(1600, 0.85)
 /// ```
-///
-/// See also:
-/// - [M3EButtonDecoration.motion] for button styling
-/// - [M3EToggleButtonDecoration.motion] for toggle button styling
 @immutable
 class M3EMotion {
   const M3EMotion._({
@@ -47,8 +87,6 @@ class M3EMotion {
   );
 
   /// Default spatial motion (stiffness: 700, damping: 0.9).
-  ///
-  /// Balanced spring for general use.
   static const M3EMotion standardSpatialDefault = M3EMotion._(
     stiffness: 700,
     damping: 0.9,
@@ -154,9 +192,8 @@ class M3EMotion {
   ///
   /// [stiffness] controls how fast the spring bounces (higher = faster).
   /// [damping] controls how quickly oscillations settle (0.7-1.0 recommended).
-  factory M3EMotion.custom(double stiffness, double damping) {
-    return M3EMotion._(stiffness: stiffness, damping: damping);
-  }
+  const M3EMotion.custom({required this.stiffness, required this.damping})
+    : snapToEnd = false;
 
   /// Spring stiffness. Higher values make the spring snappier.
   final double stiffness;

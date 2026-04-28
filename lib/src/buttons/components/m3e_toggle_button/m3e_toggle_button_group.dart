@@ -96,9 +96,6 @@ class M3EToggleButtonGroupAction {
   final bool enabled;
 
   /// Optional decoration that bundles styling properties together.
-  ///
-  /// When provided, decoration values take precedence over individual flat
-  /// parameters (e.g. [backgroundColor], [foregroundColor], etc.).
   final M3EToggleButtonDecoration? decoration;
 
   /// A custom fixed width for this specific button.

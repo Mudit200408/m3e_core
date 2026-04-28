@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'm3e_motion.dart';
+import '../../common/m3e_common.dart';
 
 /// Styling configuration for the overflow popup menu in [M3EToggleButtonGroup].
 ///

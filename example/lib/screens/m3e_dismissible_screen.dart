@@ -279,9 +279,25 @@ class _DismissibleColumnTabState extends State<_DismissibleColumnTab> {
 
   double _neighbourPull = 8.0;
   int _neighbourReach = 3;
-  double _neighbourStiffness = 800;
-  double _neighbourDamping = 0.7;
+  M3EMotion _neighbourMotion = const M3EMotion.custom(
+    stiffness: 800,
+    damping: 0.7,
+  );
+  M3EMotion _snapBackMotion = const M3EMotion.custom(
+    stiffness: 380,
+    damping: 0.6,
+  );
+  M3EMotion _flyMotion = const M3EMotion.custom(stiffness: 400, damping: 0.8);
+  double _collapseSpeed = 50.0;
   double _dismissThreshold = 0.6;
+  M3EHapticFeedback _hapticOnTap = M3EHapticFeedback.light;
+  M3EHapticFeedback _hapticOnThreshold = M3EHapticFeedback.medium;
+  bool _dismissHapticStream = false;
+  bool _gmailUI = false;
+  double _outerRadius = 18.0;
+  double _innerRadius = 4.0;
+  double _selectedBorderRadius = 20.0;
+  double _gap = 4.0;
 
   Future<bool> _onDismiss(int index, DismissDirection direction) async {
     final item = _items[index];
@@ -352,23 +368,118 @@ class _DismissibleColumnTabState extends State<_DismissibleColumnTab> {
                   ),
                   SliderRow(
                     label: 'Stiffness',
-                    value: _neighbourStiffness,
+                    value: _neighbourMotion.stiffness,
                     min: 100,
                     max: 1500,
                     divisions: 28,
                     format: (v) => v.toStringAsFixed(0),
-                    onChanged: (v) => setState(() => _neighbourStiffness = v),
+                    onChanged: (v) => setState(
+                      () => _neighbourMotion = M3EMotion.custom(
+                        stiffness: v,
+                        damping: _neighbourMotion.damping,
+                      ),
+                    ),
                   ),
                   SliderRow(
                     label: 'Damping',
-                    value: _neighbourDamping,
+                    value: _neighbourMotion.damping,
                     min: 0.1,
                     max: 1.0,
                     divisions: 18,
                     format: (v) => v.toStringAsFixed(2),
-                    onChanged: (v) => setState(() => _neighbourDamping = v),
+                    onChanged: (v) => setState(
+                      () => _neighbourMotion = M3EMotion.custom(
+                        stiffness: _neighbourMotion.stiffness,
+                        damping: v,
+                      ),
+                    ),
                   ),
                   const Divider(height: 16),
+                  Text(
+                    'Snap Back Motion',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: cs.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SliderRow(
+                    label: 'Stiffness',
+                    value: _snapBackMotion.stiffness,
+                    min: 50,
+                    max: 1500,
+                    divisions: 29,
+                    format: (v) => v.toStringAsFixed(0),
+                    onChanged: (v) => setState(
+                      () => _snapBackMotion = M3EMotion.custom(
+                        stiffness: v,
+                        damping: _snapBackMotion.damping,
+                      ),
+                    ),
+                  ),
+                  SliderRow(
+                    label: 'Damping',
+                    value: _snapBackMotion.damping,
+                    min: 0.1,
+                    max: 1.0,
+                    divisions: 18,
+                    format: (v) => v.toStringAsFixed(2),
+                    onChanged: (v) => setState(
+                      () => _snapBackMotion = M3EMotion.custom(
+                        stiffness: _snapBackMotion.stiffness,
+                        damping: v,
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 16),
+                  Text(
+                    'Fly Motion',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: cs.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SliderRow(
+                    label: 'Stiffness',
+                    value: _flyMotion.stiffness,
+                    min: 50,
+                    max: 1500,
+                    divisions: 29,
+                    format: (v) => v.toStringAsFixed(0),
+                    onChanged: (v) => setState(
+                      () => _flyMotion = M3EMotion.custom(
+                        stiffness: v,
+                        damping: _flyMotion.damping,
+                      ),
+                    ),
+                  ),
+                  SliderRow(
+                    label: 'Damping',
+                    value: _flyMotion.damping,
+                    min: 0.1,
+                    max: 1.0,
+                    divisions: 18,
+                    format: (v) => v.toStringAsFixed(2),
+                    onChanged: (v) => setState(
+                      () => _flyMotion = M3EMotion.custom(
+                        stiffness: _flyMotion.stiffness,
+                        damping: v,
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 16),
+                  SliderRow(
+                    label: 'Collapse Spd',
+                    value: _collapseSpeed,
+                    min: 10,
+                    max: 200,
+                    divisions: 19,
+                    format: (v) => v.toStringAsFixed(0),
+                    onChanged: (v) => setState(() => _collapseSpeed = v),
+                  ),
                   SliderRow(
                     label: 'Threshold',
                     value: _dismissThreshold,
@@ -378,9 +489,139 @@ class _DismissibleColumnTabState extends State<_DismissibleColumnTab> {
                     format: (v) => v.toStringAsFixed(2),
                     onChanged: (v) => setState(() => _dismissThreshold = v),
                   ),
+                  const Divider(height: 16),
+                  Text(
+                    'Border Radius',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: cs.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SliderRow(
+                    label: 'Outer Rad',
+                    value: _outerRadius,
+                    min: 0,
+                    max: 60,
+                    divisions: 60,
+                    format: (v) => v.toStringAsFixed(0),
+                    onChanged: (v) => setState(() => _outerRadius = v),
+                  ),
+                  SliderRow(
+                    label: 'Inner Rad',
+                    value: _innerRadius,
+                    min: 0,
+                    max: 60,
+                    divisions: 60,
+                    format: (v) => v.toStringAsFixed(0),
+                    onChanged: (v) => setState(() => _innerRadius = v),
+                  ),
+                  SliderRow(
+                    label: 'Selected R',
+                    value: _selectedBorderRadius,
+                    min: 0,
+                    max: 60,
+                    divisions: 60,
+                    format: (v) => v.toStringAsFixed(0),
+                    onChanged: (v) => setState(() => _selectedBorderRadius = v),
+                  ),
+                  SliderRow(
+                    label: 'Gap',
+                    value: _gap,
+                    min: 0,
+                    max: 50,
+                    divisions: 50,
+                    format: (v) => v.toStringAsFixed(0),
+                    onChanged: (v) => setState(() => _gap = v),
+                  ),
+                  const Divider(height: 16),
+                  Text(
+                    'Haptics',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: cs.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'On Tap',
+                        style: TextStyle(fontSize: 13, color: cs.onSurface),
+                      ),
+                      DropdownButton<M3EHapticFeedback>(
+                        value: _hapticOnTap,
+                        isDense: true,
+                        style: TextStyle(fontSize: 13, color: cs.onSurface),
+                        items: M3EHapticFeedback.values
+                            .map(
+                              (v) => DropdownMenuItem(
+                                value: v,
+                                child: Text(v.name),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) => setState(() => _hapticOnTap = v!),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'On Threshold',
+                        style: TextStyle(fontSize: 13, color: cs.onSurface),
+                      ),
+                      DropdownButton<M3EHapticFeedback>(
+                        value: _hapticOnThreshold,
+                        isDense: true,
+                        style: TextStyle(fontSize: 13, color: cs.onSurface),
+                        items: M3EHapticFeedback.values
+                            .map(
+                              (v) => DropdownMenuItem(
+                                value: v,
+                                child: Text(v.name),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) =>
+                            setState(() => _hapticOnThreshold = v!),
+                      ),
+                    ],
+                  ),
+                  SwitchListTile(
+                    title: const Text(
+                      'Haptic Stream',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    value: _dismissHapticStream,
+                    onChanged: (v) => setState(() => _dismissHapticStream = v),
+                  ),
+                  SwitchListTile(
+                    title: const Text(
+                      'Gmail Style UI',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    value: _gmailUI,
+                    onChanged: (v) => setState(() => _gmailUI = v),
+                  ),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          FilledButton.tonalIcon(
+            onPressed: _reset,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reset items'),
           ),
           const SizedBox(height: 12),
 
@@ -404,17 +645,45 @@ class _DismissibleColumnTabState extends State<_DismissibleColumnTab> {
             M3EDismissibleCardColumn(
               itemCount: _items.length,
               onDismiss: _onDismiss,
+
               onTap: (i) => showSnack(context, 'Tapped: ${_items[i].subject}'),
               style: M3EDismissibleCardStyle(
-                hapticOnTap: 1,
-                hapticOnThreshold: 2,
-                dismissHapticStream: false,
+                hapticOnTap: _hapticOnTap,
+                hapticOnThreshold: _hapticOnThreshold,
+                dismissHapticStream: _dismissHapticStream,
                 dismissThreshold: _dismissThreshold,
                 neighbourPull: _neighbourPull,
                 neighbourReach: _neighbourReach,
-                neighbourStiffness: _neighbourStiffness,
-                neighbourDamping: _neighbourDamping,
-                selectedBorderRadius: 20,
+                neighbourMotion: _neighbourMotion,
+                snapBackMotion: _snapBackMotion,
+                flyMotion: _flyMotion,
+                collapseSpeed: _collapseSpeed,
+                outerRadius: _outerRadius,
+                innerRadius: _innerRadius,
+                selectedBorderRadius: _selectedBorderRadius,
+                gap: _gap,
+                background: _gmailUI
+                    ? Container(
+                        color: const Color(0xFF87d292),
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.archive,
+                          color: Colors.black,
+                          size: 28,
+                        ),
+                      )
+                    : null,
+                secondaryBackground: _gmailUI
+                    ? Container(
+                        color: Colors.red.shade600,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      )
+                    : null,
               ),
               itemBuilder: (context, index) {
                 final item = _items[index];
@@ -424,12 +693,6 @@ class _DismissibleColumnTabState extends State<_DismissibleColumnTab> {
                 );
               },
             ),
-          const SizedBox(height: 16),
-          FilledButton.tonalIcon(
-            onPressed: _reset,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Reset items'),
-          ),
         ],
       ),
     );

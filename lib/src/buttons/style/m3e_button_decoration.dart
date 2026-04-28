@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'm3e_button_enums.dart';
-import 'm3e_motion.dart';
+import '../../common/m3e_common.dart';
 
 /// Styling overrides for [M3EButton].
 ///

@@ -5,7 +5,7 @@
 
 import 'package:flutter/services.dart';
 
-import '../style/m3e_button_enums.dart';
+import '../../common/m3e_common.dart';
 
 /// Shared numeric constants used throughout the button package.
 ///

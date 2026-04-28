@@ -1,8 +1,18 @@
+/// Material 3 Expressive (M3E) components and utilities for Flutter.
+///
+/// This library provides a set of high-performance, expressive UI components
+/// that follow the Material 3 design system with enhanced animations and
+/// interactions.
+library m3e_core;
+
+// Common components.
+export 'src/common/m3e_common.dart';
+
 // Non-dismissible variants (static layout).
 export 'src/card/m3e_card.dart';
 
 // Dismissible variants (interactive dismiss + neighbour pull).
-export 'src/dismissible/dismissible.dart';
+export 'src/dismissible/m3e_dismissible.dart';
 
 // Dropdown menu.
 export 'src/dropdown/dropdown.dart';

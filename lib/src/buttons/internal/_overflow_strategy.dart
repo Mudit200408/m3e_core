@@ -8,7 +8,7 @@ import 'package:m3e_core/m3e_core.dart';
 
 /// Callback type for building overflow menu content.
 ///
-/// Used by [OverflowStrategy.buildOverflowMenu] to allow custom implementations
+/// Used by [OverflowStrategy] to allow custom implementations
 /// to define how overflow menu items are displayed.
 typedef OverflowMenuItemBuilder =
     Widget Function(
@@ -85,7 +85,6 @@ abstract class OverflowStrategy {
 
   /// Returns the estimated main-axis extent of the trigger built by [buildOverflowTrigger].
   ///
-  /// If this returns [null], the group will fall back to a standard icon-only measurement.
   /// Provide this if your custom trigger is significantly wider than a standard
   /// icon button (for example, if it includes a text label) to prevent the
   /// group from overflowing and clipping the content.
@@ -96,8 +95,7 @@ abstract class OverflowStrategy {
   /// Override this to provide a custom visible layout when buttons overflow.
   /// Return a [Widget] that displays the visible portion of the button group.
   ///
-  /// The [buildButton] callback creates a button at the given index with
-  /// the appropriate [isFirstInGroup] and [isLastInGroup] flags.
+  /// The [buildButton] callback creates a button at the given index.
   ///
   /// For example, a custom strategy might wrap buttons in a custom scrollable:
   /// ```dart

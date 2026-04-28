@@ -11,8 +11,7 @@
 /// See also:
 /// - [M3EToggleButtonGroup] for the connected toggle button group
 enum M3EButtonGroupType {
-  /// Independent buttons with gaps between them. Spacing is controlled by
-  /// [density] parameter.
+  /// Independent buttons with gaps between them.
   standard,
 
   /// Buttons share edges with no gap. Inner corners animate on press;

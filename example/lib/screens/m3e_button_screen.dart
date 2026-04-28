@@ -272,7 +272,7 @@ class _ButtonTab extends StatelessWidget {
               M3EFilledButton(
                 shape: M3EButtonShape.round,
                 decoration: M3EButtonDecoration.styleFrom(
-                  motion: M3EMotion.custom(600, 0.3),
+                  motion: M3EMotion.custom(stiffness: 600, damping: 0.3),
                 ),
                 onPressed: () {},
                 child: const Text('Bouncy 0.3'),
@@ -1831,7 +1831,7 @@ class _TbgConnectedSquareGroupState extends State<_TbgConnectedSquareGroup> {
     decoration: M3EToggleButtonDecoration.styleFrom(
       connectedInnerRadius: 10,
       pressedRadius: 3,
-      motion: M3EMotion.custom(600, 0.7),
+      motion: M3EMotion.custom(stiffness: 600, damping: 0.7),
     ),
     onSelectedIndexChanged: (i) => setState(() => _index = i),
     actions: [
@@ -1873,7 +1873,7 @@ class _TbgConnectedExampleState extends State<_TbgConnectedExample> {
     decoration: M3EToggleButtonDecoration.styleFrom(
       connectedInnerRadius: 10,
       pressedRadius: 3,
-      motion: M3EMotion.custom(600, 0.7),
+      motion: M3EMotion.custom(stiffness: 600, damping: 0.7),
     ),
     onSelectedIndexChanged: (i) => setState(() => _index = i),
     actions: [
@@ -1941,12 +1941,12 @@ class _OverflowToggleDemoGroupState extends State<_OverflowToggleDemoGroup> {
 
     final overflowPopupDecoration = M3EOverflowPopupDecoration(
       trailing: Icon(Icons.check_circle_rounded, color: cs.primary, size: 20),
-      motion: M3EMotion.custom(800, 0.7),
+      motion: M3EMotion.custom(stiffness: 800, damping: 0.7),
     );
 
     final overflowBottomSheetDecoration = M3EOverflowBottomSheetDecoration(
       trailing: Icon(Icons.check_circle_rounded, color: cs.primary, size: 20),
-      motion: M3EMotion.custom(700, 0.4),
+      motion: M3EMotion.custom(stiffness: 700, damping: 0.4),
     );
 
     final group = M3EToggleButtonGroup(

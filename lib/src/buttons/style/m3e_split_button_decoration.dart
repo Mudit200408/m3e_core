@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../common/m3e_common.dart';
 import 'm3e_button_decoration.dart';
 import 'm3e_button_enums.dart';
-import 'm3e_motion.dart';
 
 /// Menu presentation style used by [M3ESplitButtonDecoration.menuStyle].
 enum SplitButtonMenuStyle {

@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:motor/motor.dart';
 
+import '../common/m3e_common.dart';
 import 'm3e_dropdown_controller.dart';
 import 'm3e_dropdown_item.dart';
 import 'm3e_dropdown_style.dart';
+
+import 'widgets/m3e_dropdown_chips.dart';
+import 'widgets/m3e_dropdown_menu_item.dart';
 
 /// Signature for a function that asynchronously returns dropdown items.
 typedef M3EDropdownFutureRequest<T> =
@@ -88,30 +91,33 @@ class M3EDropdownMenu<T> extends StatefulWidget {
   // ── Shape ──
 
   /// Radius applied to the dropdown panel container and (when no
-  /// [M3EDropdownFieldDecoration.borderRadius] is set) the field.
+  /// [M3EDropdownFieldStyle.borderRadius] is set) the field.
   ///
   /// Defaults to `28.0`.
   final double containerRadius;
 
   // ── Styling ──
 
-  /// Field decoration.
-  final M3EDropdownFieldDecoration fieldDecoration;
+  /// Field style.
+  final M3EDropdownFieldStyle fieldStyle;
 
-  /// Dropdown panel decoration.
-  final M3EDropdownDecoration dropdownDecoration;
+  /// Dropdown panel style.
+  final M3EDropdownStyle dropdownStyle;
 
-  /// Chip decoration (only used when [showChipAnimation] is true).
-  final M3EChipDecoration chipDecoration;
+  /// Chip style (only used when [showChipAnimation] is true).
+  final M3EChipStyle chipStyle;
 
-  /// Search field decoration (only used when [searchEnabled] is true).
-  final M3ESearchDecoration searchDecoration;
+  /// Search field style (only used when [searchEnabled] is true).
+  final M3ESearchStyle searchStyle;
 
-  /// Item decoration.
-  final M3EDropdownItemDecoration itemDecoration;
+  /// Item style.
+  final M3EDropdownItemStyle itemStyle;
 
   /// Optional builder for each dropdown item – overrides default rendering.
   final M3EDropdownItemBuilder<T>? itemBuilder;
+
+  /// Optional builder for the empty state when no items match the filter.
+  final WidgetBuilder? emptyBuilder;
 
   /// Optional builder for each selected item in the field.
   ///
@@ -122,7 +128,7 @@ class M3EDropdownMenu<T> extends StatefulWidget {
 
   /// An optional widget placed between dropdown items.
   ///
-  /// When non-null, overrides `itemGap` inside [M3EDropdownItemDecoration.itemGap] and is used as the separator in
+  /// When non-null, overrides `itemGap` inside [M3EDropdownItemStyle.itemGap] and is used as the separator in
   /// the dropdown item list.
   final Widget? itemSeparator;
 
@@ -148,15 +154,15 @@ class M3EDropdownMenu<T> extends StatefulWidget {
 
   // ── Animation ──
 
-  /// The spring stiffness for the expand/collapse animation.
+  /// The spring motion for the expand animation.
   ///
-  /// Defaults to `380`.
-  final double stiffness;
+  /// Defaults to [M3EMotion.expressiveSpatialDefault].
+  final M3EMotion openMotion;
 
-  /// The spring damping ratio for the expand/collapse animation.
+  /// The spring motion for the collapse animation.
   ///
-  /// Defaults to `0.8`.
-  final double damping;
+  /// Defaults to [M3EMotion.expressiveSpatialDefault].
+  final M3EMotion closeMotion;
 
   // ── Splash ──
 
@@ -170,8 +176,8 @@ class M3EDropdownMenu<T> extends StatefulWidget {
 
   // ── Haptics ──
 
-  /// Haptic feedback level on tap (0 = none, 1 = light, 2 = medium, 3 = heavy).
-  final int haptic;
+  /// Haptic feedback level on tap.
+  final M3EHapticFeedback haptic;
 
   /// Creates an [M3EDropdownMenu] with a static list of items.
   const M3EDropdownMenu({
@@ -186,22 +192,23 @@ class M3EDropdownMenu<T> extends StatefulWidget {
     this.controller,
     this.enabled = true,
     this.containerRadius = 28.0,
-    this.fieldDecoration = const M3EDropdownFieldDecoration(),
-    this.dropdownDecoration = const M3EDropdownDecoration(),
-    this.chipDecoration = const M3EChipDecoration(),
-    this.searchDecoration = const M3ESearchDecoration(),
-    this.itemDecoration = const M3EDropdownItemDecoration(),
+    this.fieldStyle = const M3EDropdownFieldStyle(),
+    this.dropdownStyle = const M3EDropdownStyle(),
+    this.chipStyle = const M3EChipStyle(),
+    this.searchStyle = const M3ESearchStyle(),
+    this.itemStyle = const M3EDropdownItemStyle(),
     this.itemBuilder,
+    this.emptyBuilder,
     this.selectedItemBuilder,
     this.itemSeparator,
     this.validator,
     this.autovalidateMode = AutovalidateMode.disabled,
     this.focusNode,
     this.closeOnBackButton = false,
-    this.stiffness = 380,
-    this.damping = 0.8,
+    this.openMotion = M3EMotion.expressiveSpatialDefault,
+    this.closeMotion = M3EMotion.expressiveSpatialDefault,
     this.splashFactory = NoSplash.splashFactory,
-    this.haptic = 0,
+    this.haptic = M3EHapticFeedback.none,
   }) : future = null;
 
   /// Creates an [M3EDropdownMenu] that loads items asynchronously.
@@ -217,22 +224,23 @@ class M3EDropdownMenu<T> extends StatefulWidget {
     this.controller,
     this.enabled = true,
     this.containerRadius = 28.0,
-    this.fieldDecoration = const M3EDropdownFieldDecoration(),
-    this.dropdownDecoration = const M3EDropdownDecoration(),
-    this.chipDecoration = const M3EChipDecoration(),
-    this.searchDecoration = const M3ESearchDecoration(),
-    this.itemDecoration = const M3EDropdownItemDecoration(),
+    this.fieldStyle = const M3EDropdownFieldStyle(),
+    this.dropdownStyle = const M3EDropdownStyle(),
+    this.chipStyle = const M3EChipStyle(),
+    this.searchStyle = const M3ESearchStyle(),
+    this.itemStyle = const M3EDropdownItemStyle(),
     this.itemBuilder,
+    this.emptyBuilder,
     this.selectedItemBuilder,
     this.itemSeparator,
     this.validator,
     this.autovalidateMode = AutovalidateMode.disabled,
     this.focusNode,
     this.closeOnBackButton = false,
-    this.stiffness = 380,
-    this.damping = 0.8,
+    this.openMotion = M3EMotion.expressiveSpatialDefault,
+    this.closeMotion = M3EMotion.expressiveSpatialDefault,
     this.splashFactory = NoSplash.splashFactory,
-    this.haptic = 0,
+    this.haptic = M3EHapticFeedback.none,
   }) : items = const [];
 
   @override
@@ -244,9 +252,16 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   late M3EDropdownController<T> _controller;
   bool _ownController = false;
 
+  // Interaction states for field
+  bool _isHoveredField = false;
+  bool _isPressedField = false;
+
+  // Track selection state for field duration logic
+  bool _lastIsOpen = false;
+
   // Chip slide controllers — keyed by item value
   final Map<Object, SingleMotionController> _chipSlideControllers = {};
-  final Map<Object, GlobalKey<_SpringChipState>> _chipKeys = {};
+  final Map<Object, GlobalKey<M3ESpringChipState>> _chipKeys = {};
 
   // ── Overlay (OverlayPortal — no manual OverlayEntry management) ──
   final LayerLink _layerLink = LayerLink();
@@ -256,9 +271,12 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   final GlobalKey<FormFieldState<List<M3EDropdownItem<T>>?>> _formFieldKey =
       GlobalKey();
 
-  final GlobalKey<_MoreChipsIndicatorState> _moreKey = GlobalKey();
+  final GlobalKey<M3EMoreChipsIndicatorState> _moreKey = GlobalKey();
   // Focus
   late FocusNode _focusNode;
+
+  // Animation direction tracking
+  bool? _openingShowOnTop;
 
   // Search
   final TextEditingController _searchTextController = TextEditingController();
@@ -282,18 +300,12 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     super.initState();
 
     _expandCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-        stiffness: widget.stiffness,
-        damping: widget.damping,
-      ),
+      motion: widget.openMotion.toMotion(),
       vsync: this,
     );
 
     _arrowCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-        stiffness: widget.stiffness,
-        damping: widget.damping,
-      ),
+      motion: widget.openMotion.toMotion(),
       vsync: this,
     );
 
@@ -316,6 +328,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
       _controller.initialize();
     }
 
+    _lastIsOpen = _controller.isOpen;
     _controller.addListener(_onControllerChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -401,12 +414,10 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     }
 
     // Spring params changed
-    if (widget.stiffness != oldWidget.stiffness ||
-        widget.damping != oldWidget.damping) {
-      _expandCtrl.motion = MaterialSpringMotion.expressiveSpatialDefault()
-          .copyWith(stiffness: widget.stiffness, damping: widget.damping);
-      _arrowCtrl.motion = MaterialSpringMotion.expressiveSpatialDefault()
-          .copyWith(stiffness: widget.stiffness, damping: widget.damping);
+    if (widget.openMotion != oldWidget.openMotion ||
+        widget.closeMotion != oldWidget.closeMotion) {
+      _expandCtrl.motion = widget.openMotion.toMotion();
+      _arrowCtrl.motion = widget.openMotion.toMotion();
     }
   }
 
@@ -466,6 +477,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
       if (_portalController.isShowing) {
         _portalController.hide();
       }
+      _openingShowOnTop = null;
     }
   }
 
@@ -478,6 +490,34 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     if (!_controller.isOpen) {
       _controller.setOpen(true);
     }
+
+    // Determine direction before opening
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox != null && renderBox.attached) {
+      final renderBoxSize = renderBox.size;
+      final renderBoxOffset = renderBox.localToGlobal(Offset.zero);
+      final screenHeight = MediaQuery.of(context).size.height;
+      final spaceBelow =
+          screenHeight - renderBoxOffset.dy - renderBoxSize.height;
+      final spaceAbove = renderBoxOffset.dy;
+
+      switch (widget.dropdownStyle.expandDirection) {
+        case ExpandDirection.down:
+          _openingShowOnTop = false;
+          break;
+        case ExpandDirection.up:
+          _openingShowOnTop = true;
+          break;
+        case ExpandDirection.auto:
+          _openingShowOnTop =
+              spaceBelow < widget.dropdownStyle.maxHeight &&
+              spaceAbove > spaceBelow;
+          break;
+      }
+    }
+
+    _expandCtrl.motion = widget.openMotion.toMotion();
+    _arrowCtrl.motion = widget.openMotion.toMotion();
     _expandCtrl.animateTo(1);
     _arrowCtrl.animateTo(math.pi);
     _portalController.show();
@@ -489,6 +529,8 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     if (_controller.isOpen) {
       _controller.setOpen(false);
     }
+    _expandCtrl.motion = widget.closeMotion.toMotion();
+    _arrowCtrl.motion = widget.closeMotion.toMotion();
     _expandCtrl.animateTo(0);
     _arrowCtrl.animateTo(0);
     _searchTextController.clear();
@@ -508,20 +550,28 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     }
   }
 
-  void _applyHaptic() {
-    switch (widget.haptic) {
-      case 1:
-        HapticFeedback.lightImpact();
-        break;
-      case 2:
-        HapticFeedback.mediumImpact();
-        break;
-      case 3:
-        HapticFeedback.heavyImpact();
-        break;
-      default:
-        break;
+  BorderRadius _buildEffectiveFieldRadius() {
+    final fd = widget.fieldStyle;
+
+    // Determine the "base" for the current state (Open vs Closed)
+    final baseRadius = _controller.isOpen && fd.selectedBorderRadius != null
+        ? BorderRadius.circular(fd.selectedBorderRadius!)
+        : (fd.borderRadius ??
+              BorderRadius.circular(
+                widget.dropdownStyle.containerRadius ?? widget.containerRadius,
+              ));
+
+    if (_isPressedField && fd.pressedRadius != null) {
+      return BorderRadius.circular(fd.pressedRadius!);
     }
+    if (_isHoveredField && fd.hoverRadius != null) {
+      return BorderRadius.circular(fd.hoverRadius!);
+    }
+    return baseRadius;
+  }
+
+  void _applyHaptic() {
+    applyHaptic(widget.haptic);
   }
 
   // ── Item selection ──
@@ -548,7 +598,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         if (chipKey?.currentState != null) {
           // Build the current displayOptions to find the index
           final selected = _controller.selectedItems;
-          final maxCount = widget.chipDecoration.maxDisplayCount;
+          final maxCount = widget.chipStyle.maxDisplayCount;
           final displayOptions = maxCount != null && selected.length > maxCount
               ? selected.take(maxCount).toList()
               : selected;
@@ -579,7 +629,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
       builder: (formState) {
         return OverlayPortal(
           controller: _portalController,
-          overlayChildBuilder: (_) => _buildOverlay(),
+          overlayChildBuilder: (_) => _buildOverlay(formState),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,14 +644,13 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                     listenable: _listenable,
                     builder: (_, _) {
                       return Semantics(
-                        label:
-                            widget.fieldDecoration.hintText ?? 'Dropdown field',
+                        label: widget.fieldStyle.hintText ?? 'Dropdown field',
                         button: true,
                         enabled: widget.enabled,
                         child: Focus(
                           focusNode: _focusNode,
                           canRequestFocus: widget.enabled,
-                          child: _buildField(context),
+                          child: _buildField(context, formState),
                         ),
                       );
                     },
@@ -614,9 +663,14 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     formState.errorText!,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
+                    style:
+                        (widget.fieldStyle.errorStyle ??
+                                Theme.of(context).textTheme.bodySmall)
+                            ?.copyWith(
+                              color:
+                                  widget.fieldStyle.errorStyle?.color ??
+                                  Theme.of(context).colorScheme.error,
+                            ),
                   ),
                 ),
               ],
@@ -629,7 +683,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
   // ── Overlay (dropdown panel) ──
 
-  Widget _buildOverlay() {
+  Widget _buildOverlay(FormFieldState<List<M3EDropdownItem<T>>?> formState) {
     final renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null || !renderBox.attached) {
       return const SizedBox.shrink();
@@ -642,27 +696,31 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     final spaceAbove = renderBoxOffset.dy;
 
     final bool showOnTop;
-    switch (widget.dropdownDecoration.expandDirection) {
-      case ExpandDirection.down:
-        showOnTop = false;
-        break;
-      case ExpandDirection.up:
-        showOnTop = true;
-        break;
-      case ExpandDirection.auto:
-        showOnTop =
-            spaceBelow < widget.dropdownDecoration.maxHeight &&
-            spaceAbove > spaceBelow;
-        break;
+    if (_openingShowOnTop != null) {
+      showOnTop = _openingShowOnTop!;
+    } else {
+      switch (widget.dropdownStyle.expandDirection) {
+        case ExpandDirection.down:
+          showOnTop = false;
+          break;
+        case ExpandDirection.up:
+          showOnTop = true;
+          break;
+        case ExpandDirection.auto:
+          showOnTop =
+              spaceBelow < widget.dropdownStyle.maxHeight &&
+              spaceAbove > spaceBelow;
+          break;
+      }
     }
 
-    final marginOffset = widget.dropdownDecoration.marginTop == 0
+    final marginOffset = widget.dropdownStyle.marginTop == 0
         ? Offset.zero
         : Offset(
             0,
             showOnTop
-                ? -widget.dropdownDecoration.marginTop
-                : widget.dropdownDecoration.marginTop,
+                ? -widget.dropdownStyle.marginTop
+                : widget.dropdownStyle.marginTop,
           );
 
     return Stack(
@@ -707,23 +765,21 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
   // ── Field ──
 
-  Widget _buildField(BuildContext context) {
+  Widget _buildField(
+    BuildContext context,
+    FormFieldState<List<M3EDropdownItem<T>>?> formState,
+  ) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final fd = widget.fieldDecoration;
+    final fd = widget.fieldStyle;
 
     final bgColor = fd.backgroundColor ?? cs.surfaceContainerHighest;
     final fgColor = fd.foregroundColor ?? cs.onSurface;
     final borderSide =
-        (_controller.isOpen ? fd.focusedBorder : fd.border) ?? BorderSide.none;
-
-    final closedRadius =
-        fd.borderRadius ??
-        BorderRadius.circular(
-          widget.dropdownDecoration.containerRadius ?? widget.containerRadius,
-        );
-    final expandedRadius = fd.expandedBorderRadius;
-    final bool animateRadius = expandedRadius != null;
+        (formState.hasError
+            ? fd.errorBorder
+            : (_controller.isOpen ? fd.focusedBorder : fd.border)) ??
+        BorderSide.none;
 
     Widget? trailing;
     if (_isLoading) {
@@ -748,7 +804,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
               _controller.clearAll();
               _formFieldKey.currentState?.didChange(_controller.selectedItems);
             },
-            child: Icon(Icons.clear, color: fgColor, size: 20),
+            child: fd.clearIcon ?? Icon(Icons.clear, color: fgColor, size: 20),
           ),
         ),
       );
@@ -778,6 +834,9 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     Widget content;
     final selected = _controller.selectedItems;
 
+    final bool isOpenChanged = _lastIsOpen != _controller.isOpen;
+    _lastIsOpen = _controller.isOpen;
+
     if (widget.selectedItemBuilder != null && selected.isNotEmpty) {
       if (widget.showChipAnimation) {
         // Route through _buildChips so we get all spring animations
@@ -786,10 +845,10 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         final children = selected
             .map((o) => widget.selectedItemBuilder!(o))
             .toList();
-        if (widget.chipDecoration.wrap) {
+        if (widget.chipStyle.wrap) {
           content = Wrap(
-            spacing: widget.chipDecoration.spacing,
-            runSpacing: widget.chipDecoration.runSpacing,
+            spacing: widget.chipStyle.spacing,
+            runSpacing: widget.chipStyle.runSpacing,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: children,
           );
@@ -801,7 +860,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                 for (int i = 0; i < children.length; i++) ...[
                   children[i],
                   if (i < children.length - 1)
-                    SizedBox(width: widget.chipDecoration.spacing),
+                    SizedBox(width: widget.chipStyle.spacing),
                 ],
               ],
             ),
@@ -829,50 +888,69 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
       );
     }
 
-    Widget buildFieldBody(BorderRadius radius) {
-      return Material(
-        color: bgColor,
-        shape: RoundedRectangleBorder(borderRadius: radius, side: borderSide),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          splashFactory: widget.splashFactory,
-          mouseCursor: widget.enabled
-              ? SystemMouseCursors.click
-              : SystemMouseCursors.forbidden,
-          onTap: widget.enabled ? _toggle : null,
-          borderRadius: radius,
-          child: Padding(
-            padding: fd.padding,
-            child: Row(
-              children: [
-                if (fd.prefixIcon != null) ...[
-                  fd.prefixIcon!,
-                  const SizedBox(width: 8),
-                ],
-                Expanded(child: content),
-                if (trailing != null) ...[const SizedBox(width: 8), trailing],
-              ],
+    Widget buildFieldBody() {
+      final contentRow = Row(
+        children: [
+          if (fd.prefixIcon != null) ...[
+            fd.prefixIcon!,
+            const SizedBox(width: 8),
+          ],
+          Expanded(child: content),
+          if (trailing != null) ...[const SizedBox(width: 8), trailing],
+        ],
+      );
+
+      final duration = isOpenChanged
+          ? const Duration(milliseconds: 20)
+          : const Duration(milliseconds: 40);
+
+      return TweenAnimationBuilder<BorderRadius?>(
+        duration: duration,
+        curve: Curves.easeOut,
+        tween: BorderRadiusTween(
+          begin: _buildEffectiveFieldRadius(),
+          end: _buildEffectiveFieldRadius(),
+        ),
+        builder: (context, animatedRadius, child) {
+          final effectiveRadius =
+              animatedRadius ?? _buildEffectiveFieldRadius();
+          return Material(
+            color: bgColor,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: effectiveRadius,
+              side: borderSide,
             ),
-          ),
-        ),
+            child: InkWell(
+              splashFactory: fd.splashFactory ?? widget.splashFactory,
+              splashColor: fd.splashColor,
+              highlightColor: fd.highlightColor,
+              overlayColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return fgColor.withValues(alpha: 0.10);
+                }
+                if (states.contains(WidgetState.hovered)) {
+                  return fgColor.withValues(alpha: 0.05);
+                }
+                return Colors.transparent;
+              }),
+              mouseCursor: widget.enabled
+                  ? (fd.mouseCursor ?? SystemMouseCursors.click)
+                  : SystemMouseCursors.forbidden,
+              onTap: widget.enabled ? _toggle : null,
+              onHover: (hover) => setState(() => _isHoveredField = hover),
+              onTapDown: (_) => setState(() => _isPressedField = true),
+              onTapUp: (_) => setState(() => _isPressedField = false),
+              onTapCancel: () => setState(() => _isPressedField = false),
+              child: Padding(padding: fd.padding, child: child),
+            ),
+          );
+        },
+        child: contentRow,
       );
     }
 
-    if (animateRadius) {
-      return Padding(
-        padding: fd.margin,
-        child: AnimatedBuilder(
-          animation: _expandCtrl,
-          builder: (context, child) {
-            final t = _expandCtrl.value.clamp(0.0, 1.0);
-            final radius = BorderRadius.lerp(closedRadius, expandedRadius, t)!;
-            return buildFieldBody(radius);
-          },
-        ),
-      );
-    }
-
-    return Padding(padding: fd.margin, child: buildFieldBody(closedRadius));
+    return Padding(padding: fd.margin, child: buildFieldBody());
   }
 
   // ── Chips ──
@@ -891,7 +969,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     List<M3EDropdownItem<T>> selected,
     Color fgColor,
   ) {
-    final cd = widget.chipDecoration;
+    final cd = widget.chipStyle;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -955,10 +1033,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
       _chipSlideControllers.putIfAbsent(
         key,
         () => SingleMotionController(
-          motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-            stiffness: 100,
-            damping: 0.1,
-          ),
+          motion: M3EMotion.standardEffectsFast.toMotion(),
           vsync: this, // _M3EDropdownMenuState uses TickerProviderStateMixin
         ),
       );
@@ -973,13 +1048,13 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
       final chipKey = _chipKeys.putIfAbsent(
         optionKey,
-        () => GlobalKey<_SpringChipState>(),
+        () => GlobalKey<M3ESpringChipState>(),
       );
 
       slideAnims.add(_chipSlideControllers[optionKey]!);
 
       chipWidgets.add(
-        _SpringChip<T>(
+        M3ESpringChip<T>(
           key: chipKey,
           item: option,
           cd: cd,
@@ -1035,7 +1110,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
     if (showMoreChips) {
       chipWidgets.add(
-        _MoreChipsIndicator(
+        M3EMoreChipsIndicator(
           key: _moreKey,
           count: remainingCount > 0 ? remainingCount : _moreChipsLastCount,
           cd: cd,
@@ -1059,7 +1134,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     return ConstrainedBox(
       constraints: BoxConstraints.loose(const Size(double.infinity, 40)),
       child: Flow(
-        delegate: _ChipFlowDelegate(
+        delegate: M3EChipFlowDelegate(
           slideAnimations: slideAnims,
           spacing: cd.spacing,
         ),
@@ -1071,14 +1146,14 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   void _handleChipRemove(
     M3EDropdownItem<T> option,
     Object optionKey,
-    GlobalKey<_SpringChipState> chipKey,
+    GlobalKey<M3ESpringChipState> chipKey,
     List<M3EDropdownItem<T>> displayOptions,
     int removedIndex,
   ) {
     // 1. Capture the width of the gap being created
     final removedBox = chipKey.currentContext?.findRenderObject() as RenderBox?;
     final removedWidth =
-        (removedBox?.size.width ?? 0) + widget.chipDecoration.spacing;
+        (removedBox?.size.width ?? 0) + widget.chipStyle.spacing;
 
     // 2. Identify WHICH chips are moving BEFORE we change the list
     // We want to animate any chip that was to the right of the deleted one.
@@ -1096,7 +1171,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
       final selectedItems = _controller.selectedItems;
       final maxDisplay =
-          widget.chipDecoration.maxDisplayCount ?? selectedItems.length;
+          widget.chipStyle.maxDisplayCount ?? selectedItems.length;
       final remainingCount = selectedItems.length - maxDisplay;
 
       // 5. Loop through the chips we captured in Step 2
@@ -1109,8 +1184,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         if (slideCtrl != null) {
           // --- A. THE SLIDE ---
           // Always slide from the old position to the new 0 position
-          slideCtrl.motion = MaterialSpringMotion.expressiveEffectsDefault()
-              .copyWith(stiffness: 600, damping: 0.6);
+          slideCtrl.motion = M3EMotion.standardEffectsFast.toMotion();
           slideCtrl.animateTo(0, from: removedWidth);
 
           // --- B. THE SQUISH ---
@@ -1143,7 +1217,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   Widget _buildDropdownPanel(bool showOnTop) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final dd = widget.dropdownDecoration;
+    final dd = widget.dropdownStyle;
     final filtered = _controller.items;
 
     return AnimatedBuilder(
@@ -1170,8 +1244,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
           color: dd.backgroundColor ?? cs.surfaceContainerHighest,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
-              widget.dropdownDecoration.containerRadius ??
-                  widget.containerRadius,
+              widget.dropdownStyle.containerRadius ?? widget.containerRadius,
             ),
           ),
           clipBehavior: Clip.antiAlias,
@@ -1196,15 +1269,16 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                   ),
                 )
               else if (filtered.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    dd.noItemsFoundText,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurface.withValues(alpha: 0.5),
-                    ),
-                  ),
-                )
+                widget.emptyBuilder?.call(context) ??
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        dd.noItemsFoundText,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: cs.onSurface.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    )
               else
                 Flexible(
                   child: ListView.separated(
@@ -1213,13 +1287,25 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                     itemCount: filtered.length,
                     separatorBuilder: (_, _) =>
                         widget.itemSeparator ??
-                        SizedBox(height: widget.itemDecoration.itemGap ?? 3.0),
+                        SizedBox(height: widget.itemStyle.itemGap ?? 3.0),
                     itemBuilder: (context, index) {
-                      return _buildDropdownItem(
-                        context,
-                        filtered[index],
-                        index,
-                        filtered.length,
+                      final item = filtered[index];
+                      if (widget.itemBuilder != null) {
+                        return widget.itemBuilder!(
+                          item,
+                          item.selected,
+                          () => _onItemTap(item),
+                        );
+                      }
+
+                      return M3EDropdownMenuItemWidget<T>(
+                        key: ValueKey(item.value),
+                        item: item,
+                        index: index,
+                        total: filtered.length,
+                        style: widget.itemStyle,
+                        splashFactory: widget.splashFactory,
+                        onTap: () => _onItemTap(item),
                       );
                     },
                   ),
@@ -1235,13 +1321,13 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   // ── Search ──
 
   Widget _buildSearch(BuildContext context) {
-    final sd = widget.searchDecoration;
+    final sd = widget.searchStyle;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
     final searchRadius =
         sd.borderRadius ??
-        BorderRadius.circular(widget.itemDecoration.outerRadius ?? 12.0);
+        BorderRadius.circular(widget.itemStyle.outerRadius ?? 12.0);
 
     return Padding(
       padding: sd.margin,
@@ -1249,6 +1335,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         controller: _searchTextController,
         autofocus: sd.autofocus,
         style: sd.textStyle ?? theme.textTheme.bodyMedium,
+        mouseCursor: sd.mouseCursor,
         decoration: InputDecoration(
           hintText: sd.hintText,
           hintStyle: sd.hintStyle,
@@ -1288,7 +1375,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   }
 
   void _handleSearchChanged(String value) {
-    final debounceMs = widget.searchDecoration.searchDebounceMs;
+    final debounceMs = widget.searchStyle.searchDebounceMs;
     if (debounceMs <= 0) {
       _controller.setSearchQuery(value);
       return;
@@ -1298,450 +1385,5 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     _searchDebounce = Timer(Duration(milliseconds: debounceMs), () {
       _controller.setSearchQuery(value);
     });
-  }
-
-  // ── Dropdown item ──
-
-  Widget _buildDropdownItem(
-    BuildContext context,
-    M3EDropdownItem<T> item,
-    int index,
-    int total,
-  ) {
-    if (widget.itemBuilder != null) {
-      return widget.itemBuilder!(item, item.selected, () => _onItemTap(item));
-    }
-
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final id = widget.itemDecoration;
-
-    final isFirst = index == 0;
-    final isLast = index == total - 1;
-    final isSingle = total == 1;
-
-    final outerR = id.outerRadius ?? 12.0;
-    final innerR = id.innerRadius ?? 4.0;
-    final selectedR = id.selectedBorderRadius ?? outerR;
-
-    BorderRadius borderRadius;
-    if (item.selected) {
-      borderRadius = BorderRadius.circular(selectedR);
-    } else if (isSingle) {
-      borderRadius = BorderRadius.circular(outerR);
-    } else if (isFirst) {
-      borderRadius = BorderRadius.vertical(
-        top: Radius.circular(outerR),
-        bottom: Radius.circular(innerR),
-      );
-    } else if (isLast) {
-      borderRadius = BorderRadius.vertical(
-        top: Radius.circular(innerR),
-        bottom: Radius.circular(outerR),
-      );
-    } else {
-      borderRadius = BorderRadius.circular(innerR);
-    }
-
-    Color bgColor;
-    if (item.disabled) {
-      bgColor =
-          id.disabledBackgroundColor ?? cs.onSurface.withValues(alpha: 0.04);
-    } else if (item.selected) {
-      bgColor = id.selectedBackgroundColor ?? cs.secondaryContainer;
-    } else {
-      bgColor = id.backgroundColor ?? cs.surfaceContainerHigh;
-    }
-
-    Color textColor;
-    if (item.disabled) {
-      textColor = id.disabledTextColor ?? cs.onSurface.withValues(alpha: 0.38);
-    } else if (item.selected) {
-      textColor = id.selectedTextColor ?? cs.onSecondaryContainer;
-    } else {
-      textColor = id.textColor ?? cs.onSurface;
-    }
-
-    return Material(
-      color: bgColor,
-      shape: RoundedRectangleBorder(borderRadius: borderRadius),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        splashFactory: widget.splashFactory,
-        onTap: item.disabled ? null : () => _onItemTap(item),
-        borderRadius: borderRadius,
-        child: Padding(
-          padding: id.itemPadding,
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  item.label,
-                  style:
-                      (item.selected ? id.selectedTextStyle : id.textStyle) ??
-                      theme.textTheme.bodyLarge?.copyWith(color: textColor),
-                ),
-              ),
-              if (item.selected)
-                id.selectedIcon ??
-                    Icon(Icons.check_rounded, color: textColor, size: 20),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// --- Spring Chip -----
-class _SpringChip<T> extends StatefulWidget {
-  final M3EDropdownItem<T> item;
-  final M3EChipDecoration cd;
-  final Color chipColor;
-  final TextStyle? labelStyle;
-  final ColorScheme cs;
-  final bool enabled;
-  final VoidCallback onRemove;
-  final double
-  slideOffset; // how much to slide left when a previous chip is removed
-
-  /// When non-null, replaces the default chip body with this widget.
-  final Widget? customChild;
-
-  const _SpringChip({
-    required super.key,
-    required this.item,
-    required this.cd,
-    required this.chipColor,
-    required this.labelStyle,
-    required this.cs,
-    required this.enabled,
-    required this.onRemove,
-    this.slideOffset = 0,
-    this.customChild,
-  });
-
-  @override
-  State<_SpringChip<T>> createState() => _SpringChipState<T>();
-}
-
-class _SpringChipState<T> extends State<_SpringChip<T>>
-    with TickerProviderStateMixin {
-  late SingleMotionController _scaleCtrl;
-  late SingleMotionController _slideCtrl;
-  late SingleMotionController _squishCtrl;
-  @override
-  void initState() {
-    super.initState();
-    _squishCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-        stiffness: widget.cd.openStiffness,
-        damping: widget.cd.openDamping,
-      ), // Bouncy spring
-      vsync: this,
-    );
-    _squishCtrl.value = 1.0;
-    _scaleCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-        stiffness: widget.cd.openStiffness,
-        damping: widget.cd.openDamping,
-      ),
-      vsync: this,
-    );
-    _slideCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-        stiffness: widget.cd.openStiffness,
-        damping: widget.cd.openDamping,
-      ),
-      vsync: this,
-    );
-    _scaleCtrl.animateTo(1);
-  }
-
-  @override
-  void didUpdateWidget(covariant _SpringChip<T> old) {
-    super.didUpdateWidget(old);
-    if (old.slideOffset != widget.slideOffset) {
-      _slideCtrl.animateTo(widget.slideOffset);
-    }
-  }
-
-  void triggerSquish(double intensity) {
-    // We animate from 1.0 -> intensity -> 1.0 (handled by the spring)
-    _squishCtrl.animateTo(1.0, from: intensity);
-  }
-
-  @override
-  void dispose() {
-    _scaleCtrl.dispose();
-    _slideCtrl.dispose();
-    _squishCtrl.dispose();
-    super.dispose();
-  }
-
-  void animateOut(VoidCallback onDone) {
-    _scaleCtrl.motion = MaterialSpringMotion.expressiveSpatialDefault()
-        .copyWith(
-          stiffness: widget.cd.closeStiffness,
-          damping: widget.cd.closeDamping,
-        );
-    _scaleCtrl.animateTo(0);
-    void listener() {
-      if (_scaleCtrl.value <= 0.01) {
-        _scaleCtrl.removeListener(listener);
-        onDone();
-      }
-    }
-
-    _scaleCtrl.addListener(listener);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_scaleCtrl, _slideCtrl, _squishCtrl]),
-      builder: (context, child) {
-        final scale = _scaleCtrl.value.clamp(0.0, 1.05);
-        final slide = _slideCtrl.value;
-        final squish = _squishCtrl.value;
-
-        // combine the entrance/exit 'scale' with the 'squish'
-        // result: horizontal = entrance_scale * squish_factor
-        //         vertical   = entrance_scale
-        final double finalXScale = scale * squish;
-        final double finalYScale = scale;
-
-        return Transform.translate(
-          offset: Offset(slide, 0),
-          child: Opacity(
-            opacity: scale.clamp(0.0, 1.0),
-            child: Transform(
-              alignment: Alignment.centerLeft,
-              // diagonal3Values is the modern, clean way to set x, y, z scale
-              transform: Matrix4.diagonal3Values(finalXScale, finalYScale, 1.0),
-              child: child,
-            ),
-          ),
-        );
-      },
-      child: widget.customChild ?? _buildChipBody(),
-    );
-  }
-
-  Widget _buildChipBody() {
-    final cd = widget.cd;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: cd.borderRadius,
-        color: widget.enabled ? widget.chipColor : Colors.grey.withAlpha(30),
-        border: cd.border != null ? Border.fromBorderSide(cd.border!) : null,
-      ),
-      padding: cd.padding,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            widget.item.label,
-            style:
-                widget.labelStyle?.copyWith(
-                  color: widget.enabled
-                      ? widget.labelStyle?.color
-                      : Colors.grey,
-                ) ??
-                TextStyle(color: widget.enabled ? null : Colors.grey),
-          ),
-          if (widget.enabled) ...[
-            const SizedBox(width: 4),
-            Semantics(
-              label: 'Remove ${widget.item.label}',
-              button: true,
-              child: Tooltip(
-                message: 'Remove ${widget.item.label}',
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: widget.onRemove,
-                  child:
-                      widget.cd.deleteIcon ??
-                      Icon(
-                        Icons.close,
-                        size: 16,
-                        color: widget.cs.onSecondaryContainer,
-                      ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _ChipFlowDelegate extends FlowDelegate {
-  final List<Animation<double>> slideAnimations;
-  final double spacing;
-
-  _ChipFlowDelegate({required this.slideAnimations, required this.spacing})
-    : super(repaint: Listenable.merge(slideAnimations));
-
-  @override
-  void paintChildren(FlowPaintingContext context) {
-    double x = 0;
-    for (int i = 0; i < context.childCount; i++) {
-      final childSize = context.getChildSize(i)!;
-      final slideOffset = slideAnimations[i].value;
-      context.paintChild(
-        i,
-        transform: Matrix4.translationValues(x + slideOffset, 0, 0),
-      );
-      x += childSize.width + spacing;
-    }
-  }
-
-  @override
-  Size getSize(BoxConstraints constraints) =>
-      Size(constraints.maxWidth, constraints.maxHeight);
-
-  @override
-  BoxConstraints getConstraintsForChild(int i, BoxConstraints constraints) =>
-      constraints.loosen();
-
-  @override
-  bool shouldRepaint(_ChipFlowDelegate old) => true;
-}
-
-class _MoreChipsIndicator extends StatefulWidget {
-  final int count;
-  final M3EChipDecoration cd;
-  final Color chipColor;
-  final TextStyle? labelStyle;
-
-  const _MoreChipsIndicator({
-    super.key,
-    required this.count,
-    required this.cd,
-    required this.chipColor,
-    required this.labelStyle,
-  });
-
-  @override
-  State<_MoreChipsIndicator> createState() => _MoreChipsIndicatorState();
-}
-
-class _MoreChipsIndicatorState extends State<_MoreChipsIndicator>
-    with TickerProviderStateMixin {
-  late SingleMotionController _scaleCtrl;
-  late SingleMotionController _popCtrl;
-  late SingleMotionController _squishCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _scaleCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveSpatialDefault().copyWith(
-        stiffness: widget.cd.openStiffness,
-        damping: widget.cd.openDamping,
-      ),
-      vsync: this,
-    );
-    _scaleCtrl.animateTo(1);
-
-    _popCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveEffectsDefault().copyWith(
-        stiffness: 800,
-        damping: 0.4,
-      ),
-      vsync: this,
-    )..value = 1.0;
-
-    _squishCtrl = SingleMotionController(
-      motion: MaterialSpringMotion.expressiveEffectsDefault().copyWith(
-        stiffness: 600,
-        damping: 0.35,
-      ),
-      vsync: this,
-    )..value = 1.0;
-  }
-
-  void triggerSquish(double intensity) {
-    _squishCtrl.animateTo(1.0, from: intensity);
-  }
-
-  void animateOut(VoidCallback onDone) {
-    _scaleCtrl.motion = MaterialSpringMotion.expressiveSpatialDefault()
-        .copyWith(
-          stiffness: widget.cd.closeStiffness,
-          damping: widget.cd.closeDamping,
-        );
-    _scaleCtrl.animateTo(0);
-    void listener() {
-      if (_scaleCtrl.value <= 0.01) {
-        _scaleCtrl.removeListener(listener);
-        onDone();
-      }
-    }
-
-    _scaleCtrl.addListener(listener);
-  }
-
-  void animateIn() {
-    _scaleCtrl.motion = MaterialSpringMotion.expressiveSpatialDefault()
-        .copyWith(
-          stiffness: widget.cd.openStiffness,
-          damping: widget.cd.openDamping,
-        );
-    _scaleCtrl.animateTo(1);
-  }
-
-  @override
-  void didUpdateWidget(covariant _MoreChipsIndicator old) {
-    super.didUpdateWidget(old);
-    if (old.count != widget.count) {
-      // Pop effect when the number increments/decrements
-      _popCtrl.animateTo(1.0, from: 1.25);
-    }
-  }
-
-  @override
-  void dispose() {
-    _scaleCtrl.dispose();
-    _popCtrl.dispose();
-    _squishCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_scaleCtrl, _popCtrl, _squishCtrl]),
-      builder: (context, child) {
-        final scale = _scaleCtrl.value.clamp(0.0, 1.05);
-        final pop = _popCtrl.value;
-        final squish = _squishCtrl.value;
-        return Opacity(
-          opacity: scale.clamp(0.0, 1.0),
-          child: Transform(
-            alignment: Alignment.centerLeft,
-            transform: Matrix4.diagonal3Values(
-              scale * pop * squish,
-              scale * pop,
-              1.0,
-            ),
-            child: child,
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: widget.cd.borderRadius,
-          color: widget.chipColor,
-          border: widget.cd.border != null
-              ? Border.fromBorderSide(widget.cd.border!)
-              : null,
-        ),
-        padding: widget.cd.padding,
-        child: Text('+${widget.count}', style: widget.labelStyle),
-      ),
-    );
   }
 }
