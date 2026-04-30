@@ -28,12 +28,20 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 
 ```yaml
 dependencies:
-  m3e_core: ^0.0.4
+  m3e_core: ^0.1.0
 ```
 
 ```dart
 import 'package:m3e_core/m3e_core.dart';
 ```
+
+---
+
+## ⚠️ Breaking API Changes (v0.1.0)
+
+Version `0.1.0` updates **m3e_dismissible**, **m3e_expandable**, and **m3e_dropdown** to v0.1.0. These updates include **breaking API changes**.
+
+Please refer to the documentation on their respective individual package pages (linked below) for detailed migration guides and updated API references.
 
 ---
 
