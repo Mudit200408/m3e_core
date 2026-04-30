@@ -29,7 +29,7 @@ class _DismissibleM3EScreenState extends State<DismissibleM3EScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dismissible M3E'),
+        title: const Text('M3E Dismissible'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         bottom: TabBar(
           controller: _tabController,

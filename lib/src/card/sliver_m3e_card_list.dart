@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+import '../common/m3e_common.dart';
+import 'm3e_card_widget.dart';
 
 /// A Material 3 interactive card list for use in [CustomScrollView]s.
 ///
@@ -39,10 +41,10 @@ class SliverM3ECardList extends StatelessWidget {
 
   /// The inner padding applied to the [itemBuilder] child of each item.
   ///
-  /// Defaults to `EdgeInsets.all(16.0)`.
+  /// Defaults to `EdgeInsets.all(12.0)`.
   final EdgeInsetsGeometry? padding;
 
-  /// The outer margin applied around the individual cards.
+  /// The outer margin applied around the entire list of cards.
   ///
   /// Defaults to [EdgeInsets.zero]. The [gap] parameter handles the space
   /// between individual cards.
@@ -53,6 +55,26 @@ class SliverM3ECardList extends StatelessWidget {
   /// Provides the `index` of the tapped item. If null, the item will not be
   /// interactive.
   final void Function(int index)? onTap;
+
+  /// Optional callback invoked when an item is long-pressed.
+  ///
+  /// Provides the `index` of the long-pressed item.
+  final void Function(int index)? onLongPress;
+
+  /// Optional semantic label builder for accessibility.
+  final String Function(int index)? semanticLabelBuilder;
+
+  /// The cursor for a mouse pointer when it enters a card's bounds.
+  final MouseCursor? mouseCursor;
+
+  /// The color to use when a card is focused by keyboard navigation.
+  final Color? focusColor;
+
+  /// The color to use when a card is hovered by a mouse pointer.
+  final Color? hoverColor;
+
+  /// Called when the focus state of a card changes.
+  final void Function(int index, bool)? onFocusChange;
 
   /// The border drawn around each card item.
   ///
@@ -80,15 +102,59 @@ class SliverM3ECardList extends StatelessWidget {
   /// Defaults to `true`.
   final bool enableFeedback;
 
-  /// The level of haptic feedback on tap.
+  /// The haptic feedback to provide on tap.
+  final M3EHapticFeedback haptic;
+
+  /// Widget displayed when the list is empty (itemCount is 0).
   ///
-  /// * 0 -> No haptics (default)
-  /// * 1 -> Light impact
-  /// * 2 -> Medium impact
-  /// * 3 -> Heavy impact
-  final int haptic;
+  /// Renders a [SliverToBoxAdapter] containing the widget.
+  final Widget? emptyBuilder;
+
+  // -- SliverList.builder specific properties --
+
+  /// Whether to wrap each child in an [AutomaticKeepAlive].
+  ///
+  /// Defaults to `true`.
+  final bool addAutomaticKeepAlives;
+
+  /// Whether to wrap each child in a [RepaintBoundary].
+  ///
+  /// Defaults to `true`.
+  final bool addRepaintBoundaries;
+
+  /// Whether to wrap each child in an [IndexedSemantics].
+  ///
+  /// Defaults to `true`.
+  final bool addSemanticIndexes;
 
   /// Creates a [SliverM3ECardList].
+  ///
+  /// [itemCount] — number of items in the list.
+  /// [itemBuilder] — builds a widget for each index.
+  /// [outerRadius] — radius for outer corners (default: `24.0`).
+  /// [innerRadius] — radius for inner corners (default: `4.0`).
+  /// [gap] — space between adjacent items (default: `3.0`).
+  /// [color] — background color (default: [ColorScheme.surfaceContainerHighest]).
+  /// [padding] — inner padding for each card (default: `EdgeInsets.all(12.0)`).
+  /// [margin] — outer margin around the entire sliver list.
+  /// [onTap] — callback invoked with the tapped item's index.
+  /// [onLongPress] — callback invoked with the long-pressed item's index.
+  /// [semanticLabelBuilder] — accessibility label for each item.
+  /// [mouseCursor] — mouse cursor on hover.
+  /// [focusColor] — focus indicator color.
+  /// [hoverColor] — hover indicator color.
+  /// [onFocusChange] — focus state change callback.
+  /// [border] — border drawn around each card.
+  /// [elevation] — card elevation (default: `0`).
+  /// [splashColor] — ink splash color.
+  /// [highlightColor] — ink highlight color.
+  /// [splashFactory] — custom ink splash factory.
+  /// [enableFeedback] — whether to provide feedback on tap (default: `true`).
+  /// [haptic] — haptic feedback level (default: [M3EHapticFeedback.none]).
+  /// [emptyBuilder] — widget shown when the list is empty.
+  /// [addAutomaticKeepAlives] — wrap children in [AutomaticKeepAlive] (default: `true`).
+  /// [addRepaintBoundaries] — wrap children in [RepaintBoundary] (default: `true`).
+  /// [addSemanticIndexes] — wrap children in [IndexedSemantics] (default: `true`).
   const SliverM3ECardList({
     super.key,
     required this.itemCount,
@@ -100,95 +166,75 @@ class SliverM3ECardList extends StatelessWidget {
     this.padding,
     this.margin,
     this.onTap,
+    this.onLongPress,
+    this.semanticLabelBuilder,
+    this.mouseCursor,
+    this.focusColor,
+    this.hoverColor,
+    this.onFocusChange,
     this.border,
     this.elevation = 0,
     this.splashColor,
     this.highlightColor,
     this.splashFactory,
     this.enableFeedback = true,
-    this.haptic = 0,
+    this.haptic = M3EHapticFeedback.none,
+    this.emptyBuilder,
+    this.addAutomaticKeepAlives = true,
+    this.addRepaintBoundaries = true,
+    this.addSemanticIndexes = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate((context, index) {
-        final bool isFirst = index == 0;
-        final bool isLast = index == itemCount - 1;
-        final bool isSingle = itemCount == 1;
+    if (itemCount == 0) {
+      final Widget sliver = SliverToBoxAdapter(
+        child: emptyBuilder ?? const SizedBox.shrink(),
+      );
+      return margin != null
+          ? SliverPadding(padding: margin!, sliver: sliver)
+          : sliver;
+    }
 
-        final BorderRadius borderRadius = _calculateRadius(
-          isFirst,
-          isLast,
-          isSingle,
-        );
-
-        return RepaintBoundary(
-          child: Padding(
-            padding: margin ?? EdgeInsets.zero,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : gap),
-              child: Material(
-                elevation: elevation,
-                color:
-                    color ??
-                    Theme.of(context).colorScheme.surfaceContainerHighest,
-                shape: RoundedRectangleBorder(
-                  borderRadius: borderRadius,
-                  side: border ?? BorderSide.none,
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  splashColor: splashColor,
-                  highlightColor: highlightColor,
-                  splashFactory: splashFactory,
-                  enableFeedback: enableFeedback,
-                  onTap: onTap != null
-                      ? () {
-                          onTap!(index);
-                          switch (haptic) {
-                            case 1:
-                              HapticFeedback.lightImpact();
-                              break;
-                            case 2:
-                              HapticFeedback.mediumImpact();
-                              break;
-                            case 3:
-                              HapticFeedback.heavyImpact();
-                              break;
-                            case 0:
-                            default:
-                              break;
-                          }
-                        }
-                      : null,
-                  child: Padding(
-                    padding: padding ?? const EdgeInsets.all(16.0),
-                    child: itemBuilder(context, index),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      }, childCount: itemCount),
+    final Widget sliver = SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return M3ECard(
+            index: index,
+            position: calculateCardPosition(index, itemCount),
+            outerRadius: outerRadius,
+            innerRadius: innerRadius,
+            gap: gap,
+            color: color,
+            padding: padding,
+            onTap: onTap,
+            onLongPress: onLongPress,
+            semanticLabel: semanticLabelBuilder?.call(index),
+            mouseCursor: mouseCursor,
+            focusColor: focusColor,
+            hoverColor: hoverColor,
+            onFocusChange: onFocusChange != null
+                ? (focused) => onFocusChange!(index, focused)
+                : null,
+            border: border,
+            elevation: elevation,
+            splashColor: splashColor,
+            highlightColor: highlightColor,
+            splashFactory: splashFactory,
+            enableFeedback: enableFeedback,
+            haptic: haptic,
+            child: itemBuilder(context, index),
+          );
+        },
+        childCount: itemCount,
+        addAutomaticKeepAlives: addAutomaticKeepAlives,
+        addRepaintBoundaries: addRepaintBoundaries,
+        addSemanticIndexes: addSemanticIndexes,
+      ),
     );
-  }
 
-  BorderRadius _calculateRadius(bool first, bool last, bool single) {
-    if (single) return BorderRadius.circular(outerRadius);
-    if (first) {
-      return BorderRadius.vertical(
-        top: Radius.circular(outerRadius),
-        bottom: Radius.circular(innerRadius),
-      );
-    }
-    if (last) {
-      return BorderRadius.vertical(
-        top: Radius.circular(innerRadius),
-        bottom: Radius.circular(outerRadius),
-      );
-    }
-    return BorderRadius.circular(innerRadius);
+    return margin != null
+        ? SliverPadding(padding: margin!, sliver: sliver)
+        : sliver;
   }
 }

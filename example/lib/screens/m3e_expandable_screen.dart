@@ -25,7 +25,7 @@ class _ExpandableM3EScreenState extends State<ExpandableM3EScreen> {
           show: _showSemanticsDebugger,
           child: Scaffold(
             appBar: AppBar(
-              title: const Text('Expandable M3E'),
+              title: const Text('M3E Expandable'),
               backgroundColor: Theme.of(context).colorScheme.inversePrimary,
               bottom: const TabBar(
                 isScrollable: true,

@@ -154,7 +154,7 @@ class ExampleHomePage extends StatelessWidget {
           ),
           _buildNavCard(
             context,
-            title: 'Dismissible M3E',
+            title: 'M3E Dismissible',
             subtitle:
                 'Archive or delete data using robust, highly-damped dismissible lists',
             icon: Icons.swipe_rounded,
@@ -162,7 +162,7 @@ class ExampleHomePage extends StatelessWidget {
           ),
           _buildNavCard(
             context,
-            title: 'Expandable M3E',
+            title: 'M3E Expandable',
             subtitle:
                 'Richly animated spring expansion lists covering Columns, Slivers, and ListViews',
             icon: Icons.expand_circle_down_rounded,

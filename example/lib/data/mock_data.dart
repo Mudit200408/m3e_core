@@ -325,7 +325,7 @@ void showSnack(BuildContext context, String msg) {
 
 Widget buildSectionHeader(BuildContext context, String title) {
   return Padding(
-    padding: const EdgeInsets.only(bottom: 8, left: 4),
+    padding: const EdgeInsets.all(12),
     child: Text(
       title,
       style: TextStyle(

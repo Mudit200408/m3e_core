@@ -3,7 +3,7 @@
 /// This library provides a set of high-performance, expressive UI components
 /// that follow the Material 3 design system with enhanced animations and
 /// interactions.
-library m3e_core;
+library;
 
 // Common components.
 export 'src/common/m3e_common.dart';

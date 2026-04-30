@@ -1,5 +1,5 @@
 # 0.1.0
-- Updated `m3e_dismissible`, `m3e_expandable`, and `m3e_dropdown` to v0.1.0.
+- Updated `m3e_dismissible`, `m3e_expandable`, `m3e_card_list` and `m3e_dropdown` to v0.1.0.
 - **Breaking API Changes**: There are significant API changes in these components. Please check the documentation on their respective pages for migration details.
 
 # 0.0.5

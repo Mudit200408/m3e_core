@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+import '../common/m3e_common.dart';
+import 'm3e_card_widget.dart';
 
 /// A Material 3 static card column with dynamically rounded corners.
 ///
@@ -37,7 +39,7 @@ class M3ECardColumn extends StatelessWidget {
   /// The inner padding applied to each child.
   ///
   /// Defaults to `EdgeInsets.all(12.0)`.
-  final EdgeInsetsGeometry? itemPadding;
+  final EdgeInsetsGeometry? padding;
 
   /// The outer margin applied around the entire group of cards.
   ///
@@ -50,6 +52,26 @@ class M3ECardColumn extends StatelessWidget {
   /// Provides the `index` of the tapped item. If null, the item will not be
   /// interactive.
   final void Function(int index)? onTap;
+
+  /// Optional callback invoked when an item is long-pressed.
+  ///
+  /// Provides the `index` of the long-pressed item.
+  final void Function(int index)? onLongPress;
+
+  /// Optional semantic label builder for accessibility.
+  final String Function(int index)? semanticLabelBuilder;
+
+  /// The cursor for a mouse pointer when it enters a card's bounds.
+  final MouseCursor? mouseCursor;
+
+  /// The color to use when a card is focused by keyboard navigation.
+  final Color? focusColor;
+
+  /// The color to use when a card is hovered by a mouse pointer.
+  final Color? hoverColor;
+
+  /// Called when the focus state of a card changes.
+  final void Function(int index, bool)? onFocusChange;
 
   /// The border drawn around each card item.
   ///
@@ -77,15 +99,38 @@ class M3ECardColumn extends StatelessWidget {
   /// Defaults to `true`.
   final bool enableFeedback;
 
-  /// The level of haptic feedback on tap.
+  /// The haptic feedback to provide on tap.
+  final M3EHapticFeedback haptic;
+
+  /// Widget displayed when the column is empty.
   ///
-  /// * 0 -> No haptics (default)
-  /// * 1 -> Light impact
-  /// * 2 -> Medium impact
-  /// * 3 -> Heavy impact
-  final int haptic;
+  /// If null, [SizedBox.shrink] is shown.
+  final Widget? emptyBuilder;
 
   /// Creates a [M3ECardColumn].
+  ///
+  /// [children] — the list of pre-built card widgets.
+  /// [outerRadius] — radius for outer corners (default: `24.0`).
+  /// [innerRadius] — radius for inner corners (default: `4.0`).
+  /// [gap] — space between adjacent items (default: `3.0`).
+  /// [color] — background color (default: [ColorScheme.surfaceContainerHighest]).
+  /// [padding] — inner padding for each card (default: `EdgeInsets.all(12.0)`).
+  /// [margin] — outer margin around the entire column.
+  /// [onTap] — callback invoked with the tapped item's index.
+  /// [onLongPress] — callback invoked with the long-pressed item's index.
+  /// [semanticLabelBuilder] — accessibility label for each item.
+  /// [mouseCursor] — mouse cursor on hover.
+  /// [focusColor] — focus indicator color.
+  /// [hoverColor] — hover indicator color.
+  /// [onFocusChange] — focus state change callback.
+  /// [border] — border drawn around each card.
+  /// [elevation] — card elevation (default: `0`).
+  /// [splashColor] — ink splash color.
+  /// [highlightColor] — ink highlight color.
+  /// [splashFactory] — custom ink splash factory.
+  /// [enableFeedback] — whether to provide feedback on tap (default: `true`).
+  /// [haptic] — haptic feedback level (default: [M3EHapticFeedback.none]).
+  /// [emptyBuilder] — widget shown when the column is empty.
   const M3ECardColumn({
     super.key,
     required this.children,
@@ -93,96 +138,66 @@ class M3ECardColumn extends StatelessWidget {
     this.innerRadius = 4.0,
     this.gap = 3.0,
     this.color,
-    this.itemPadding,
+    this.padding,
     this.margin,
     this.onTap,
+    this.onLongPress,
+    this.semanticLabelBuilder,
+    this.mouseCursor,
+    this.focusColor,
+    this.hoverColor,
+    this.onFocusChange,
     this.border,
     this.elevation = 0,
     this.splashColor,
     this.highlightColor,
     this.splashFactory,
     this.enableFeedback = true,
-    this.haptic = 0,
+    this.haptic = M3EHapticFeedback.none,
+    this.emptyBuilder,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (children.isEmpty) return const SizedBox.shrink();
+    if (children.isEmpty) {
+      final empty = emptyBuilder ?? const SizedBox.shrink();
+      return margin != null ? Padding(padding: margin!, child: empty) : empty;
+    }
 
-    return Column(
+    final total = children.length;
+
+    final Widget column = Column(
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(children.length, (index) {
-        final bool isFirst = index == 0;
-        final bool isLast = index == children.length - 1;
-        final bool isSingle = children.length == 1;
-
-        BorderRadius borderRadius;
-        if (isSingle) {
-          borderRadius = BorderRadius.circular(outerRadius);
-        } else if (isFirst) {
-          borderRadius = BorderRadius.vertical(
-            top: Radius.circular(outerRadius),
-            bottom: Radius.circular(innerRadius),
-          );
-        } else if (isLast) {
-          borderRadius = BorderRadius.vertical(
-            top: Radius.circular(innerRadius),
-            bottom: Radius.circular(outerRadius),
-          );
-        } else {
-          borderRadius = BorderRadius.circular(innerRadius);
-        }
-
-        return RepaintBoundary(
-          child: Padding(
-            padding: margin ?? EdgeInsets.zero,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : gap),
-              child: Material(
-                elevation: elevation,
-                color:
-                    color ??
-                    Theme.of(context).colorScheme.surfaceContainerHighest,
-                shape: RoundedRectangleBorder(
-                  borderRadius: borderRadius,
-                  side: border ?? BorderSide.none,
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  splashColor: splashColor,
-                  highlightColor: highlightColor,
-                  splashFactory: splashFactory,
-                  enableFeedback: enableFeedback,
-                  onTap: onTap != null
-                      ? () {
-                          onTap!(index);
-                          switch (haptic) {
-                            case 1:
-                              HapticFeedback.lightImpact();
-                              break;
-                            case 2:
-                              HapticFeedback.mediumImpact();
-                              break;
-                            case 3:
-                              HapticFeedback.heavyImpact();
-                              break;
-                            case 0:
-                            default:
-                              break;
-                          }
-                        }
-                      : null,
-                  child: Container(
-                    width: double.infinity,
-                    padding: itemPadding ?? const EdgeInsets.all(12),
-                    child: children[index],
-                  ),
-                ),
-              ),
-            ),
-          ),
+      children: List.generate(total, (index) {
+        return M3ECard(
+          index: index,
+          position: calculateCardPosition(index, total),
+          outerRadius: outerRadius,
+          innerRadius: innerRadius,
+          gap: gap,
+          color: color,
+          padding: padding,
+          onTap: onTap,
+          onLongPress: onLongPress,
+          semanticLabel: semanticLabelBuilder?.call(index),
+          mouseCursor: mouseCursor,
+          focusColor: focusColor,
+          hoverColor: hoverColor,
+          onFocusChange: onFocusChange != null
+              ? (focused) => onFocusChange!(index, focused)
+              : null,
+          border: border,
+          elevation: elevation,
+          splashColor: splashColor,
+          highlightColor: highlightColor,
+          splashFactory: splashFactory,
+          enableFeedback: enableFeedback,
+          haptic: haptic,
+          child: children[index],
         );
       }),
     );
+
+    return margin != null ? Padding(padding: margin!, child: column) : column;
   }
 }
