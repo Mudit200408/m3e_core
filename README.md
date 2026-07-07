@@ -7,7 +7,7 @@
 
 ![M3E Intro](https://raw.githubusercontent.com/Mudit200408/m3e_core/main/doc/intro.png)
 
-A comprehensive Flutter package providing **Expressive Material 3** components: Card Lists, Dismissible Cards, Expandable Cards, Dropdown Menus, Buttons, and Extended M3 Shapes.
+A comprehensive Flutter package providing **Expressive Material 3** components: Card Lists, Dismissible Cards, Expandable Cards, Dropdown Menus, Buttons, Floating Toolbars, and Extended M3 Shapes.
 
 ---
 
@@ -75,6 +75,185 @@ A robust button system featuring:
 ### 6. M3 Shapes Extended
 A wide variety of predefined Material 3 expressive shapes (Gem, Slanted, Flower, etc.) for visual elements or clipping.
 [Detailed Documentation →](https://pub.dev/packages/flutter_m3shapes_extended)
+
+### 7. M3E Floating Toolbar
+
+A faithful Flutter port of the **Material 3 Expressive `FloatingToolbar`** component family. Supports horizontal and vertical layouts, optional FAB morphing, scroll-exit animations, and haptic feedback — all driven by `motor` spring physics.
+
+#### Widget Variants
+
+| Widget | Description |
+|---|---|
+| `M3EHorizontalFloatingToolbar` | Horizontal pill toolbar with optional leading/trailing slots |
+| `M3EFabHorizontalFloatingToolbar` | Horizontal toolbar + morphing FAB |
+| `M3EVerticalFloatingToolbar` | Vertical pill toolbar with optional leading/trailing slots |
+| `M3EFabVerticalFloatingToolbar` | Vertical toolbar + morphing FAB |
+
+#### Standard Toolbar (No FAB)
+
+```dart
+M3EHorizontalFloatingToolbar(
+  expanded: _expanded,
+  decoration: M3EFloatingToolbarDecoration(
+    colors: M3EFloatingToolbarDefaults.standardColors(context),
+    haptic: M3EHapticFeedback.light,
+  ),
+  leadingContent: IconButton(
+    icon: const Icon(Icons.attachment_rounded),
+    onPressed: () {},
+  ),
+  content: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      IconButton(icon: const Icon(Icons.mic_rounded), onPressed: () {}),
+      IconButton(icon: const Icon(Icons.videocam_rounded), onPressed: () {}),
+    ],
+  ),
+  trailingContent: IconButton(
+    icon: const Icon(Icons.send_rounded),
+    onPressed: () {},
+  ),
+)
+```
+
+Toggle `expanded` to animate `leadingContent` and `trailingContent` in/out. The center `content` is always visible.
+
+#### FAB Morph Toolbar
+
+```dart
+M3EFabHorizontalFloatingToolbar(
+  expanded: _expanded,
+  fabPosition: M3EFloatingToolbarHorizontalFabPosition.end,
+  decoration: M3EFloatingToolbarDecoration(
+    colors: M3EFloatingToolbarDefaults.vibrantColors(context),
+    motion: const M3EMotion.custom(stiffness: 800, damping: 0.6), // optional
+    haptic: M3EHapticFeedback.medium,
+  ),
+  floatingActionButton: M3EFloatingToolbarDefaults.vibrantFab(
+    context: context,
+    onPressed: () => setState(() => _expanded = !_expanded),
+    child: Icon(_expanded ? Icons.close_rounded : Icons.edit_note_rounded),
+  ),
+  content: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      IconButton(icon: const Icon(Icons.share_outlined), onPressed: () {}),
+      IconButton(icon: const Icon(Icons.bookmark_border_rounded), onPressed: () {}),
+    ],
+  ),
+)
+```
+
+When `expanded` flips, the FAB morphs between **80 dp** (collapsed) and **56 dp** (expanded) while the toolbar slides in/out using the `motion` spring. The `motion` parameter also live-reacts to updates — useful for interactive physics sliders.
+
+#### Scroll Exit Behavior
+
+Wraps the scrollable content and automatically slides the toolbar off-screen as the user scrolls.
+
+```dart
+// 1. Create behavior once (e.g. in initState)
+final scrollBehavior = M3EFloatingToolbarScrollBehavior.exitAlways(
+  exitDirection: M3EFloatingToolbarExitDirection.bottom,
+);
+
+// 2. Wrap the scrollable
+M3EFloatingToolbarScrollWrapper(
+  behavior: scrollBehavior,
+  child: ListView.builder(...),
+)
+
+// 3. Pass behavior to toolbar
+M3EFabHorizontalFloatingToolbar(
+  expanded: _expanded,
+  scrollBehavior: scrollBehavior,
+  ...
+)
+```
+
+| `M3EFloatingToolbarExitDirection` | Effect |
+|---|---|
+| `top` | Toolbar slides up off-screen |
+| `bottom` | Toolbar slides down off-screen |
+| `start` | Toolbar slides to leading edge |
+| `end` | Toolbar slides to trailing edge |
+
+#### Scroll Gesture Expand/Collapse (Vertical, No FAB)
+
+For non-FAB toolbars, use `M3EFloatingToolbarVerticalNestedScroll` to expand/collapse based on scroll distance threshold:
+
+```dart
+M3EFloatingToolbarVerticalNestedScroll(
+  expanded: _expanded,
+  onExpand: () => setState(() => _expanded = true),
+  onCollapse: () => setState(() => _expanded = false),
+  expandScrollDistanceThreshold: 40.0,  // dp
+  collapseScrollDistanceThreshold: 40.0,
+  child: ListView.builder(...),
+)
+```
+
+#### Color Schemes
+
+```dart
+// Standard — surfaceContainer toolbar, primaryContainer FAB
+M3EFloatingToolbarDefaults.standardColors(context)
+
+// Vibrant — primaryContainer toolbar, tertiaryContainer FAB
+M3EFloatingToolbarDefaults.vibrantColors(context)
+
+// Fully custom
+const M3EFloatingToolbarColors(
+  toolbarContainerColor: Color(0xFF1A1A2E),
+  toolbarContentColor: Colors.white,
+  fabContainerColor: Color(0xFF6C63FF),
+  fabContentColor: Colors.white,
+)
+```
+
+#### FAB Helpers
+
+```dart
+// Standard — primaryContainer background
+M3EFloatingToolbarDefaults.standardFab(
+  context: context,
+  onPressed: onPressed,
+  child: const Icon(Icons.edit_rounded),
+)
+
+// Vibrant — tertiaryContainer background
+M3EFloatingToolbarDefaults.vibrantFab(
+  context: context,
+  onPressed: onPressed,
+  child: const Icon(Icons.edit_rounded),
+)
+```
+
+> **Note:** The FAB's `onPressed` action is independent from the toolbar's `expanded` state. You can use the FAB to save, share, or perform any action while a separate toggle controls expand/collapse.
+
+#### Key Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `expanded` | `bool` | Controls expand/collapse state |
+| `content` | `Widget` | Main always-visible slot (Row/Column) |
+| `leadingContent` | `Widget?` | Animated leading slot (standard only) |
+| `trailingContent` | `Widget?` | Animated trailing slot (standard only) |
+| `floatingActionButton` | `Widget` | FAB widget (FAB variants only) |
+| `fabPosition` | `enum` | `start`/`end` (horizontal) or `top`/`bottom` (vertical) |
+| `scrollBehavior` | `M3EFloatingToolbarScrollBehavior?` | Scroll-exit integration |
+| `decoration` | `M3EFloatingToolbarDecoration?` | Style configuration override (colors, shape, padding, haptic, motion, elevations) |
+
+#### Default Tokens
+
+| Token | Value |
+|---|---|
+| Container height/width | 64 dp |
+| FAB size (expanded) | 56 dp |
+| FAB size (collapsed) | 80 dp |
+| Toolbar-to-FAB gap | 8 dp |
+| Screen offset | 16 dp |
+| Scroll exit threshold | 40 dp |
+| Default motion | `M3EMotion.expressiveSpatialFast` |
 
 ---
 

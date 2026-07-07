@@ -25,3 +25,6 @@ export 'src/shapes/m3e_shapes_core.dart';
 
 // M3E Buttons
 export 'src/buttons/button.dart';
+
+// M3E Floating Toolbar
+export 'src/floating_toolbar/floating_toolbar.dart';

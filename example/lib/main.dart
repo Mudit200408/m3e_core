@@ -5,6 +5,8 @@ import 'screens/m3e_button_screen.dart';
 import 'screens/m3e_expandable_screen.dart';
 import 'screens/m3e_card_screen.dart';
 import 'screens/m3e_dismissible_screen.dart';
+import 'screens/m3e_floating_toolbar_screen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -184,8 +186,17 @@ class ExampleHomePage extends StatelessWidget {
             icon: Icons.smart_button_rounded,
             destination: const ButtonM3EScreen(),
           ),
+          _buildNavCard(
+            context,
+            title: 'M3E Floating Toolbar',
+            subtitle:
+                'Expressive floating toolbars with morphing FAB and exit-always scroll physics',
+            icon: Icons.subtitles_rounded,
+            destination: const FloatingToolbarM3EScreen(),
+          ),
         ],
       ),
     );
+
   }
 }
