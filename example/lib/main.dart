@@ -6,6 +6,7 @@ import 'screens/m3e_expandable_screen.dart';
 import 'screens/m3e_card_screen.dart';
 import 'screens/m3e_dismissible_screen.dart';
 import 'screens/m3e_floating_toolbar_screen.dart';
+import 'screens/m3e_slider_screen.dart';
 
 
 void main() {
@@ -193,6 +194,14 @@ class ExampleHomePage extends StatelessWidget {
                 'Expressive floating toolbars with morphing FAB and exit-always scroll physics',
             icon: Icons.subtitles_rounded,
             destination: const FloatingToolbarM3EScreen(),
+          ),
+          _buildNavCard(
+            context,
+            title: 'M3E Slider',
+            subtitle:
+                'Premium expressive sliders with dual-thumb ranges, ticks, custom decorations & haptics',
+            icon: Icons.linear_scale_rounded,
+            destination: const M3ESliderScreen(),
           ),
         ],
       ),

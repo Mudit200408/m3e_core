@@ -28,3 +28,6 @@ export 'src/buttons/button.dart';
 
 // M3E Floating Toolbar
 export 'src/floating_toolbar/floating_toolbar.dart';
+
+// M3E Slider
+export 'src/slider/slider.dart';
