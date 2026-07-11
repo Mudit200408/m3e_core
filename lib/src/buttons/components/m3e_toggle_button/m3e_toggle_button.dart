@@ -537,7 +537,7 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
 
     switch (widget.style) {
       case M3EButtonStyle.filled:
-        bgColor = checked ? cs.primary : cs.surfaceContainerHighest;
+        bgColor = checked ? cs.primary : cs.surfaceContainer;
         fgColor = checked ? cs.onPrimary : cs.onSurfaceVariant;
         break;
 
@@ -547,13 +547,13 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
         break;
 
       case M3EButtonStyle.tonal:
-        bgColor = checked ? cs.secondaryContainer : cs.surfaceContainerHighest;
-        fgColor = checked ? cs.onSecondaryContainer : cs.onSurfaceVariant;
+        bgColor = checked ? cs.secondary : cs.secondaryContainer;
+        fgColor = checked ? cs.onSecondary : cs.onSecondaryContainer;
         break;
 
       case M3EButtonStyle.outlined:
-        bgColor = checked ? cs.secondaryContainer : Colors.transparent;
-        fgColor = checked ? cs.onSecondaryContainer : cs.onSurface;
+        bgColor = checked ? cs.inverseSurface : Colors.transparent;
+        fgColor = checked ? cs.onInverseSurface : cs.onSurfaceVariant;
         break;
 
       case M3EButtonStyle.text:
@@ -563,7 +563,7 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
     }
 
     final bool transparent =
-        widget.style == M3EButtonStyle.outlined ||
+        (widget.style == M3EButtonStyle.outlined && !checked) ||
         widget.style == M3EButtonStyle.text;
 
     return ButtonStyle(
@@ -634,7 +634,8 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
             width: 1,
           );
         }
-        return BorderSide(color: tokens.outline(), width: 1);
+        if (checked) return BorderSide.none;
+        return BorderSide(color: cs.outlineVariant, width: 1);
       }),
       mouseCursor: WidgetStateProperty.resolveWith((states) {
         if (widget.decoration?.mouseCursor != null) {
