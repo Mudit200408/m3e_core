@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:m3e_core/m3e_core.dart';
+import 'package:motor/motor.dart';
 
 class FloatingToolbarM3EScreen extends StatefulWidget {
   const FloatingToolbarM3EScreen({super.key});
@@ -32,11 +34,35 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
   bool _scrollExitEnabled = true;
   bool _scrollExitAlignedEnd = true;
   bool _scrollExitIsVertical = false;
-  M3EHapticFeedback _scrollExitHaptic = M3EHapticFeedback.none;
   bool _scrollExitScrollGesture = true;
   bool _scrollExitFabCustomAction = false;
   double _toolbarStiffness = 800.0;
   double _toolbarDamping = 0.6;
+
+  // Tab 4 (Bottom Nav) States
+  int _bottomNavIndex = 0;
+  final List<_NavBarItem> _navItems = [
+    const _NavBarItem(
+      icon: Icons.home_outlined,
+      selectedIcon: Icons.home_rounded,
+      label: 'Home',
+    ),
+    const _NavBarItem(
+      icon: Icons.search_outlined,
+      selectedIcon: Icons.search_rounded,
+      label: 'Search',
+    ),
+    const _NavBarItem(
+      icon: Icons.favorite_outline,
+      selectedIcon: Icons.favorite_rounded,
+      label: 'Favorites',
+    ),
+    const _NavBarItem(
+      icon: Icons.person_outline,
+      selectedIcon: Icons.person_rounded,
+      label: 'Profile',
+    ),
+  ];
 
   // Scroll Behavior State (Tab 3)
   late M3EFloatingToolbarScrollBehavior _bottomScrollBehavior;
@@ -66,7 +92,7 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
         : M3EFloatingToolbarDefaults.standardColors(context);
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: cs.surfaceContainerLowest,
         appBar: AppBar(
@@ -83,6 +109,7 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
                 text: 'Vertical',
               ),
               Tab(icon: Icon(Icons.unfold_more_rounded), text: 'Scroll Exit'),
+              Tab(icon: Icon(Icons.navigation_rounded), text: 'Bottom Nav'),
             ],
           ),
         ),
@@ -98,6 +125,9 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
 
             // Tab 3: Scroll Exit Demo
             _buildScrollExitTab(colors, cs),
+
+            // Tab 4: Bottom Nav Demo
+            _buildBottomNavTab(colors, cs),
           ],
         ),
       ),
@@ -692,24 +722,6 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
                   : (val) => setState(() => _scrollExitScrollGesture = val),
             ),
             ListTile(
-              title: const Text('Haptic Level'),
-              subtitle: Text(_scrollExitHaptic.name.toUpperCase()),
-              trailing: SizedBox(
-                width: 150,
-                child: Slider(
-                  value: _scrollExitHaptic.index.toDouble(),
-                  min: 0,
-                  max: 3,
-                  divisions: 3,
-                  onChanged: (val) {
-                    setState(() {
-                      _scrollExitHaptic = M3EHapticFeedback.values[val.round()];
-                    });
-                  },
-                ),
-              ),
-            ),
-            ListTile(
               title: const Text('Stiffness'),
               subtitle: Text(_toolbarStiffness.toStringAsFixed(1)),
               trailing: SizedBox(
@@ -1048,6 +1060,107 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
     );
   }
 
+  Widget _buildBottomNavTab(M3EFloatingToolbarColors colors, ColorScheme cs) {
+    final navColors = M3EFloatingToolbarColors(
+      toolbarContainerColor: cs.primary,
+      toolbarContentColor: cs.onPrimary,
+      fabContainerColor: cs.primaryContainer,
+      fabContentColor: cs.onPrimaryContainer,
+    );
+
+    final decoration = M3EFloatingToolbarDecoration(
+      motion: M3EMotion.custom(stiffness: 900, damping: 0.5),
+      colors: navColors,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      expandedShadowElevation: 6.0,
+    );
+
+    final content = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(_navItems.length, (index) {
+        final isSelected = index == _bottomNavIndex;
+        return _M3ENavBarTab(
+          key: ValueKey(_navItems[index].label),
+          item: _navItems[index],
+          isSelected: isSelected,
+          onTap: () => setState(() => _bottomNavIndex = index),
+        );
+      }),
+    );
+
+    final bodyWidgets = [
+      Center(
+        child: Text('Home', style: Theme.of(context).textTheme.headlineMedium),
+      ),
+      Center(
+        child: Text(
+          'Search',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
+      Center(
+        child: Text(
+          'Favorites',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
+      Center(
+        child: Text(
+          'Profile',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ),
+    ];
+
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(24),
+          child: Card(
+            elevation: 0,
+            color: cs.surfaceContainerHigh,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 300,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: bodyWidgets[_bottomNavIndex],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: 16,
+          child: M3EFabHorizontalFloatingToolbar(
+            expanded: true,
+            decoration: decoration,
+            fabPosition: M3EFloatingToolbarHorizontalFabPosition.end,
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('FAB pressed!'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+              backgroundColor: cs.primaryContainer,
+              foregroundColor: cs.onPrimaryContainer,
+              elevation: 0,
+              child: const Icon(Icons.add_rounded),
+            ),
+            content: content,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildVibrantColorSwitch() {
     return SwitchListTile(
       title: const Text('Use Vibrant Color Palette'),
@@ -1092,6 +1205,142 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _NavBarItem {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+
+  const _NavBarItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+  });
+}
+
+class _M3ENavBarTab extends StatefulWidget {
+  final _NavBarItem item;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _M3ENavBarTab({
+    super.key,
+    required this.item,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_M3ENavBarTab> createState() => _M3ENavBarTabState();
+}
+
+class _M3ENavBarTabState extends State<_M3ENavBarTab>
+    with SingleTickerProviderStateMixin {
+  late final SingleMotionController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SingleMotionController(
+      motion: M3EMotion.custom(stiffness: 800, damping: 0.4).toMotion(),
+      vsync: this,
+      initialValue: widget.isSelected ? 1.0 : 0.0,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _M3ENavBarTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSelected != oldWidget.isSelected) {
+      _controller.animateTo(widget.isSelected ? 1.0 : 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final progress = _controller.value.clamp(0.0, 1.0);
+
+        final double width = lerpDouble(48.0, 110.0, progress)!;
+
+        final Color? bgColor = Color.lerp(
+          Colors.transparent,
+          theme.colorScheme.surface,
+          progress,
+        );
+
+        final Color? contentColor = Color.lerp(
+          theme.colorScheme.onPrimary,
+          theme.colorScheme.primary,
+          progress,
+        );
+
+        return Container(
+          width: width,
+          height: 48.0,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(24),
+              onTap: widget.onTap,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    widget.isSelected
+                        ? widget.item.selectedIcon
+                        : widget.item.icon,
+                    color: contentColor,
+                    size: 24,
+                  ),
+                  if (progress > 0.01)
+                    ClipRect(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: progress,
+                        child: Opacity(
+                          opacity: progress,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: Text(
+                              widget.item.label,
+                              style: TextStyle(
+                                color: contentColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.clip,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
