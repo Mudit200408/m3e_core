@@ -1,3 +1,6 @@
+# 0.1.2
+- toggle-button: Match the button colors to M3E color spec
+
 # 0.1.1
 - Adds `M3EFloatingToolbar` component family.
 - Adds `M3ESlider` and `M3ERangeSlider` components.
