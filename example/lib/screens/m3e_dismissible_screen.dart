@@ -122,7 +122,9 @@ class _DismissibleListViewTabState extends State<_DismissibleListViewTab> {
             listPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             itemCount: _items.length + (_isLoadingMore ? 1 : 0),
             onDismiss: _onDismiss,
-            style: getDismissStyle(),
+            style: getDismissStyle().copyWith(
+              hapticOnThreshold: M3EHapticFeedback.heavy,
+            ),
 
             itemBuilder: (context, index) {
               if (index == _items.length) {
@@ -221,6 +223,7 @@ class _DismissibleSliverTabState extends State<_DismissibleSliverTab> {
                     outerRadius: 6,
                     innerRadius: 6,
                     selectedBorderRadius: 80,
+                    hapticOnThreshold: M3EHapticFeedback.heavy,
                   ),
                   itemBuilder: (context, index) {
                     if (index == _items.length) {
