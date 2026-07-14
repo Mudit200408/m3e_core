@@ -181,7 +181,7 @@ class _DropdownM3EScreenState extends State<DropdownM3EScreen> {
               M3EDropdownMenu<String>(
                 items: fruitItems,
                 showChipAnimation: true,
-                haptic: M3EHapticFeedback.light,
+                haptic: M3EHapticFeedback.heavy,
                 selectedItemBuilder: (item) {
                   return Chip(
                     avatar: Icon(
