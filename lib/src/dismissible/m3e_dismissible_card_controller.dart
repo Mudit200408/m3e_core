@@ -1,7 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:motor/motor.dart';
 
 import '../common/m3e_common.dart';
@@ -547,7 +546,9 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     if (!style.enableFeedback) return;
     if (_hapticStopwatch.elapsedMilliseconds < _kVibrationThresholdMs) return;
     _hapticStopwatch.reset();
-    HapticFeedback.selectionClick();
+    final progress = _dragProgress;
+    final amplitude = 0.10 + (0.85 - 0.10) * progress;
+    applyTypedHaptic('dragTexture', amplitude);
   }
 
   // ── Spring-back (below threshold release) ──
