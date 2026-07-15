@@ -214,7 +214,11 @@ class _M3ECircularWavyProgressIndicatorState
           );
         }
         // Animate progress from current interpolated position to new value
-        _fromProgress = lerpDouble(_fromProgress, _toProgress, _progressCurve.value)!;
+        _fromProgress = lerpDouble(
+          _fromProgress,
+          _toProgress,
+          _progressCurve.value,
+        )!;
         _toProgress = widget.value!;
         _progressController.forward(from: 0.0);
       }
