@@ -1,53 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:motor/motor.dart';
 
-/// Haptic feedback intensity levels for Material 3 Expressive components.
-///
-/// ## Levels
-/// - [none] — No haptic feedback (default)
-/// - [light] — Light tap feedback for subtle interactions
-/// - [medium] — Medium impact for standard button presses
-/// - [heavy] — Heavy impact for significant actions
-enum M3EHapticFeedback {
-  /// No haptic feedback.
-  none(0),
-
-  /// Light tap feedback.
-  light(1),
-
-  /// Medium impact feedback.
-  medium(2),
-
-  /// Heavy impact feedback.
-  heavy(3);
-
-  final int value;
-  const M3EHapticFeedback(this.value);
-
-  /// Helper function to apply haptic feedback based on [M3EHapticFeedback].
-  void apply() {
-    applyHaptic(this);
-  }
-}
-
-/// Helper function to apply haptic feedback based on [M3EHapticFeedback].
-void applyHaptic(M3EHapticFeedback haptic) {
-  switch (haptic) {
-    case M3EHapticFeedback.light:
-      HapticFeedback.lightImpact();
-      break;
-    case M3EHapticFeedback.medium:
-      HapticFeedback.mediumImpact();
-      break;
-    case M3EHapticFeedback.heavy:
-      HapticFeedback.heavyImpact();
-      break;
-    case M3EHapticFeedback.none:
-      break;
-  }
-}
-
+export '../haptics/m3e_haptics.dart';
 /// Spring animation configuration for Material 3 Expressive components.
 ///
 /// Use to customize the spring physics for component animations.

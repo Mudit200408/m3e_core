@@ -111,6 +111,7 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
   RenderBox? _renderBox;
   int? _cachedDivisions;
   List<double>? _cachedTickFractions;
+  M3EHapticTracker? _hapticTracker;
 
   late final SingleMotionController _dockController;
   bool _isDocked = false;
@@ -209,6 +210,20 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
     return fraction * (widget.max - widget.min) + widget.min;
   }
 
+  void _initHapticTracker(Offset globalPosition) {
+    final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
+    final config = widget.decoration?.hapticConfig ??
+        (widget.divisions != null
+            ? const M3EHapticConfig.discrete()
+            : const M3EHapticConfig.continuous());
+
+    _hapticTracker = M3EHapticTracker(
+      baseHaptic: haptic,
+      config: config,
+    );
+    _hapticTracker!.start(_valueToFraction(widget.value), globalPosition);
+  }
+
   void _updateValue(double newValue) {
     if (!widget.enabled || widget.onChanged == null) return;
     final clamped = newValue.clamp(widget.min, widget.max);
@@ -220,8 +235,12 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
       final currentTick = (fraction * divs).round();
       if (currentTick != _lastHapticTick) {
         _lastHapticTick = currentTick;
-        final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
-        haptic.apply();
+        if (_hapticTracker != null) {
+          _hapticTracker!.triggerTick(fraction);
+        } else {
+          final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
+          haptic.apply();
+        }
       }
     }
 
@@ -238,6 +257,7 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
     _isDragging = true;
     _renderBox = context.findRenderObject() as RenderBox;
     _lastHapticTick = -1;
+    _initHapticTracker(details.globalPosition);
     widget.onChangeStart?.call(widget.value);
   }
 
@@ -260,6 +280,7 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
     }
     final rawValue = _fractionToValue(fraction);
 
+    _hapticTracker?.update(fraction, details.globalPosition);
     _updateValue(rawValue);
   }
 
@@ -268,6 +289,7 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
     _isPressed.value = false;
     _isDragging = false;
     _renderBox = null;
+    _hapticTracker = null;
     _snapToNearestTick();
   }
 
@@ -279,6 +301,7 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
     _snapController.stop();
     _isPressed.value = true;
     _lastHapticTick = -1;
+    _initHapticTracker(details.globalPosition);
     widget.onChangeStart?.call(widget.value);
 
     const margin = M3ESliderDefaults.thumbRadius;
@@ -296,12 +319,14 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
     final rawValue = _fractionToValue(fraction);
     _lastTapValue = rawValue;
 
+    _hapticTracker?.update(fraction, details.globalPosition);
     _updateValue(rawValue);
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (!widget.enabled) return;
     _isPressed.value = false;
+    _hapticTracker = null;
     _snapToNearestTick(fromValue: _lastTapValue);
     _lastTapValue = null;
   }

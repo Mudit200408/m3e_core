@@ -110,6 +110,7 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
   RenderBox? _renderBox;
   int? _cachedDivisions;
   List<double>? _cachedTickFractions;
+  M3EHapticTracker? _hapticTracker;
 
   @override
   void initState() {
@@ -251,6 +252,21 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     return fraction * (widget.max - widget.min) + widget.min;
   }
 
+  void _initHapticTracker(Offset globalPosition) {
+    final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
+    final config = widget.decoration?.hapticConfig ??
+        (widget.divisions != null
+            ? const M3EHapticConfig.discrete()
+            : const M3EHapticConfig.continuous());
+
+    _hapticTracker = M3EHapticTracker(
+      baseHaptic: haptic,
+      config: config,
+    );
+    final activeValue = _isDraggingStart ? widget.value.start : widget.value.end;
+    _hapticTracker!.start(_valueToFraction(activeValue), globalPosition);
+  }
+
   void _updateValue({double? start, double? end}) {
     if (!widget.enabled || widget.onChanged == null) return;
 
@@ -272,8 +288,12 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
       final currentTick = (activeFraction * divs).round();
       if (currentTick != _lastHapticTick) {
         _lastHapticTick = currentTick;
-        final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
-        haptic.apply();
+        if (_hapticTracker != null) {
+          _hapticTracker!.triggerTick(activeFraction);
+        } else {
+          final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
+          haptic.apply();
+        }
       }
     }
 
@@ -335,6 +355,7 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     }
 
     _lastHapticTick = -1;
+    _initHapticTracker(details.globalPosition);
     widget.onChangeStart?.call(widget.value);
   }
 
@@ -357,6 +378,8 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     }
     final rawValue = _fractionToValue(fraction);
 
+    _hapticTracker?.update(fraction, details.globalPosition);
+
     if (_isDraggingStart) {
       _updateValue(start: rawValue.clamp(widget.min, widget.value.end));
     } else {
@@ -370,6 +393,7 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     _isEndPressed.value = false;
     _isDragging = false;
     _renderBox = null;
+    _hapticTracker = null;
     _snapToNearestTick(_isDraggingStart);
   }
 
@@ -405,6 +429,7 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
       _isStartPressed.value = true;
       _isStartFocusedFromPointer = true;
       _startFocusNode.requestFocus();
+      _initHapticTracker(details.globalPosition);
       widget.onChangeStart?.call(widget.value);
       _updateValue(start: rawValue.clamp(widget.min, widget.value.end));
     } else {
@@ -412,6 +437,7 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
       _isEndPressed.value = true;
       _isEndFocusedFromPointer = true;
       _endFocusNode.requestFocus();
+      _initHapticTracker(details.globalPosition);
       widget.onChangeStart?.call(widget.value);
       _updateValue(end: rawValue.clamp(widget.value.start, widget.max));
     }
@@ -421,6 +447,7 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     if (!widget.enabled) return;
     _isStartPressed.value = false;
     _isEndPressed.value = false;
+    _hapticTracker = null;
     _snapToNearestTick(_isDraggingStart, fromValue: _lastTapValue);
     _lastTapValue = null;
   }

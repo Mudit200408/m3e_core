@@ -25,6 +25,9 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
   bool _volumeTrailingIcon = false;
 
   M3EHapticFeedback _selectedHaptic = M3EHapticFeedback.light;
+  bool _enableContinuousDrag = true;
+  bool _vibrateOnBookends = true;
+  double _dragThreshold = 0.02;
 
   @override
   Widget build(BuildContext context) {
@@ -41,23 +44,83 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
         children: [
           // ── Continuous Slider Card ──
           _buildDemoSection(
-            title: 'Continuous Slider',
-            subtitle: 'Smooth value adjustments between 0.0 and 1.0',
+            title: 'Continuous Slider with Advanced Haptics',
+            subtitle: 'Smooth value adjustments with continuous feedback, edge vibrations, and speed scaling',
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 M3ESlider(
                   value: _continuousVal,
                   onChanged: (val) {
                     setState(() => _continuousVal = val);
                   },
+                  decoration: M3ESliderDecoration(
+                    haptic: M3EHapticFeedback.light,
+                      hapticConfig: M3EHapticConfig(
+                        enableContinuousDrag: _enableContinuousDrag,
+                        vibrateOnLowerBookend: _vibrateOnBookends,
+                        vibrateOnUpperBookend: _vibrateOnBookends,
+                        deltaProgressForDragThreshold: _dragThreshold,
+                        lowerBookendThreshold: 0.01,
+                        upperBookendThreshold: 0.99,
+                      ),
+                  ),
                 ),
                 const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    'Value: ${_continuousVal.toStringAsFixed(3)}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 8),
                 Text(
-                  'Value: ${_continuousVal.toStringAsFixed(3)}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: cs.onSurfaceVariant,
+                  'Haptic Settings:',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: const Text('Continuous Drag Haptics'),
+                  subtitle: const Text('Plays subtle ticks during movement'),
+                  value: _enableContinuousDrag,
+                  onChanged: (val) => setState(() => _enableContinuousDrag = val),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                SwitchListTile(
+                  title: const Text('Bookend/Edge Haptics'),
+                  subtitle: const Text('Vibrates when reaching 0.0 or 1.0 limits'),
+                  value: _vibrateOnBookends,
+                  onChanged: (val) => setState(() => _vibrateOnBookends = val),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Expanded(
+                      flex: 2,
+                      child: Text('Drag Tick Interval:'),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Slider(
+                        value: _dragThreshold,
+                        min: 0.005,
+                        max: 0.05,
+                        divisions: 9,
+                        label: _dragThreshold.toStringAsFixed(3),
+                        onChanged: _enableContinuousDrag
+                            ? (val) => setState(() => _dragThreshold = val)
+                            : null,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -328,6 +391,15 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
                       setState(() => _volumeVal = val);
                     },
                     decoration: M3ESliderDecoration(
+                      haptic: M3EHapticFeedback.light,
+                      hapticConfig: M3EHapticConfig(
+                        enableContinuousDrag: _enableContinuousDrag,
+                        vibrateOnLowerBookend: _vibrateOnBookends,
+                        vibrateOnUpperBookend: _vibrateOnBookends,
+                        deltaProgressForDragThreshold: _dragThreshold,
+                        lowerBookendThreshold: 0.01,
+                        upperBookendThreshold: 0.99,
+                      ),
                       trackHeight: 56.0,
                       trackCornerRadius: 16.0,
                       thumbWidth: 6.0,
