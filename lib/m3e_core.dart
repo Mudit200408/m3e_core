@@ -31,3 +31,7 @@ export 'src/floating_toolbar/floating_toolbar.dart';
 
 // M3E Slider
 export 'src/slider/slider.dart';
+
+// M3E Progress Indicator
+export 'src/progress_indicator/progress_indicator.dart';
+

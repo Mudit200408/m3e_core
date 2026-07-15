@@ -7,6 +7,8 @@ import 'screens/m3e_card_screen.dart';
 import 'screens/m3e_dismissible_screen.dart';
 import 'screens/m3e_floating_toolbar_screen.dart';
 import 'screens/m3e_slider_screen.dart';
+import 'screens/m3e_progress_indicator_screen.dart';
+
 
 
 void main() {
@@ -203,9 +205,18 @@ class ExampleHomePage extends StatelessWidget {
             icon: Icons.linear_scale_rounded,
             destination: const M3ESliderScreen(),
           ),
+          _buildNavCard(
+            context,
+            title: 'M3E Progress Indicators',
+            subtitle:
+                'Expressive progress indicators including standard and wavy linear/circular rings',
+            icon: Icons.hourglass_empty_rounded,
+            destination: const M3EProgressIndicatorScreen(),
+          ),
         ],
       ),
     );
+
 
   }
 }
