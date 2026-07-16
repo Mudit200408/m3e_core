@@ -45,7 +45,8 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
           // ── Continuous Slider Card ──
           _buildDemoSection(
             title: 'Continuous Slider with Advanced Haptics',
-            subtitle: 'Smooth value adjustments with continuous feedback, edge vibrations, and speed scaling',
+            subtitle:
+                'Smooth value adjustments with continuous feedback, edge vibrations, and speed scaling',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -56,14 +57,14 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
                   },
                   decoration: M3ESliderDecoration(
                     haptic: M3EHapticFeedback.light,
-                      hapticConfig: M3EHapticConfig(
-                        enableContinuousDrag: _enableContinuousDrag,
-                        vibrateOnLowerBookend: _vibrateOnBookends,
-                        vibrateOnUpperBookend: _vibrateOnBookends,
-                        deltaProgressForDragThreshold: _dragThreshold,
-                        lowerBookendThreshold: 0.01,
-                        upperBookendThreshold: 0.99,
-                      ),
+                    hapticConfig: M3EHapticConfig(
+                      enableContinuousDrag: _enableContinuousDrag,
+                      vibrateOnLowerBookend: _vibrateOnBookends,
+                      vibrateOnUpperBookend: _vibrateOnBookends,
+                      deltaProgressForDragThreshold: _dragThreshold,
+                      lowerBookendThreshold: 0.01,
+                      upperBookendThreshold: 0.99,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -81,21 +82,24 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Haptic Settings:',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 SwitchListTile(
                   title: const Text('Continuous Drag Haptics'),
                   subtitle: const Text('Plays subtle ticks during movement'),
                   value: _enableContinuousDrag,
-                  onChanged: (val) => setState(() => _enableContinuousDrag = val),
+                  onChanged: (val) =>
+                      setState(() => _enableContinuousDrag = val),
                   contentPadding: EdgeInsets.zero,
                 ),
                 SwitchListTile(
                   title: const Text('Bookend/Edge Haptics'),
-                  subtitle: const Text('Vibrates when reaching 0.0 or 1.0 limits'),
+                  subtitle: const Text(
+                    'Vibrates when reaching 0.0 or 1.0 limits',
+                  ),
                   value: _vibrateOnBookends,
                   onChanged: (val) => setState(() => _vibrateOnBookends = val),
                   contentPadding: EdgeInsets.zero,
@@ -103,10 +107,7 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(
-                      flex: 2,
-                      child: Text('Drag Tick Interval:'),
-                    ),
+                    const Expanded(flex: 2, child: Text('Drag Tick Interval:')),
                     Expanded(
                       flex: 3,
                       child: Slider(
@@ -151,9 +152,9 @@ class _M3ESliderScreenState extends State<M3ESliderScreen> {
                 const SizedBox(height: 16),
                 M3ESlider(
                   value: _discreteVal,
-                  min: 0.0,
-                  max: 5.0,
-                  divisions: 5,
+                  min: 3,
+                  max: 30,
+                  divisions: 27,
                   label: _discreteVal.round().toString(),
                   onChanged: (val) {
                     setState(() => _discreteVal = val);

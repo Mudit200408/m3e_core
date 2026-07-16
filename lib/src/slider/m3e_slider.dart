@@ -1031,13 +1031,22 @@ class _SliderTrackPainter extends CustomPainter {
     if (tickFractions.isNotEmpty && !showIcon) {
       final tickPaint = Paint()..style = PaintingStyle.fill;
 
+      // Ticks must span from startPosition to the stop-indicator position so
+      // all dots (including the endpoint dot) are evenly spaced.
+      final double tickRangeStart = orientation == Axis.horizontal
+          ? startPosition
+          : startPosition + trackCornerRadius;
+      final double tickRangeEnd = orientation == Axis.horizontal
+          ? endPosition - trackCornerRadius
+          : endPosition;
+      final double tickRange = (tickRangeEnd - tickRangeStart).abs();
+
       for (int i = 0; i < tickFractions.length; i++) {
         if (i == 0 || i == tickFractions.length - 1) continue;
 
-        final double pos = startPosition + trackLength * tickFractions[i];
         final double drawPos = orientation == Axis.horizontal
-            ? pos
-            : (size.height - margin) - trackLength * tickFractions[i];
+            ? tickRangeStart + tickRange * tickFractions[i]
+            : tickRangeEnd - tickRange * tickFractions[i];
 
         if (drawPos >= thumbPosition - gapDistance &&
             drawPos <= thumbPosition + gapDistance) {
