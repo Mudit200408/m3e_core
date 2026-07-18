@@ -202,7 +202,26 @@ class _M3ECircularWavyProgressIndicatorState
         _targetAmplitude = 1.0;
         _amplitudeController.animateTo(1.0, curve: Curves.easeOut);
       } else {
-        if (old.value == null) _stopIndeterminate();
+        if (old.value == null) {
+          _stopIndeterminate();
+          _fromProgress = widget.value!;
+          _toProgress = widget.value!;
+          _progressController.value = 1.0;
+        } else if (widget.value! < old.value!) {
+          _fromProgress = widget.value!;
+          _toProgress = widget.value!;
+          _progressController.value = 1.0;
+        } else {
+          // Animate progress from current interpolated position to new value
+          _fromProgress = lerpDouble(
+            _fromProgress,
+            _toProgress,
+            _progressCurve.value,
+          )!;
+          _toProgress = widget.value!;
+          _progressController.forward(from: 0.0);
+        }
+
         final double newTarget =
             (widget.amplitude ??
             M3EProgressIndicatorDefaults.indicatorAmplitude)(widget.value!);
@@ -213,14 +232,6 @@ class _M3ECircularWavyProgressIndicatorState
             curve: Curves.easeOut,
           );
         }
-        // Animate progress from current interpolated position to new value
-        _fromProgress = lerpDouble(
-          _fromProgress,
-          _toProgress,
-          _progressCurve.value,
-        )!;
-        _toProgress = widget.value!;
-        _progressController.forward(from: 0.0);
       }
     }
   }

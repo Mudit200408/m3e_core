@@ -161,16 +161,23 @@ class _M3ELinearWavyProgressIndicatorState
         _amplitudeController.animateTo(1.0, curve: Curves.easeOut);
       } else {
         _indeterminateController.stop();
+        if (oldWidget.value == null || widget.value! < oldWidget.value!) {
+          _fromProgress = widget.value!;
+          _toProgress = widget.value!;
+          _progressController.value = 1.0;
+        } else {
+          // Animate progress from current interpolated position to new value
+          _fromProgress = lerpDouble(_fromProgress, _toProgress, _progressCurve.value)!;
+          _toProgress = widget.value!;
+          _progressController.forward(from: 0.0);
+        }
+
         final double newTarget = (widget.amplitude ??
             M3EProgressIndicatorDefaults.indicatorAmplitude)(widget.value!);
         if (newTarget != _targetAmplitude) {
           _targetAmplitude = newTarget;
           _amplitudeController.animateTo(_targetAmplitude, curve: Curves.easeOut);
         }
-        // Animate progress from current interpolated position to new value
-        _fromProgress = lerpDouble(_fromProgress, _toProgress, _progressCurve.value)!;
-        _toProgress = widget.value!;
-        _progressController.forward(from: 0.0);
       }
     }
   }
