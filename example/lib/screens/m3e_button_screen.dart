@@ -8,58 +8,77 @@ import 'tabs/split_button_tab.dart';
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 
-class ButtonM3EScreen extends StatelessWidget {
+class ButtonM3EScreen extends StatefulWidget {
   const ButtonM3EScreen({super.key, this.themeMode, this.onThemeModeChanged});
 
   final ThemeMode? themeMode;
   final ValueChanged<ThemeMode>? onThemeModeChanged;
 
   @override
+  State<ButtonM3EScreen> createState() => _ButtonM3EScreenState();
+}
+
+class _ButtonM3EScreenState extends State<ButtonM3EScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('M3E Buttons'),
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          actions: [
-            if (themeMode != null && onThemeModeChanged != null)
-              IconButton(
-                icon: Icon(
-                  Theme.of(context).brightness == Brightness.light
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
-                ),
-                onPressed: () {
-                  final newMode = themeMode == ThemeMode.light
-                      ? ThemeMode.dark
-                      : ThemeMode.light;
-                  onThemeModeChanged!(newMode);
-                },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('M3E Buttons'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          if (widget.themeMode != null && widget.onThemeModeChanged != null)
+            IconButton(
+              icon: Icon(
+                Theme.of(context).brightness == Brightness.light
+                    ? Icons.dark_mode
+                    : Icons.light_mode,
               ),
-            const SizedBox(width: 8),
+              onPressed: () {
+                final newMode = widget.themeMode == ThemeMode.light
+                    ? ThemeMode.dark
+                    : ThemeMode.light;
+                widget.onThemeModeChanged!(newMode);
+              },
+            ),
+          const SizedBox(width: 8),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          tabs: const [
+            Tab(text: 'M3EButton'),
+            Tab(text: 'M3EToggleButton'),
+            Tab(text: 'M3EToggleButtonGroup'),
+            Tab(text: 'M3ESplitButton'),
           ],
-          bottom: const TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            tabs: [
-              Tab(text: 'M3EButton'),
-              Tab(text: 'M3EToggleButton'),
-              Tab(text: 'M3EToggleButtonGroup'),
-              Tab(text: 'M3ESplitButton'),
-            ],
-          ),
         ),
-        body: const TabBarView(
-          children: [
-            _ButtonTab(),
-            _ToggleButtonTab(),
-            _ToggleButtonGroupTab(),
-            SplitButtonTab(),
-          ],
-        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          _ButtonTab(),
+          _ToggleButtonTab(),
+          _ToggleButtonGroupTab(),
+          SplitButtonTab(),
+        ],
       ),
     );
   }

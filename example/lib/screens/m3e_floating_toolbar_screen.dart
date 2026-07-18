@@ -11,7 +11,9 @@ class FloatingToolbarM3EScreen extends StatefulWidget {
       _FloatingToolbarM3EScreenState();
 }
 
-class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
+class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
   // Tab 1 (Horizontal) States
   bool _expandedHorizontal = true;
   bool _expandedHorizontalFab = true;
@@ -82,6 +84,13 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
   void initState() {
     super.initState();
     _updateScrollBehavior();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -91,29 +100,29 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
         ? M3EFloatingToolbarDefaults.vibrantColors(context)
         : M3EFloatingToolbarDefaults.standardColors(context);
 
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        backgroundColor: cs.surfaceContainerLowest,
-        appBar: AppBar(
-          title: const Text('M3E Floating Toolbar'),
-          backgroundColor: cs.inversePrimary,
-          bottom: const TabBar(
-            tabs: [
-              Tab(
-                icon: Icon(Icons.align_horizontal_left_rounded),
-                text: 'Horizontal',
-              ),
-              Tab(
-                icon: Icon(Icons.align_vertical_bottom_rounded),
-                text: 'Vertical',
-              ),
-              Tab(icon: Icon(Icons.unfold_more_rounded), text: 'Scroll Exit'),
-              Tab(icon: Icon(Icons.navigation_rounded), text: 'Bottom Nav'),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
+      appBar: AppBar(
+        title: const Text('M3E Floating Toolbar'),
+        backgroundColor: cs.inversePrimary,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.align_horizontal_left_rounded),
+              text: 'Horizontal',
+            ),
+            Tab(
+              icon: Icon(Icons.align_vertical_bottom_rounded),
+              text: 'Vertical',
+            ),
+            Tab(icon: Icon(Icons.unfold_more_rounded), text: 'Scroll Exit'),
+            Tab(icon: Icon(Icons.navigation_rounded), text: 'Bottom Nav'),
+          ],
         ),
-        body: TabBarView(
+      ),
+      body: TabBarView(
+        controller: _tabController,
           physics:
               const NeverScrollableScrollPhysics(), // Prevent swipe conflicts with lists
           children: [
@@ -130,8 +139,7 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen> {
             _buildBottomNavTab(colors, cs),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildHorizontalTab(M3EFloatingToolbarColors colors, ColorScheme cs) {

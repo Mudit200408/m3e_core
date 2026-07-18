@@ -36,7 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.9
   m3e_core:
     path: ..
-
+  dynamic_color: ^1.8.1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

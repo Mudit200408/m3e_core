@@ -10,8 +10,22 @@ class ExpandableM3EScreen extends StatefulWidget {
   State<ExpandableM3EScreen> createState() => _ExpandableM3EScreenState();
 }
 
-class _ExpandableM3EScreenState extends State<ExpandableM3EScreen> {
+class _ExpandableM3EScreenState extends State<ExpandableM3EScreen>
+    with SingleTickerProviderStateMixin {
   bool _showSemanticsDebugger = false;
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,34 +33,33 @@ class _ExpandableM3EScreenState extends State<ExpandableM3EScreen> {
       data: const M3EExpandableThemeData(
         style: M3EExpandableStyle(outerRadius: 28, innerRadius: 10, gap: 6),
       ),
-      child: DefaultTabController(
-        length: 5,
-        child: _SemanticsDebuggerWrapper(
-          show: _showSemanticsDebugger,
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text('M3E Expandable'),
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              bottom: const TabBar(
-                isScrollable: true,
-                tabs: [
-                  Tab(text: 'Simple (Text)'),
-                  Tab(text: 'Builder'),
-                  Tab(text: 'Rich Content'),
-                  Tab(text: 'Sliver'),
-                  Tab(text: 'Playground'),
-                ],
-              ),
-            ),
-            body: const TabBarView(
-              children: [
-                _SimpleTextTab(),
-                _BuilderLegacyTab(),
-                _RichContentTab(),
-                _ExpandableSliverTab(),
-                _PlaygroundTab(),
+      child: _SemanticsDebuggerWrapper(
+        show: _showSemanticsDebugger,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('M3E Expandable'),
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            bottom: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabs: const [
+                Tab(text: 'Simple (Text)'),
+                Tab(text: 'Builder'),
+                Tab(text: 'Rich Content'),
+                Tab(text: 'Sliver'),
+                Tab(text: 'Playground'),
               ],
             ),
+          ),
+          body: TabBarView(
+            controller: _tabController,
+            children: const [
+              _SimpleTextTab(),
+              _BuilderLegacyTab(),
+              _RichContentTab(),
+              _ExpandableSliverTab(),
+              _PlaygroundTab(),
+            ],
           ),
         ),
       ),

@@ -27,31 +27,28 @@ class _M3ECardScreenState extends State<M3ECardScreen>
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('M3E Cards'),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Normal List'),
-              Tab(text: 'Lazy List'),
-              Tab(text: 'Sliver Lazy List'),
-              Tab(text: 'Playground'),
-            ],
-          ),
-        ),
-        body: TabBarView(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('M3E Cards'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        bottom: TabBar(
           controller: _tabController,
-          children: [
-            const _NormalListTab(),
-            const _LazyListTab(),
-            const _SliverLazyListTab(),
-            _PlaygroundTab(),
+          tabs: const [
+            Tab(text: 'Normal List'),
+            Tab(text: 'Lazy List'),
+            Tab(text: 'Sliver Lazy List'),
+            Tab(text: 'Playground'),
           ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          const _NormalListTab(),
+          const _LazyListTab(),
+          const _SliverLazyListTab(),
+          _PlaygroundTab(),
+        ],
       ),
     );
   }
