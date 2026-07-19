@@ -11,6 +11,7 @@ import 'screens/m3e_dismissible_screen.dart';
 import 'screens/m3e_floating_toolbar_screen.dart';
 import 'screens/m3e_slider_screen.dart';
 import 'screens/m3e_progress_indicator_screen.dart';
+import 'screens/m3e_loading_indicator_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -331,6 +332,14 @@ class ExampleHomePage extends StatelessWidget {
                 'Expressive progress indicators including standard and wavy linear/circular rings',
             icon: Icons.hourglass_empty_rounded,
             destination: const M3EProgressIndicatorScreen(),
+          ),
+          _buildNavCard(
+            context,
+            title: 'M3E Loading Indicators',
+            subtitle:
+                'Expressive loading indicators that morph smoothly between vector path shapes',
+            icon: Icons.refresh_rounded,
+            destination: const M3ELoadingIndicatorScreen(),
           ),
         ],
       ),
