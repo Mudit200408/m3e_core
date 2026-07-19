@@ -20,8 +20,8 @@ class _M3ELoadingIndicatorScreenState extends State<M3ELoadingIndicatorScreen> {
 
   // Selected shapes for custom sequence
   final List<Shapes> _selectedShapes = [
-    Shapes.soft_burst,
-    Shapes.c9_sided_cookie,
+    Shapes.softBurst,
+    Shapes.c9SidedCookie,
     Shapes.pentagon,
     Shapes.pill,
   ];
@@ -72,8 +72,8 @@ class _M3ELoadingIndicatorScreenState extends State<M3ELoadingIndicatorScreen> {
                   label: 'Clover & Flower Morph',
                   indicator: M3ELoadingIndicator(
                     shapes: const [
-                      Shapes.l4_leaf_clover,
-                      Shapes.l8_leaf_clover,
+                      Shapes.l4LeafClover,
+                      Shapes.l8LeafClover,
                       Shapes.flower,
                       Shapes.puffy,
                     ],
@@ -86,9 +86,9 @@ class _M3ELoadingIndicatorScreenState extends State<M3ELoadingIndicatorScreen> {
                     color: cs.secondary,
                     shapes: const [
                       Shapes.burst,
-                      Shapes.soft_burst,
+                      Shapes.softBurst,
                       Shapes.boom,
-                      Shapes.soft_boom,
+                      Shapes.softBoom,
                     ],
                   ),
                 ),
@@ -135,7 +135,7 @@ class _M3ELoadingIndicatorScreenState extends State<M3ELoadingIndicatorScreen> {
                           containerColor: cs.secondaryContainer,
                           indicatorColor: cs.onSecondaryContainer,
                           shapes: const [
-                            Shapes.very_sunny,
+                            Shapes.verySunny,
                             Shapes.sunny,
                             Shapes.fan,
                           ],
@@ -153,7 +153,7 @@ class _M3ELoadingIndicatorScreenState extends State<M3ELoadingIndicatorScreen> {
                           containerColor: cs.tertiaryContainer,
                           indicatorColor: cs.onTertiaryContainer,
                           shapes: const [
-                            Shapes.hearth,
+                            Shapes.heart,
                             Shapes.bun,
                             Shapes.ghostish,
                           ],

@@ -23,6 +23,7 @@ dependencies:
   path_drawing: ^1.0.1
   vector_math: ^2.2.0
   material_color_utilities: ^0.13.0
+  meta: ^1.16.0
 
 dev_dependencies:
   flutter_test:
