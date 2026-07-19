@@ -435,7 +435,7 @@ class M3EShape extends StatelessWidget {
     clipBehavior: clipBehavior,
   );
 
-  /// Creates a container with a very_sunny shape.
+  /// Creates a container with a verySunny shape.
   factory M3EShape.verySunny({
     double? width,
     double? height,
@@ -447,7 +447,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.very_sunny,
+    Shapes.verySunny,
     height: height,
     width: width,
     color: color,
@@ -495,7 +495,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.c4_sided_cookie,
+    Shapes.c4SidedCookie,
     height: height,
     width: width,
     color: color,
@@ -519,7 +519,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.c6_sided_cookie,
+    Shapes.c6SidedCookie,
     height: height,
     width: width,
     color: color,
@@ -543,7 +543,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.c7_sided_cookie,
+    Shapes.c7SidedCookie,
     height: height,
     width: width,
     color: color,
@@ -567,7 +567,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.c9_sided_cookie,
+    Shapes.c9SidedCookie,
     height: height,
     width: width,
     color: color,
@@ -591,7 +591,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.c12_sided_cookie,
+    Shapes.c12SidedCookie,
     height: height,
     width: width,
     color: color,
@@ -615,7 +615,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.l4_leaf_clover,
+    Shapes.l4LeafClover,
     height: height,
     width: width,
     color: color,
@@ -639,7 +639,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.l8_leaf_clover,
+    Shapes.l8LeafClover,
     height: height,
     width: width,
     color: color,
@@ -675,7 +675,7 @@ class M3EShape extends StatelessWidget {
     clipBehavior: clipBehavior,
   );
 
-  /// Creates a container with a soft_burst shape.
+  /// Creates a container with a softBurst shape.
   factory M3EShape.softBurst({
     double? width,
     double? height,
@@ -687,7 +687,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.soft_burst,
+    Shapes.softBurst,
     height: height,
     width: width,
     color: color,
@@ -723,7 +723,7 @@ class M3EShape extends StatelessWidget {
     clipBehavior: clipBehavior,
   );
 
-  /// Creates a container with a soft_boom shape.
+  /// Creates a container with a softBoom shape.
   factory M3EShape.softBoom({
     double? width,
     double? height,
@@ -735,7 +735,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.soft_boom,
+    Shapes.softBoom,
     height: height,
     width: width,
     color: color,
@@ -795,7 +795,7 @@ class M3EShape extends StatelessWidget {
     clipBehavior: clipBehavior,
   );
 
-  /// Creates a container with a puffy_diamond shape.
+  /// Creates a container with a puffyDiamond shape.
   factory M3EShape.puffyDiamond({
     double? width,
     double? height,
@@ -807,7 +807,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.puffy_diamond,
+    Shapes.puffyDiamond,
     height: height,
     width: width,
     color: color,
@@ -843,7 +843,7 @@ class M3EShape extends StatelessWidget {
     clipBehavior: clipBehavior,
   );
 
-  /// Creates a container with a pixel_circle shape.
+  /// Creates a container with a pixelCircle shape.
   factory M3EShape.pixelCircle({
     double? width,
     double? height,
@@ -855,7 +855,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.pixel_circle,
+    Shapes.pixelCircle,
     height: height,
     width: width,
     color: color,
@@ -867,7 +867,7 @@ class M3EShape extends StatelessWidget {
     clipBehavior: clipBehavior,
   );
 
-  /// Creates a container with a pixel_triangle shape.
+  /// Creates a container with a pixelTriangle shape.
   factory M3EShape.pixelTriangle({
     double? width,
     double? height,
@@ -879,7 +879,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.pixel_triangle,
+    Shapes.pixelTriangle,
     height: height,
     width: width,
     color: color,
@@ -915,8 +915,8 @@ class M3EShape extends StatelessWidget {
     clipBehavior: clipBehavior,
   );
 
-  /// Creates a container with a hearth shape.
-  factory M3EShape.hearth({
+  /// Creates a container with a heart shape.
+  factory M3EShape.heart({
     double? width,
     double? height,
     Color? color,
@@ -927,7 +927,7 @@ class M3EShape extends StatelessWidget {
     EdgeInsetsGeometry? margin,
     Clip clipBehavior = Clip.antiAlias,
   }) => M3EShape(
-    Shapes.hearth,
+    Shapes.heart,
     height: height,
     width: width,
     color: color,
