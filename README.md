@@ -23,6 +23,10 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 - [flutter_m3shapes_extended](https://pub.dev/packages/flutter_m3shapes_extended) - Full suite of M3 expressive shapes.
 - [m3e_floating_toolbar](https://pub.dev/packages/m3e_floating_toolbar) - Material 3 Expressive FloatingToolbar family.
 - [m3e_slider](https://pub.dev/packages/m3e_slider) - Material 3 Expressive Slider and RangeSlider components.
+- [m3e_color_scheme](https://pub.dev/packages/m3e_color_scheme) - Material 3 Expressive dynamic color scheme utilities.
+- [m3e_haptics](https://pub.dev/packages/m3e_haptics) - Expressive haptic feedback engine with spring-synchronized patterns.
+- [m3e_progress_indicator](https://pub.dev/packages/m3e_progress_indicator) - Material 3 Expressive circular and linear progress indicators.
+- [m3e_loading_indicator](https://pub.dev/packages/m3e_loading_indicator) - Expressive loading indicator with shape morphing animations.
 
 ---
 
@@ -30,7 +34,7 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 
 ```yaml
 dependencies:
-  m3e_core: ^0.1.2
+  m3e_core: ^0.1.3
 ```
 
 ```dart
@@ -85,6 +89,22 @@ A faithful Flutter port of the Material 3 Expressive FloatingToolbar component f
 ### 8. M3E Slider
 Material 3 Expressive Slider and RangeSlider with docking animations, spring physics, and support for track shapes.
 [Detailed Documentation →](https://pub.dev/packages/m3e_slider)
+
+### 9. M3E Color Scheme
+Dynamic color scheme utilities following Material 3 Expressive color system guidelines.
+[Detailed Documentation →](https://pub.dev/packages/m3e_color_scheme)
+
+### 10. M3E Haptics
+Expressive haptic feedback engine with spring-synchronized patterns for rich tactile experiences.
+[Detailed Documentation →](https://pub.dev/packages/m3e_haptics)
+
+### 11. M3E Progress Indicator
+Material 3 Expressive circular and linear progress indicators with wavy and animated variants.
+[Detailed Documentation →](https://pub.dev/packages/m3e_progress_indicator)
+
+### 12. M3E Loading Indicator
+Expressive loading indicator with fluid shape morphing animations.
+[Detailed Documentation →](https://pub.dev/packages/m3e_loading_indicator)
 
 ---
 

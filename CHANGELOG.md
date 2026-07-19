@@ -1,3 +1,12 @@
+# 0.1.3
+- Adds `M3ELoadingIndicator` and `M3EContainedLoadingIndicator` components with shape morphing animations.
+- Adds polygon shape morphing engine (`RoundedPolygon`, `Morph`, etc.) used by the loading indicator.
+- Adds `M3ECircularProgressIndicator`, `M3ELinearProgressIndicator`, and their wavy variants.
+- Adds `M3EHapticEngine` with spring-synchronized haptic feedback patterns.
+- Adds `M3EColorScheme` dynamic color scheme utilities.
+- Updates `flutter_m3shapes_extended` shapes integration.
+
+
 # 0.1.2
 - toggle-button: Match the button colors to M3E color spec
 
