@@ -44,12 +44,12 @@ class M3ELoadingIndicator extends ProgressIndicator {
 class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     with TickerProviderStateMixin {
   static const List<Shapes> _defaultShapes = [
-    Shapes.soft_burst,
-    Shapes.c9_sided_cookie,
+    Shapes.softBurst,
+    Shapes.c9SidedCookie,
     Shapes.pentagon,
     Shapes.pill,
     Shapes.sunny,
-    Shapes.c4_sided_cookie,
+    Shapes.c4SidedCookie,
     Shapes.oval,
   ];
 
