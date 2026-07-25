@@ -207,10 +207,6 @@ class _M3ECircularWavyProgressIndicatorState
           _fromProgress = widget.value!;
           _toProgress = widget.value!;
           _progressController.value = 1.0;
-        } else if (widget.value! < old.value!) {
-          _fromProgress = widget.value!;
-          _toProgress = widget.value!;
-          _progressController.value = 1.0;
         } else {
           // Animate progress from current interpolated position to new value
           _fromProgress = lerpDouble(

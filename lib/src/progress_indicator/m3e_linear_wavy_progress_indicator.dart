@@ -161,7 +161,7 @@ class _M3ELinearWavyProgressIndicatorState
         _amplitudeController.animateTo(1.0, curve: Curves.easeOut);
       } else {
         _indeterminateController.stop();
-        if (oldWidget.value == null || widget.value! < oldWidget.value!) {
+        if (oldWidget.value == null) {
           _fromProgress = widget.value!;
           _toProgress = widget.value!;
           _progressController.value = 1.0;
