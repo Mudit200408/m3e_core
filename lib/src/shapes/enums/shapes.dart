@@ -260,29 +260,26 @@ enum Shapes {
             centerY: 0.5,
           );
         case Shapes.slanted:
-          return _customPolygon(
-            const [
-              _PointNRound(
-                Point(0.926, 0.970),
-                CornerRounding(radius: 0.189, smoothing: 0.811),
-              ),
-              _PointNRound(
-                Point(-0.021, 0.967),
-                CornerRounding(radius: 0.187, smoothing: 0.057),
-              ),
-            ],
-            2,
-          ).normalized();
+          return _customPolygon(const [
+            _PointNRound(
+              Point(0.926, 0.970),
+              CornerRounding(radius: 0.189, smoothing: 0.811),
+            ),
+            _PointNRound(
+              Point(-0.021, 0.967),
+              CornerRounding(radius: 0.187, smoothing: 0.057),
+            ),
+          ], 2).normalized();
         case Shapes.arch:
           return RoundedPolygon.fromVerticesNum(
-            4,
-            perVertexRounding: const [
-              _cornerRound100,
-              _cornerRound100,
-              _cornerRound20,
-              _cornerRound20,
-            ],
-          )
+                4,
+                perVertexRounding: const [
+                  _cornerRound100,
+                  _cornerRound100,
+                  _cornerRound20,
+                  _cornerRound20,
+                ],
+              )
               .transformed(
                 (Matrix4.identity()..rotateZ(_negative135Radians))
                     .asPointTransformer(),
@@ -316,10 +313,7 @@ enum Shapes {
                 CornerRounding(radius: 0.426),
               ),
               const _PointNRound(Point(1.001, 0.428)),
-              const _PointNRound(
-                Point(1, 0.609),
-                CornerRounding(radius: 1),
-              ),
+              const _PointNRound(Point(1, 0.609), CornerRounding(radius: 1)),
             ],
             2,
             mirroring: true,
@@ -332,81 +326,60 @@ enum Shapes {
               )
               .normalized();
         case Shapes.arrow:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.5, 0.892),
-                CornerRounding(radius: 0.313),
-              ),
-              const _PointNRound(
-                Point(-0.216, 1.05),
-                CornerRounding(radius: 0.207),
-              ),
-              const _PointNRound(
-                Point(0.499, -0.16),
-                CornerRounding(radius: 0.215, smoothing: 1),
-              ),
-              const _PointNRound(
-                Point(1.225, 1.06),
-                CornerRounding(radius: 0.211),
-              ),
-            ],
-            1,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.5, 0.892),
+              CornerRounding(radius: 0.313),
+            ),
+            const _PointNRound(
+              Point(-0.216, 1.05),
+              CornerRounding(radius: 0.207),
+            ),
+            const _PointNRound(
+              Point(0.499, -0.16),
+              CornerRounding(radius: 0.215, smoothing: 1),
+            ),
+            const _PointNRound(
+              Point(1.225, 1.06),
+              CornerRounding(radius: 0.211),
+            ),
+          ], 1).normalized();
         case Shapes.fan:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(1.004, 1),
-                CornerRounding(radius: 0.148, smoothing: 0.417),
-              ),
-              const _PointNRound(
-                Point(0, 1),
-                CornerRounding(radius: 0.151),
-              ),
-              const _PointNRound(
-                Point(0, -0.003),
-                CornerRounding(radius: 0.148),
-              ),
-              const _PointNRound(
-                Point(0.978, 0.02),
-                CornerRounding(radius: 0.803),
-              ),
-            ],
-            1,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(1.004, 1),
+              CornerRounding(radius: 0.148, smoothing: 0.417),
+            ),
+            const _PointNRound(Point(0, 1), CornerRounding(radius: 0.151)),
+            const _PointNRound(Point(0, -0.003), CornerRounding(radius: 0.148)),
+            const _PointNRound(
+              Point(0.978, 0.02),
+              CornerRounding(radius: 0.803),
+            ),
+          ], 1).normalized();
         case Shapes.diamond:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.5, 1.096),
-                CornerRounding(radius: 0.151, smoothing: 0.524),
-              ),
-              const _PointNRound(
-                Point(0.04, 0.5),
-                CornerRounding(radius: .159),
-              ),
-            ],
-            2,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.5, 1.096),
+              CornerRounding(radius: 0.151, smoothing: 0.524),
+            ),
+            const _PointNRound(Point(0.04, 0.5), CornerRounding(radius: .159)),
+          ], 2).normalized();
         case Shapes.clampShell:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.171, 0.841),
-                CornerRounding(radius: 0.159),
-              ),
-              const _PointNRound(
-                Point(-0.02, 0.5),
-                CornerRounding(radius: 0.140),
-              ),
-              const _PointNRound(
-                Point(0.17, 0.159),
-                CornerRounding(radius: 0.159),
-              ),
-            ],
-            2,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.171, 0.841),
+              CornerRounding(radius: 0.159),
+            ),
+            const _PointNRound(
+              Point(-0.02, 0.5),
+              CornerRounding(radius: 0.140),
+            ),
+            const _PointNRound(
+              Point(0.17, 0.159),
+              CornerRounding(radius: 0.159),
+            ),
+          ], 2).normalized();
         case Shapes.pentagon:
           return _customPolygon(
             [
@@ -450,19 +423,16 @@ enum Shapes {
             mirroring: true,
           ).normalized();
         case Shapes.verySunny:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.5, 1.080),
-                CornerRounding(radius: 0.085),
-              ),
-              const _PointNRound(
-                Point(0.358, 0.843),
-                CornerRounding(radius: 0.085),
-              ),
-            ],
-            8,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.5, 1.080),
+              CornerRounding(radius: 0.085),
+            ),
+            const _PointNRound(
+              Point(0.358, 0.843),
+              CornerRounding(radius: 0.085),
+            ),
+          ], 8).normalized();
         case Shapes.sunny:
           return RoundedPolygon.star(
             numVerticesPerRadius: 8,
@@ -470,39 +440,33 @@ enum Shapes {
             rounding: _cornerRound15,
           ).normalized();
         case Shapes.c4SidedCookie:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(1.237, 1.236),
-                CornerRounding(radius: 0.258),
-              ),
-              const _PointNRound(
-                Point(0.5, 0.918),
-                CornerRounding(radius: 0.233),
-              ),
-            ],
-            4,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(1.237, 1.236),
+              CornerRounding(radius: 0.258),
+            ),
+            const _PointNRound(
+              Point(0.5, 0.918),
+              CornerRounding(radius: 0.233),
+            ),
+          ], 4).normalized();
         case Shapes.c6SidedCookie:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.723, 0.884),
-                CornerRounding(radius: 0.394),
-              ),
-              const _PointNRound(
-                Point(0.5, 1.099),
-                CornerRounding(radius: 0.398),
-              ),
-            ],
-            6,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.723, 0.884),
+              CornerRounding(radius: 0.394),
+            ),
+            const _PointNRound(
+              Point(0.5, 1.099),
+              CornerRounding(radius: 0.398),
+            ),
+          ], 6).normalized();
         case Shapes.c7SidedCookie:
           return RoundedPolygon.star(
-            numVerticesPerRadius: 7,
-            innerRadius: 0.75,
-            rounding: _cornerRound50,
-          )
+                numVerticesPerRadius: 7,
+                innerRadius: 0.75,
+                rounding: _cornerRound50,
+              )
               .transformed(
                 (Matrix4.identity()..rotateZ(_negative90Radians))
                     .asPointTransformer(),
@@ -510,10 +474,10 @@ enum Shapes {
               .normalized();
         case Shapes.c9SidedCookie:
           return RoundedPolygon.star(
-            numVerticesPerRadius: 9,
-            innerRadius: 0.8,
-            rounding: _cornerRound50,
-          )
+                numVerticesPerRadius: 9,
+                innerRadius: 0.8,
+                rounding: _cornerRound50,
+              )
               .transformed(
                 (Matrix4.identity()..rotateZ(_negative90Radians))
                     .asPointTransformer(),
@@ -521,10 +485,10 @@ enum Shapes {
               .normalized();
         case Shapes.c12SidedCookie:
           return RoundedPolygon.star(
-            numVerticesPerRadius: 12,
-            innerRadius: 0.8,
-            rounding: _cornerRound50,
-          )
+                numVerticesPerRadius: 12,
+                innerRadius: 0.8,
+                rounding: _cornerRound50,
+              )
               .transformed(
                 (Matrix4.identity()..rotateZ(_negative90Radians))
                     .asPointTransformer(),
@@ -543,58 +507,46 @@ enum Shapes {
             mirroring: true,
           ).normalized();
         case Shapes.l8LeafClover:
-          return _customPolygon(
-            [
-              const _PointNRound(Point(0.5, 0.036)),
-              const _PointNRound(
-                Point(0.758, -0.101),
-                CornerRounding(radius: 0.209),
-              ),
-            ],
-            8,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(Point(0.5, 0.036)),
+            const _PointNRound(
+              Point(0.758, -0.101),
+              CornerRounding(radius: 0.209),
+            ),
+          ], 8).normalized();
         case Shapes.burst:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.5, -0.006),
-                CornerRounding(radius: 0.006),
-              ),
-              const _PointNRound(
-                Point(0.592, 0.158),
-                CornerRounding(radius: 0.006),
-              ),
-            ],
-            12,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.5, -0.006),
+              CornerRounding(radius: 0.006),
+            ),
+            const _PointNRound(
+              Point(0.592, 0.158),
+              CornerRounding(radius: 0.006),
+            ),
+          ], 12).normalized();
         case Shapes.softBurst:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.193, 0.277),
-                CornerRounding(radius: 0.053),
-              ),
-              const _PointNRound(
-                Point(0.176, 0.055),
-                CornerRounding(radius: 0.053),
-              ),
-            ],
-            10,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.193, 0.277),
+              CornerRounding(radius: 0.053),
+            ),
+            const _PointNRound(
+              Point(0.176, 0.055),
+              CornerRounding(radius: 0.053),
+            ),
+          ], 10).normalized();
         case Shapes.boom:
-          return _customPolygon(
-            [
-              const _PointNRound(
-                Point(0.457, 0.296),
-                CornerRounding(radius: 0.007),
-              ),
-              const _PointNRound(
-                Point(0.5, -0.051),
-                CornerRounding(radius: 0.007),
-              ),
-            ],
-            15,
-          ).normalized();
+          return _customPolygon([
+            const _PointNRound(
+              Point(0.457, 0.296),
+              CornerRounding(radius: 0.007),
+            ),
+            const _PointNRound(
+              Point(0.5, -0.051),
+              CornerRounding(radius: 0.007),
+            ),
+          ], 15).normalized();
         case Shapes.softBoom:
           return _customPolygon(
             [
@@ -633,48 +585,49 @@ enum Shapes {
           ).normalized();
         case Shapes.puffy:
           return _customPolygon(
-            [
-              const _PointNRound(Point(0.5, 0.053)),
-              const _PointNRound(
-                Point(0.545, -0.04),
-                CornerRounding(radius: 0.405),
-              ),
-              const _PointNRound(
-                Point(0.670, -0.035),
-                CornerRounding(radius: 0.426),
-              ),
-              const _PointNRound(
-                Point(0.717, 0.066),
-                CornerRounding(radius: 0.574),
-              ),
-              const _PointNRound(Point(0.722, 0.128)),
-              const _PointNRound(
-                Point(0.777, 0.002),
-                CornerRounding(radius: 0.36),
-              ),
-              const _PointNRound(
-                Point(0.914, 0.149),
-                CornerRounding(radius: 0.66),
-              ),
-              const _PointNRound(
-                Point(0.926, 0.289),
-                CornerRounding(radius: 0.66),
-              ),
-              const _PointNRound(Point(0.881, 0.346)),
-              const _PointNRound(
-                Point(0.940, 0.344),
-                CornerRounding(radius: 0.126),
-              ),
-              const _PointNRound(
-                Point(1.003, 0.437),
-                CornerRounding(radius: 0.255),
-              ),
-            ],
-            2,
-            mirroring: true,
-          )
+                [
+                  const _PointNRound(Point(0.5, 0.053)),
+                  const _PointNRound(
+                    Point(0.545, -0.04),
+                    CornerRounding(radius: 0.405),
+                  ),
+                  const _PointNRound(
+                    Point(0.670, -0.035),
+                    CornerRounding(radius: 0.426),
+                  ),
+                  const _PointNRound(
+                    Point(0.717, 0.066),
+                    CornerRounding(radius: 0.574),
+                  ),
+                  const _PointNRound(Point(0.722, 0.128)),
+                  const _PointNRound(
+                    Point(0.777, 0.002),
+                    CornerRounding(radius: 0.36),
+                  ),
+                  const _PointNRound(
+                    Point(0.914, 0.149),
+                    CornerRounding(radius: 0.66),
+                  ),
+                  const _PointNRound(
+                    Point(0.926, 0.289),
+                    CornerRounding(radius: 0.66),
+                  ),
+                  const _PointNRound(Point(0.881, 0.346)),
+                  const _PointNRound(
+                    Point(0.940, 0.344),
+                    CornerRounding(radius: 0.126),
+                  ),
+                  const _PointNRound(
+                    Point(1.003, 0.437),
+                    CornerRounding(radius: 0.255),
+                  ),
+                ],
+                2,
+                mirroring: true,
+              )
               .transformed(
-                (Matrix4.identity()..scaleByVector3(Vector3(1.0, 0.742, 1.0))).asPointTransformer(),
+                (Matrix4.identity()..scaleByVector3(Vector3(1.0, 0.742, 1.0)))
+                    .asPointTransformer(),
               )
               .normalized();
         case Shapes.puffyDiamond:
@@ -696,14 +649,8 @@ enum Shapes {
         case Shapes.ghostish:
           return _customPolygon(
             [
-              const _PointNRound(
-                Point(0.5, 0),
-                CornerRounding(radius: 1),
-              ),
-              const _PointNRound(
-                Point(1, 0),
-                CornerRounding(radius: 1),
-              ),
+              const _PointNRound(Point(0.5, 0), CornerRounding(radius: 1)),
+              const _PointNRound(Point(1, 0), CornerRounding(radius: 1)),
               const _PointNRound(
                 Point(1, 1.14),
                 CornerRounding(radius: 0.254, smoothing: 0.106),
@@ -763,10 +710,7 @@ enum Shapes {
                 Point(0.992, 0.631),
                 CornerRounding(radius: 1),
               ),
-              const _PointNRound(
-                Point(0.968, 1),
-                CornerRounding(radius: 1),
-              ),
+              const _PointNRound(Point(0.968, 1), CornerRounding(radius: 1)),
             ],
             2,
             mirroring: true,
@@ -800,10 +744,7 @@ enum Shapes {
 }
 
 class _PointNRound {
-  const _PointNRound(
-    this.p, [
-    this.r = CornerRounding.unrounded,
-  ]);
+  const _PointNRound(this.p, [this.r = CornerRounding.unrounded]);
 
   final Point p;
   final CornerRounding r;
@@ -861,17 +802,14 @@ List<_PointNRound> _doRepeat(
       for (var index = 0; index < points.length; index++) {
         final i = (r.isEven) ? index : points.length - 1 - index;
         if (i > 0 || r.isEven) {
-          final a = sectionAngle * r +
+          final a =
+              sectionAngle * r +
               ((r.isEven)
                   ? measures[i].angle
                   : sectionAngle - measures[i].angle + 2 * measures[0].angle);
 
-          final finalPoint = Point(
-                    math.cos(a),
-                    math.sin(a),
-                  ) *
-                  measures[i].distance +
-              center;
+          final finalPoint =
+              Point(math.cos(a), math.sin(a)) * measures[i].distance + center;
 
           result.add(_PointNRound(finalPoint, points[i].r));
         }
@@ -881,13 +819,12 @@ List<_PointNRound> _doRepeat(
     final np = points.length;
     for (var i = 0; i < np * reps; i++) {
       final point = points[i % np].p.rotate(
-            (i ~/ np) * 360 / reps,
-            center: center,
-          );
+        (i ~/ np) * 360 / reps,
+        center: center,
+      );
       result.add(_PointNRound(point, points[i % np].r));
     }
   }
 
   return result;
 }
-

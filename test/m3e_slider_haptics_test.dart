@@ -17,50 +17,55 @@ void main() {
     hapticCalls.clear();
     // Intercept native haptic method channel
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(const MethodChannel('m3e_haptics/haptics'), (MethodCall methodCall) async {
-      if (methodCall.method == 'vibrate') {
-        final arguments = methodCall.arguments as Map;
-        final type = arguments['type'] as String;
-        // Map AOSP-aligned event types to HapticFeedbackType strings.
-        // dragTexture → light feel; tickCrossing → medium; bookendLower / bookendUpper → heavy
-        final String mappedType = switch (type) {
-          'dragTexture' => 'HapticFeedbackType.lightImpact',
-          'bookendLower' => 'HapticFeedbackType.heavyImpact',
-          'tickCrossing' => 'HapticFeedbackType.mediumImpact',
-          'bookendUpper' => 'HapticFeedbackType.heavyImpact',
-          // Legacy single-word types kept for backward compatibility
-          'light' => 'HapticFeedbackType.lightImpact',
-          'medium' => 'HapticFeedbackType.mediumImpact',
-          'heavy' => 'HapticFeedbackType.heavyImpact',
-          _ => 'HapticFeedbackType.mediumImpact',
-        };
-        hapticCalls.add(mappedType);
-      }
-      return null;
-    });
+        .setMockMethodCallHandler(const MethodChannel('m3e_haptics/haptics'), (
+          MethodCall methodCall,
+        ) async {
+          if (methodCall.method == 'vibrate') {
+            final arguments = methodCall.arguments as Map;
+            final type = arguments['type'] as String;
+            // Map AOSP-aligned event types to HapticFeedbackType strings.
+            // dragTexture → light feel; tickCrossing → medium; bookendLower / bookendUpper → heavy
+            final String mappedType = switch (type) {
+              'dragTexture' => 'HapticFeedbackType.lightImpact',
+              'bookendLower' => 'HapticFeedbackType.heavyImpact',
+              'tickCrossing' => 'HapticFeedbackType.mediumImpact',
+              'bookendUpper' => 'HapticFeedbackType.heavyImpact',
+              // Legacy single-word types kept for backward compatibility
+              'light' => 'HapticFeedbackType.lightImpact',
+              'medium' => 'HapticFeedbackType.mediumImpact',
+              'heavy' => 'HapticFeedbackType.heavyImpact',
+              _ => 'HapticFeedbackType.mediumImpact',
+            };
+            hapticCalls.add(mappedType);
+          }
+          return null;
+        });
 
     // Intercept platform channel calls for haptic feedback
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, (MethodCall methodCall) async {
-      if (methodCall.method == 'HapticFeedback.vibrate') {
-        hapticCalls.add(methodCall.arguments as String?);
-      }
-      return null;
-    });
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall methodCall,
+        ) async {
+          if (methodCall.method == 'HapticFeedback.vibrate') {
+            hapticCalls.add(methodCall.arguments as String?);
+          }
+          return null;
+        });
   });
 
   tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(const MethodChannel('m3e_haptics/haptics'), null);
+        .setMockMethodCallHandler(
+          const MethodChannel('m3e_haptics/haptics'),
+          null,
+        );
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, null);
   });
 
   group('M3EHapticTracker unit tests', () {
     test('does not play haptics when baseHaptic is none', () {
-      final tracker = M3EHapticTracker(
-        baseHaptic: M3EHapticFeedback.none,
-      );
+      final tracker = M3EHapticTracker(baseHaptic: M3EHapticFeedback.none);
       tracker.start(0.5, Offset.zero);
       tracker.update(0.6, const Offset(10, 0));
       expect(hapticCalls, isEmpty);
@@ -152,7 +157,10 @@ void main() {
       // High velocity movement -> still 'dragTexture' type (amplitude is higher but same type)
       tracker.start(0.2, const Offset(11, 0));
       await Future.delayed(const Duration(milliseconds: 5));
-      tracker.update(0.5, const Offset(500, 0)); // dx=489, dt~5ms => ~97800 px/sec
+      tracker.update(
+        0.5,
+        const Offset(500, 0),
+      ); // dx=489, dt~5ms => ~97800 px/sec
       expect(hapticCalls, isNotEmpty);
       // Type is still 'dragTexture' → lightImpact; only amplitude differs (not visible in mock)
       expect(hapticCalls.last, equals('HapticFeedbackType.lightImpact'));
@@ -160,7 +168,9 @@ void main() {
   });
 
   group('M3ESlider haptic widget tests', () {
-    testWidgets('discrete slider triggers tick crossing haptics', (tester) async {
+    testWidgets('discrete slider triggers tick crossing haptics', (
+      tester,
+    ) async {
       double value = 0.0;
       await tester.pumpWidget(
         MaterialApp(
@@ -193,7 +203,9 @@ void main() {
       expect(hapticCalls, isNotEmpty);
     });
 
-    testWidgets('continuous slider triggers drag interval haptics', (tester) async {
+    testWidgets('continuous slider triggers drag interval haptics', (
+      tester,
+    ) async {
       double value = 0.0;
       await tester.pumpWidget(
         MaterialApp(
@@ -232,7 +244,9 @@ void main() {
   });
 
   group('M3ERangeSlider haptic widget tests', () {
-    testWidgets('continuous range slider triggers drag haptics', (tester) async {
+    testWidgets('continuous range slider triggers drag haptics', (
+      tester,
+    ) async {
       RangeValues values = const RangeValues(0.2, 0.8);
       await tester.pumpWidget(
         MaterialApp(

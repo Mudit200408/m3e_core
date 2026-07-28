@@ -25,10 +25,11 @@ void applyHaptic(M3EHapticFeedback haptic) {
 /// Dispatch a typed haptic event with a pre-computed [amplitude] (0.0–1.0).
 void applyTypedHaptic(String type, double amplitude) {
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-    _hapticChannel.invokeMethod(
-        'vibrate', {'type': type, 'amplitude': amplitude}).catchError((_) {
-      _fallbackHapticForType(type);
-    });
+    _hapticChannel
+        .invokeMethod('vibrate', {'type': type, 'amplitude': amplitude})
+        .catchError((_) {
+          _fallbackHapticForType(type);
+        });
   } else {
     _fallbackHapticForType(type);
   }

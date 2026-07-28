@@ -12,4 +12,3 @@ export 'polygon/shapes.dart'
         RoundedPolygon,
         RoundedPolygonToPathExtension,
         pathFromCubics;
-

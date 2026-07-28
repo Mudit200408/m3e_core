@@ -104,7 +104,9 @@ class _M3ELinearWavyProgressIndicatorState
 
     // 2. Amplitude animation (transition when progress changes)
     _targetAmplitude = widget.value != null
-        ? (widget.amplitude ?? M3EProgressIndicatorDefaults.indicatorAmplitude)(widget.value!)
+        ? (widget.amplitude ?? M3EProgressIndicatorDefaults.indicatorAmplitude)(
+            widget.value!,
+          )
         : 1.0;
     _amplitudeController = AnimationController(
       vsync: this,
@@ -145,8 +147,9 @@ class _M3ELinearWavyProgressIndicatorState
         widget.wavelength != oldWidget.wavelength) {
       if (widget.waveSpeed > 0) {
         final double waveCycleSec = widget.wavelength / widget.waveSpeed;
-        _waveOffsetController.duration =
-            Duration(milliseconds: (waveCycleSec * 1000).round());
+        _waveOffsetController.duration = Duration(
+          milliseconds: (waveCycleSec * 1000).round(),
+        );
         _waveOffsetController.repeat();
       } else {
         _waveOffsetController.stop();
@@ -167,16 +170,24 @@ class _M3ELinearWavyProgressIndicatorState
           _progressController.value = 1.0;
         } else {
           // Animate progress from current interpolated position to new value
-          _fromProgress = lerpDouble(_fromProgress, _toProgress, _progressCurve.value)!;
+          _fromProgress = lerpDouble(
+            _fromProgress,
+            _toProgress,
+            _progressCurve.value,
+          )!;
           _toProgress = widget.value!;
           _progressController.forward(from: 0.0);
         }
 
-        final double newTarget = (widget.amplitude ??
+        final double newTarget =
+            (widget.amplitude ??
             M3EProgressIndicatorDefaults.indicatorAmplitude)(widget.value!);
         if (newTarget != _targetAmplitude) {
           _targetAmplitude = newTarget;
-          _amplitudeController.animateTo(_targetAmplitude, curve: Curves.easeOut);
+          _amplitudeController.animateTo(
+            _targetAmplitude,
+            curve: Curves.easeOut,
+          );
         }
       }
     }
@@ -197,7 +208,8 @@ class _M3ELinearWavyProgressIndicatorState
   Widget build(BuildContext context) {
     final activeColor =
         widget.color ?? M3EProgressIndicatorDefaults.activeColor(context);
-    final trackColor = widget.backgroundColor ??
+    final trackColor =
+        widget.backgroundColor ??
         M3EProgressIndicatorDefaults.trackColor(context);
 
     return Container(
@@ -297,10 +309,16 @@ class _LinearWavyProgressPainter extends CustomPainter {
     // Calculate path width and scale
     final Rect bounds = path.getBounds();
     // Translate to center vertically
-    final Matrix4 translateMatrix = Matrix4.translationValues(0.0, height / 2.0, 0.0);
+    final Matrix4 translateMatrix = Matrix4.translationValues(
+      0.0,
+      height / 2.0,
+      0.0,
+    );
     final Path transformedPath = path.transform(translateMatrix.storage);
-    
-    final List<PathMetric> metricsList = transformedPath.computeMetrics().toList();
+
+    final List<PathMetric> metricsList = transformedPath
+        .computeMetrics()
+        .toList();
     if (metricsList.isNotEmpty) {
       final PathMetric metric = metricsList.first;
       final double scale = metric.length / (bounds.width + 0.00000001);
@@ -339,14 +357,21 @@ class _LinearWavyProgressPainter extends CustomPainter {
     final double width = size.width;
     final double halfHeight = size.height / 2;
 
-    final double strokeCapWidth =
-        (strokeWidth > width) ? 0.0 : math.max(strokeWidth / 2, trackStrokeWidth / 2);
+    final double strokeCapWidth = (strokeWidth > width)
+        ? 0.0
+        : math.max(strokeWidth / 2, trackStrokeWidth / 2);
 
     final double barTail = startFraction * width;
     final double barHead = endFraction * width;
 
-    final double adjustedBarHead = barHead.clamp(strokeCapWidth, width - strokeCapWidth);
-    final double adjustedBarTail = barTail.clamp(strokeCapWidth, width - strokeCapWidth);
+    final double adjustedBarHead = barHead.clamp(
+      strokeCapWidth,
+      width - strokeCapWidth,
+    );
+    final double adjustedBarTail = barTail.clamp(
+      strokeCapWidth,
+      width - strokeCapWidth,
+    );
 
     // Draw active indicator segment
     if ((endFraction - startFraction).abs() > 0.0) {
@@ -356,12 +381,16 @@ class _LinearWavyProgressPainter extends CustomPainter {
         final double startDist = (adjustedBarTail + waveShift) * pathData.scale;
         final double endDist = (adjustedBarHead + waveShift) * pathData.scale;
 
-        final Path segmentPath = pathData.metric!.extractPath(startDist, endDist);
+        final Path segmentPath = pathData.metric!.extractPath(
+          startDist,
+          endDist,
+        );
 
         // Translate back the waveShift and scale by amplitude around baseline
-        final Matrix4 matrix = Matrix4.translationValues(-waveShift, halfHeight, 0.0)
-          * Matrix4.diagonal3Values(1.0, amplitude, 1.0)
-          * Matrix4.translationValues(0.0, -halfHeight, 0.0);
+        final Matrix4 matrix =
+            Matrix4.translationValues(-waveShift, halfHeight, 0.0) *
+            Matrix4.diagonal3Values(1.0, amplitude, 1.0) *
+            Matrix4.translationValues(0.0, -halfHeight, 0.0);
 
         final Path transformedSegment = segmentPath.transform(matrix.storage);
         progressPathsToDraw.add(transformedSegment);
@@ -396,7 +425,7 @@ class _LinearWavyProgressPainter extends CustomPainter {
     if (progress != null) {
       // determinate mode
       final double currentProgress = progress!;
-      
+
       _drawWavyProgressSegment(
         canvas,
         0.0,
@@ -410,11 +439,17 @@ class _LinearWavyProgressPainter extends CustomPainter {
       );
 
       // Remaining track to the right, ending at the left boundary of the stop indicator
-      final double strokeCapWidth = math.max(strokeWidth / 2, trackStrokeWidth / 2);
-      final double adjustedBarHead = (currentProgress * size.width).clamp(strokeCapWidth, size.width - strokeCapWidth);
+      final double strokeCapWidth = math.max(
+        strokeWidth / 2,
+        trackStrokeWidth / 2,
+      );
+      final double adjustedBarHead = (currentProgress * size.width).clamp(
+        strokeCapWidth,
+        size.width - strokeCapWidth,
+      );
       final double trackStart = adjustedBarHead + gapSize + strokeCapWidth * 2;
       final double trackEnd = size.width - strokeCapWidth;
-      
+
       if (trackStart < trackEnd) {
         trackPath.moveTo(trackStart, size.height / 2);
         trackPath.lineTo(trackEnd, size.height / 2);
@@ -445,33 +480,40 @@ class _LinearWavyProgressPainter extends CustomPainter {
       // indeterminate mode
       final double t = animationValue;
 
-      final double firstLineHead = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 0.0,
-        durationMs: 1000.0,
-        easing: _lineEasing,
-      );
-      final double firstLineTail = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 250.0,
-        durationMs: 1000.0,
-        easing: _lineEasing,
-      );
-      final double secondLineHead = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 650.0,
-        durationMs: 850.0,
-        easing: _lineEasing,
-      );
-      final double secondLineTail = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 900.0,
-        durationMs: 850.0,
-        easing: _lineEasing,
-      );
+      final double firstLineHead =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 0.0,
+            durationMs: 1000.0,
+            easing: _lineEasing,
+          );
+      final double firstLineTail =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 250.0,
+            durationMs: 1000.0,
+            easing: _lineEasing,
+          );
+      final double secondLineHead =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 650.0,
+            durationMs: 850.0,
+            easing: _lineEasing,
+          );
+      final double secondLineTail =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 900.0,
+            durationMs: 850.0,
+            easing: _lineEasing,
+          );
 
       // Let's compute the drawn segments
-      final double strokeCapWidth = math.max(strokeWidth / 2, trackStrokeWidth / 2);
+      final double strokeCapWidth = math.max(
+        strokeWidth / 2,
+        trackStrokeWidth / 2,
+      );
       final double adjustedGap = gapSize + strokeCapWidth * 2;
 
       // Track segments in gaps:

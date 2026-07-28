@@ -21,24 +21,84 @@ void main() {
         isDark: false,
         contrastLevel: 0.0,
       );
-      expect(scheme.onPrimaryContainer.toARGB32(), equals(MaterialDynamicColors.onPrimaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onSecondaryContainer.toARGB32(), equals(MaterialDynamicColors.onSecondaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onTertiaryContainer.toARGB32(), equals(MaterialDynamicColors.onTertiaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onErrorContainer.toARGB32(), equals(MaterialDynamicColors.onErrorContainer.getArgb(dynamicScheme)));
+      expect(
+        scheme.onPrimaryContainer.toARGB32(),
+        equals(MaterialDynamicColors.onPrimaryContainer.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.onSecondaryContainer.toARGB32(),
+        equals(
+          MaterialDynamicColors.onSecondaryContainer.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.onTertiaryContainer.toARGB32(),
+        equals(
+          MaterialDynamicColors.onTertiaryContainer.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.onErrorContainer.toARGB32(),
+        equals(MaterialDynamicColors.onErrorContainer.getArgb(dynamicScheme)),
+      );
 
       // Verify M3 surface and container roles
-      expect(scheme.surface.toARGB32(), equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)));
-      expect(scheme.background.toARGB32(), equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)));
-      expect(scheme.surfaceBright.toARGB32(), equals(MaterialDynamicColors.surfaceBright.getArgb(dynamicScheme)));
-      expect(scheme.surfaceDim.toARGB32(), equals(MaterialDynamicColors.surfaceDim.getArgb(dynamicScheme)));
-      expect(scheme.surfaceVariant.toARGB32(), equals(MaterialDynamicColors.surfaceVariant.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerLowest.toARGB32(), equals(MaterialDynamicColors.surfaceContainerLowest.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerLow.toARGB32(), equals(MaterialDynamicColors.surfaceContainerLow.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainer.toARGB32(), equals(MaterialDynamicColors.surfaceContainer.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerHigh.toARGB32(), equals(MaterialDynamicColors.surfaceContainerHigh.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerHighest.toARGB32(), equals(MaterialDynamicColors.surfaceContainerHighest.getArgb(dynamicScheme)));
-      expect(scheme.inverseSurface.toARGB32(), equals(MaterialDynamicColors.inverseSurface.getArgb(dynamicScheme)));
-      expect(scheme.onInverseSurface.toARGB32(), equals(MaterialDynamicColors.inverseOnSurface.getArgb(dynamicScheme)));
+      expect(
+        scheme.surface.toARGB32(),
+        equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.background.toARGB32(),
+        equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceBright.toARGB32(),
+        equals(MaterialDynamicColors.surfaceBright.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceDim.toARGB32(),
+        equals(MaterialDynamicColors.surfaceDim.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceVariant.toARGB32(),
+        equals(MaterialDynamicColors.surfaceVariant.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceContainerLowest.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerLowest.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.surfaceContainerLow.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerLow.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.surfaceContainer.toARGB32(),
+        equals(MaterialDynamicColors.surfaceContainer.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceContainerHigh.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerHigh.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.surfaceContainerHighest.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerHighest.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.inverseSurface.toARGB32(),
+        equals(MaterialDynamicColors.inverseSurface.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.onInverseSurface.toARGB32(),
+        equals(MaterialDynamicColors.inverseOnSurface.getArgb(dynamicScheme)),
+      );
 
       // Verify M3 fixed color roles
       expect(scheme.primaryFixed, isNotNull);
@@ -69,29 +129,95 @@ void main() {
         isDark: true,
         contrastLevel: 0.0,
       );
-      expect(scheme.onPrimaryContainer.toARGB32(), equals(MaterialDynamicColors.onPrimaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onSecondaryContainer.toARGB32(), equals(MaterialDynamicColors.onSecondaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onTertiaryContainer.toARGB32(), equals(MaterialDynamicColors.onTertiaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onErrorContainer.toARGB32(), equals(MaterialDynamicColors.onErrorContainer.getArgb(dynamicScheme)));
+      expect(
+        scheme.onPrimaryContainer.toARGB32(),
+        equals(MaterialDynamicColors.onPrimaryContainer.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.onSecondaryContainer.toARGB32(),
+        equals(
+          MaterialDynamicColors.onSecondaryContainer.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.onTertiaryContainer.toARGB32(),
+        equals(
+          MaterialDynamicColors.onTertiaryContainer.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.onErrorContainer.toARGB32(),
+        equals(MaterialDynamicColors.onErrorContainer.getArgb(dynamicScheme)),
+      );
 
       // Verify M3 surface and container roles in dark mode
-      expect(scheme.surface.toARGB32(), equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)));
-      expect(scheme.background.toARGB32(), equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)));
-      expect(scheme.surfaceBright.toARGB32(), equals(MaterialDynamicColors.surfaceBright.getArgb(dynamicScheme)));
-      expect(scheme.surfaceDim.toARGB32(), equals(MaterialDynamicColors.surfaceDim.getArgb(dynamicScheme)));
-      expect(scheme.surfaceVariant.toARGB32(), equals(MaterialDynamicColors.surfaceVariant.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerLowest.toARGB32(), equals(MaterialDynamicColors.surfaceContainerLowest.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerLow.toARGB32(), equals(MaterialDynamicColors.surfaceContainerLow.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainer.toARGB32(), equals(MaterialDynamicColors.surfaceContainer.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerHigh.toARGB32(), equals(MaterialDynamicColors.surfaceContainerHigh.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainerHighest.toARGB32(), equals(MaterialDynamicColors.surfaceContainerHighest.getArgb(dynamicScheme)));
-      expect(scheme.inverseSurface.toARGB32(), equals(MaterialDynamicColors.inverseSurface.getArgb(dynamicScheme)));
-      expect(scheme.onInverseSurface.toARGB32(), equals(MaterialDynamicColors.inverseOnSurface.getArgb(dynamicScheme)));
+      expect(
+        scheme.surface.toARGB32(),
+        equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.background.toARGB32(),
+        equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceBright.toARGB32(),
+        equals(MaterialDynamicColors.surfaceBright.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceDim.toARGB32(),
+        equals(MaterialDynamicColors.surfaceDim.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceVariant.toARGB32(),
+        equals(MaterialDynamicColors.surfaceVariant.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceContainerLowest.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerLowest.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.surfaceContainerLow.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerLow.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.surfaceContainer.toARGB32(),
+        equals(MaterialDynamicColors.surfaceContainer.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceContainerHigh.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerHigh.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.surfaceContainerHighest.toARGB32(),
+        equals(
+          MaterialDynamicColors.surfaceContainerHighest.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.inverseSurface.toARGB32(),
+        equals(MaterialDynamicColors.inverseSurface.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.onInverseSurface.toARGB32(),
+        equals(MaterialDynamicColors.inverseOnSurface.getArgb(dynamicScheme)),
+      );
     });
 
     test('respects contrastLevel parameter', () {
-      final defaultScheme = M3EColorScheme.light(seedColor: seedColor, contrastLevel: 0.0);
-      final highContrastScheme = M3EColorScheme.light(seedColor: seedColor, contrastLevel: 1.0);
+      final defaultScheme = M3EColorScheme.light(
+        seedColor: seedColor,
+        contrastLevel: 0.0,
+      );
+      final highContrastScheme = M3EColorScheme.light(
+        seedColor: seedColor,
+        contrastLevel: 1.0,
+      );
 
       expect(defaultScheme.primary, isNot(equals(highContrastScheme.primary)));
     });
@@ -110,7 +236,10 @@ void main() {
     });
 
     test('overrides values when systemColorScheme is provided', () {
-      final systemBase = ColorScheme.fromSeed(seedColor: seedColor, brightness: Brightness.light);
+      final systemBase = ColorScheme.fromSeed(
+        seedColor: seedColor,
+        brightness: Brightness.light,
+      );
       final scheme = M3EColorScheme.light(
         seedColor: seedColor,
         systemColorScheme: systemBase,
@@ -126,17 +255,48 @@ void main() {
       expect(scheme.primary.toARGB32(), equals(systemBase.primary.toARGB32()));
 
       // Should override container text/icon colors
-      expect(scheme.onPrimaryContainer.toARGB32(), equals(MaterialDynamicColors.onPrimaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onSecondaryContainer.toARGB32(), equals(MaterialDynamicColors.onSecondaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onTertiaryContainer.toARGB32(), equals(MaterialDynamicColors.onTertiaryContainer.getArgb(dynamicScheme)));
-      expect(scheme.onErrorContainer.toARGB32(), equals(MaterialDynamicColors.onErrorContainer.getArgb(dynamicScheme)));
+      expect(
+        scheme.onPrimaryContainer.toARGB32(),
+        equals(MaterialDynamicColors.onPrimaryContainer.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.onSecondaryContainer.toARGB32(),
+        equals(
+          MaterialDynamicColors.onSecondaryContainer.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.onTertiaryContainer.toARGB32(),
+        equals(
+          MaterialDynamicColors.onTertiaryContainer.getArgb(dynamicScheme),
+        ),
+      );
+      expect(
+        scheme.onErrorContainer.toARGB32(),
+        equals(MaterialDynamicColors.onErrorContainer.getArgb(dynamicScheme)),
+      );
 
       // Should override surfaces and container backgrounds
-      expect(scheme.surface.toARGB32(), equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)));
-      expect(scheme.surfaceBright.toARGB32(), equals(MaterialDynamicColors.surfaceBright.getArgb(dynamicScheme)));
-      expect(scheme.surfaceDim.toARGB32(), equals(MaterialDynamicColors.surfaceDim.getArgb(dynamicScheme)));
-      expect(scheme.surfaceVariant.toARGB32(), equals(MaterialDynamicColors.surfaceVariant.getArgb(dynamicScheme)));
-      expect(scheme.surfaceContainer.toARGB32(), equals(MaterialDynamicColors.surfaceContainer.getArgb(dynamicScheme)));
+      expect(
+        scheme.surface.toARGB32(),
+        equals(MaterialDynamicColors.surface.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceBright.toARGB32(),
+        equals(MaterialDynamicColors.surfaceBright.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceDim.toARGB32(),
+        equals(MaterialDynamicColors.surfaceDim.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceVariant.toARGB32(),
+        equals(MaterialDynamicColors.surfaceVariant.getArgb(dynamicScheme)),
+      );
+      expect(
+        scheme.surfaceContainer.toARGB32(),
+        equals(MaterialDynamicColors.surfaceContainer.getArgb(dynamicScheme)),
+      );
     });
   });
 }

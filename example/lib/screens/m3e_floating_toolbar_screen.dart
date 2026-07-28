@@ -123,23 +123,23 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-          physics:
-              const NeverScrollableScrollPhysics(), // Prevent swipe conflicts with lists
-          children: [
-            // Tab 1: Horizontal Toolbars
-            _buildHorizontalTab(colors, cs),
+        physics:
+            const NeverScrollableScrollPhysics(), // Prevent swipe conflicts with lists
+        children: [
+          // Tab 1: Horizontal Toolbars
+          _buildHorizontalTab(colors, cs),
 
-            // Tab 2: Vertical Toolbars
-            _buildVerticalTab(colors, cs),
+          // Tab 2: Vertical Toolbars
+          _buildVerticalTab(colors, cs),
 
-            // Tab 3: Scroll Exit Demo
-            _buildScrollExitTab(colors, cs),
+          // Tab 3: Scroll Exit Demo
+          _buildScrollExitTab(colors, cs),
 
-            // Tab 4: Bottom Nav Demo
-            _buildBottomNavTab(colors, cs),
-          ],
-        ),
-      );
+          // Tab 4: Bottom Nav Demo
+          _buildBottomNavTab(colors, cs),
+        ],
+      ),
+    );
   }
 
   Widget _buildHorizontalTab(M3EFloatingToolbarColors colors, ColorScheme cs) {

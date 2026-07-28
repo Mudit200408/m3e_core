@@ -364,7 +364,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                           textDirection: _isRtl
                               ? TextDirection.rtl
                               : TextDirection.ltr,
-                           child: M3ECircularWavyProgressIndicator(
+                          child: M3ECircularWavyProgressIndicator(
                             value: _determinateProgress,
                             strokeWidth: _strokeWidth,
                             gapSize: _gapSize,

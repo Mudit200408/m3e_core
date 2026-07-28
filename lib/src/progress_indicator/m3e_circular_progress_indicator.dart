@@ -55,7 +55,8 @@ class M3ECircularProgressIndicator extends StatefulWidget {
       _M3ECircularProgressIndicatorState();
 }
 
-class _M3ECircularProgressIndicatorState extends State<M3ECircularProgressIndicator>
+class _M3ECircularProgressIndicatorState
+    extends State<M3ECircularProgressIndicator>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
@@ -74,7 +75,8 @@ class _M3ECircularProgressIndicatorState extends State<M3ECircularProgressIndica
   @override
   void didUpdateWidget(covariant M3ECircularProgressIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.value == null && !oldWidget.value.runtimeType.toString().contains('Null')) {
+    if (widget.value == null &&
+        !oldWidget.value.runtimeType.toString().contains('Null')) {
       if (!_animationController.isAnimating) {
         _animationController.repeat();
       }
@@ -93,7 +95,8 @@ class _M3ECircularProgressIndicatorState extends State<M3ECircularProgressIndica
   Widget build(BuildContext context) {
     final activeColor =
         widget.color ?? M3EProgressIndicatorDefaults.activeColor(context);
-    final trackColor = widget.backgroundColor ??
+    final trackColor =
+        widget.backgroundColor ??
         M3EProgressIndicatorDefaults.trackColor(context);
 
     return SizedBox(
@@ -164,7 +167,7 @@ class _CircularProgressPainter extends CustomPainter {
     Paint paint,
   ) {
     paint.color = paintColor;
-    
+
     final double diameterOffset = strokeWidth / 2;
     final double arcWidth = size.width - 2 * diameterOffset;
     final double arcHeight = size.height - 2 * diameterOffset;
@@ -194,7 +197,8 @@ class _CircularProgressPainter extends CustomPainter {
         : gapSize + strokeWidth;
 
     // gap size sweep angle in degrees: gapSize / (PI * diameter) * 360
-    final double gapSizeSweep = (adjustedGapSize / (math.pi * size.width)) * 360.0;
+    final double gapSizeSweep =
+        (adjustedGapSize / (math.pi * size.width)) * 360.0;
 
     canvas.save();
     if (!isLtr) {
@@ -244,10 +248,18 @@ class _CircularProgressPainter extends CustomPainter {
       double progressSweepFraction = 0.1;
       if (t <= 0.5) {
         final double u = t / 0.5;
-        progressSweepFraction = lerpDouble(0.1, 0.87, Curves.fastOutSlowIn.transform(u))!;
+        progressSweepFraction = lerpDouble(
+          0.1,
+          0.87,
+          Curves.fastOutSlowIn.transform(u),
+        )!;
       } else {
         final double u = (t - 0.5) / 0.5;
-        progressSweepFraction = lerpDouble(0.87, 0.1, Curves.fastOutSlowIn.transform(u))!;
+        progressSweepFraction = lerpDouble(
+          0.87,
+          0.1,
+          Curves.fastOutSlowIn.transform(u),
+        )!;
       }
 
       final double sweep = progressSweepFraction * 360.0;

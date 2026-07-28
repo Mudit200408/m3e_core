@@ -78,7 +78,8 @@ class _M3ELinearProgressIndicatorState extends State<M3ELinearProgressIndicator>
   @override
   void didUpdateWidget(covariant M3ELinearProgressIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.value == null && !oldWidget.value.runtimeType.toString().contains('Null')) {
+    if (widget.value == null &&
+        !oldWidget.value.runtimeType.toString().contains('Null')) {
       if (!_animationController.isAnimating) {
         _animationController.repeat();
       }
@@ -97,7 +98,8 @@ class _M3ELinearProgressIndicatorState extends State<M3ELinearProgressIndicator>
   Widget build(BuildContext context) {
     final activeColor =
         widget.color ?? M3EProgressIndicatorDefaults.activeColor(context);
-    final trackColor = widget.backgroundColor ??
+    final trackColor =
+        widget.backgroundColor ??
         M3EProgressIndicatorDefaults.trackColor(context);
 
     return Container(
@@ -165,7 +167,6 @@ class _LinearProgressPainter extends CustomPainter {
     required this.isLtr,
   });
 
-
   void _drawLinearIndicator(
     Canvas canvas,
     double startFraction,
@@ -190,10 +191,14 @@ class _LinearProgressPainter extends CustomPainter {
       );
     } else {
       final double strokeCapOffset = strokeHeight / 2;
-      final double adjustedBarStart =
-          barStart.clamp(strokeCapOffset, width - strokeCapOffset);
-      final double adjustedBarEnd =
-          barEnd.clamp(strokeCapOffset, width - strokeCapOffset);
+      final double adjustedBarStart = barStart.clamp(
+        strokeCapOffset,
+        width - strokeCapOffset,
+      );
+      final double adjustedBarEnd = barEnd.clamp(
+        strokeCapOffset,
+        width - strokeCapOffset,
+      );
 
       if ((endFraction - startFraction).abs() > 0) {
         canvas.drawLine(
@@ -204,7 +209,6 @@ class _LinearProgressPainter extends CustomPainter {
       }
     }
   }
-
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -220,7 +224,7 @@ class _LinearProgressPainter extends CustomPainter {
     if (progress != null) {
       // determinate mode
       final double currentProgress = progress!;
-      
+
       // track
       final double trackStartFraction =
           currentProgress + math.min(currentProgress, gapSizeFraction);
@@ -253,34 +257,40 @@ class _LinearProgressPainter extends CustomPainter {
       // indeterminate mode
       final double t = animationValue ?? 0.0;
 
-      final double firstLineHead = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 0.0,
-        durationMs: 1000.0,
-        easing: _lineEasing,
-      );
-      final double firstLineTail = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 250.0,
-        durationMs: 1000.0,
-        easing: _lineEasing,
-      );
-      final double secondLineHead = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 650.0,
-        durationMs: 850.0,
-        easing: _lineEasing,
-      );
-      final double secondLineTail = M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
-        t: t,
-        delayMs: 900.0,
-        durationMs: 850.0,
-        easing: _lineEasing,
-      );
+      final double firstLineHead =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 0.0,
+            durationMs: 1000.0,
+            easing: _lineEasing,
+          );
+      final double firstLineTail =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 250.0,
+            durationMs: 1000.0,
+            easing: _lineEasing,
+          );
+      final double secondLineHead =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 650.0,
+            durationMs: 850.0,
+            easing: _lineEasing,
+          );
+      final double secondLineTail =
+          M3EProgressIndicatorUtils.evaluateIndeterminateSegment(
+            t: t,
+            delayMs: 900.0,
+            durationMs: 850.0,
+            easing: _lineEasing,
+          );
 
       // Track before line 1
       if (firstLineHead < 1.0 - gapSizeFraction) {
-        final double start = firstLineHead > 0 ? firstLineHead + gapSizeFraction : 0.0;
+        final double start = firstLineHead > 0
+            ? firstLineHead + gapSizeFraction
+            : 0.0;
         _drawLinearIndicator(canvas, start, 1.0, trackColor, size, paint);
       }
 
@@ -298,8 +308,12 @@ class _LinearProgressPainter extends CustomPainter {
 
       // Track between line 1 and line 2
       if (firstLineTail > gapSizeFraction) {
-        final double start = secondLineHead > 0 ? secondLineHead + gapSizeFraction : 0.0;
-        final double end = firstLineTail < 1.0 ? firstLineTail - gapSizeFraction : 1.0;
+        final double start = secondLineHead > 0
+            ? secondLineHead + gapSizeFraction
+            : 0.0;
+        final double end = firstLineTail < 1.0
+            ? firstLineTail - gapSizeFraction
+            : 1.0;
         if (start < end) {
           _drawLinearIndicator(canvas, start, end, trackColor, size, paint);
         }
@@ -319,7 +333,9 @@ class _LinearProgressPainter extends CustomPainter {
 
       // Track after line 2
       if (secondLineTail > gapSizeFraction) {
-        final double end = secondLineTail < 1.0 ? secondLineTail - gapSizeFraction : 1.0;
+        final double end = secondLineTail < 1.0
+            ? secondLineTail - gapSizeFraction
+            : 1.0;
         _drawLinearIndicator(canvas, 0.0, end, trackColor, size, paint);
       }
     }

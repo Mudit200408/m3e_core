@@ -99,8 +99,7 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     _constraints =
         widget.constraints ?? indicatorTheme.constraints ?? _defaultConstraints;
 
-    final activeIndicatorScale =
-        _activeSize / 48.0;
+    final activeIndicatorScale = _activeSize / 48.0;
 
     final shapesScaleFactor =
         _calculateScaleFactor(_polygons) * activeIndicatorScale;
@@ -331,5 +330,3 @@ class _MorphPainter extends CustomPainter {
     return finalPath;
   }
 }
-
-

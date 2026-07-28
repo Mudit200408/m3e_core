@@ -212,15 +212,13 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
 
   void _initHapticTracker(Offset globalPosition) {
     final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
-    final config = widget.decoration?.hapticConfig ??
+    final config =
+        widget.decoration?.hapticConfig ??
         (widget.divisions != null
             ? const M3EHapticConfig.discrete()
             : const M3EHapticConfig.continuous());
 
-    _hapticTracker = M3EHapticTracker(
-      baseHaptic: haptic,
-      config: config,
-    );
+    _hapticTracker = M3EHapticTracker(baseHaptic: haptic, config: config);
     _hapticTracker!.start(_valueToFraction(widget.value), globalPosition);
   }
 

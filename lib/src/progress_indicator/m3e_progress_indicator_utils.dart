@@ -41,11 +41,13 @@ class M3EProgressIndicatorUtils {
 
     final double strokeCapOffset = strokeWidth / 2;
     double finalStopSize = math.min(stopSize, strokeWidth);
-    
+
     // Max offset from end to prevent too much spacing
     final double maxStopOffset = 6.0; // 6.dp
-    final double stopOffset =
-        math.min((strokeWidth - finalStopSize) / 2, maxStopOffset);
+    final double stopOffset = math.min(
+      (strokeWidth - finalStopSize) / 2,
+      maxStopOffset,
+    );
 
     double indicatorX = size.width - finalStopSize - stopOffset;
     final double progressX = size.width * progressEnd + strokeCapOffset;

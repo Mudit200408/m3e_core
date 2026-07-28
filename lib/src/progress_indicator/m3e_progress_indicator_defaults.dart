@@ -18,54 +18,53 @@ class M3EProgressIndicatorDefaults {
       Theme.of(context).colorScheme.secondaryContainer;
 
   // ── Linear Progress Defaults ──
-  
+
   /// Default stroke width for standard linear indicators.
   static const double linearStrokeWidth = 4.0;
 
   /// Default stroke width for standard linear track.
   static const double linearTrackStrokeWidth = 4.0;
-  
+
   /// Default gap size between active indicator and track for linear.
   static const double linearIndicatorTrackGapSize = 4.0;
-  
+
   /// Default size of the stop indicator at the end of the linear track.
   static const double linearTrackStopIndicatorSize = 4.0;
-  
+
   /// Default wavelength of a determinate linear progress indicator wave.
   static const double linearDeterminateWavelength = 20.0;
-  
+
   /// Default wavelength of an indeterminate linear progress indicator wave.
   static const double linearIndeterminateWavelength = 20.0;
 
   /// Default speed of a linear progress indicator wave.
   static const double linearWaveSpeed = 20.0;
-  
+
   /// Default container height of the linear wavy progress indicator.
   static const double linearContainerHeight = 10.0;
 
   // ── Circular Progress Defaults ──
-  
+
   /// Default stroke width for standard circular indicators.
   static const double circularStrokeWidth = 4.0;
 
   /// Default stroke width for standard circular track.
   static const double circularTrackStrokeWidth = 4.0;
-  
+
   /// Default gap size between active indicator and track for circular.
   static const double circularIndicatorTrackGapSize = 4.0;
-  
+
   /// Default wavelength of circular progress wave.
   static const double circularWavelength = 20.0;
 
   /// Default speed of circular progress wave.
   static const double circularWaveSpeed = 20.0;
-  
+
   /// Default container size of the circular progress indicator.
   static const double circularContainerSize = 48.0;
 
-
   // ── Animation Spec Defaults ──
-  
+
   /// Default duration for progress updates transition.
   static const Duration progressAnimationDuration = Duration(milliseconds: 300);
 

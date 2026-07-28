@@ -3,6 +3,7 @@ import 'package:motor/motor.dart';
 
 export '../haptics/m3e_haptics.dart';
 export 'm3e_color_scheme.dart';
+
 /// Spring animation configuration for Material 3 Expressive components.
 ///
 /// Use to customize the spring physics for component animations.

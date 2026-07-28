@@ -130,19 +130,16 @@ class EdgeFeature extends Feature {
 
   @override
   Feature transformed(PointTransformer f) => EdgeFeature(
-        List.generate(
-          _cubics.length,
-          (i) => _cubics[i].transformed(f),
-        ),
-      );
+    List.generate(_cubics.length, (i) => _cubics[i].transformed(f)),
+  );
 
   @override
   Feature reversed() => EdgeFeature(
-        List.generate(
-          _cubics.length,
-          (i) => _cubics[_cubics.length - 1 - i].reverse(),
-        ),
-      );
+    List.generate(
+      _cubics.length,
+      (i) => _cubics[_cubics.length - 1 - i].reverse(),
+    ),
+  );
 
   @override
   bool get isIgnorableFeature => true;
@@ -174,23 +171,20 @@ class CornerFeature extends Feature {
 
   @override
   Feature transformed(PointTransformer f) => CornerFeature(
-        List.generate(
-          _cubics.length,
-          (i) => _cubics[i].transformed(f),
-        ),
-        convex: convex,
-      );
+    List.generate(_cubics.length, (i) => _cubics[i].transformed(f)),
+    convex: convex,
+  );
 
   @override
   Feature reversed() => CornerFeature(
-        List.generate(
-          _cubics.length,
-          (i) => _cubics[_cubics.length - 1 - i].reverse(),
-        ),
-        // TODO: b/369320447 - Revert flag negation when [RoundedPolygon]
-        // ignores orientation for setting the flag.
-        convex: !convex,
-      );
+    List.generate(
+      _cubics.length,
+      (i) => _cubics[_cubics.length - 1 - i].reverse(),
+    ),
+    // TODO: b/369320447 - Revert flag negation when [RoundedPolygon]
+    // ignores orientation for setting the flag.
+    convex: !convex,
+  );
 
   @override
   bool get isIgnorableFeature => false;

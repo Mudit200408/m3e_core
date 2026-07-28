@@ -17,9 +17,7 @@ part of 'shapes.dart';
 /// splitting curves when the shapes do not have the same number of curves or
 /// when the curve placement within the shapes is very different.
 class Morph {
-  Morph(RoundedPolygon start, RoundedPolygon end)
-      : _start = start,
-        _end = end {
+  Morph(RoundedPolygon start, RoundedPolygon end) : _start = start, _end = end {
     _morphMatch = _match(start, end);
   }
 

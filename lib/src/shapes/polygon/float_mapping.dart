@@ -71,10 +71,7 @@ double linearMap(List<double> xValues, List<double> yValues, double x) {
 /// progress values between the start and end shape, which is then used to
 /// insert new curves and match curves overall.
 class DoubleMapper {
-  static final identity = DoubleMapper([
-    (0.0, 0.0),
-    (0.5, 0.5),
-  ]);
+  static final identity = DoubleMapper([(0.0, 0.0), (0.5, 0.5)]);
 
   DoubleMapper(List<(double, double)> mappings) {
     _sourceValues = List.filled(mappings.length, 0);

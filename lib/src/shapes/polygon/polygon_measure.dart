@@ -6,20 +6,20 @@ class MeasuredPolygon {
     required List<ProgressableFeature> features,
     required List<Cubic> cubics,
     required List<double> outlineProgress,
-  })  : assert(
-          outlineProgress.length == cubics.length + 1,
-          'Outline progress length is expected to be the cubics length + 1',
-        ),
-        assert(
-          outlineProgress.first == 0,
-          'First outline progress value is expected to be zero',
-        ),
-        assert(
-          outlineProgress.last == 1,
-          'Last outline progress value is expected to be one',
-        ),
-        _measurer = measurer,
-        _features = features {
+  }) : assert(
+         outlineProgress.length == cubics.length + 1,
+         'Outline progress length is expected to be the cubics length + 1',
+       ),
+       assert(
+         outlineProgress.first == 0,
+         'First outline progress value is expected to be zero',
+       ),
+       assert(
+         outlineProgress.last == 1,
+         'Last outline progress value is expected to be one',
+       ),
+       _measurer = measurer,
+       _features = features {
     final measuredCubics = <MeasuredCubic>[];
     var startOutlineProgress = 0.0;
     for (var i = 0; i < cubics.length; i++) {
@@ -54,13 +54,17 @@ class MeasuredPolygon {
 
     // Get the cubics from the polygon, at the same time, extract the features
     // and keep a reference to the representative cubic we will use.
-    for (var featureIndex = 0;
-        featureIndex < polygon.features.length;
-        featureIndex++) {
+    for (
+      var featureIndex = 0;
+      featureIndex < polygon.features.length;
+      featureIndex++
+    ) {
       final feature = polygon.features[featureIndex];
-      for (var cubicIndex = 0;
-          cubicIndex < feature.cubics.length;
-          cubicIndex++) {
+      for (
+        var cubicIndex = 0;
+        cubicIndex < feature.cubics.length;
+        cubicIndex++
+      ) {
         if (feature is CornerFeature &&
             cubicIndex == feature.cubics.length ~/ 2) {
           featureToCubic.add((feature, cubics.length));
@@ -88,19 +92,15 @@ class MeasuredPolygon {
       outlineProgress[i] = measures[i] / totalMeasure;
     }
 
-    final features = List<ProgressableFeature>.generate(
-      featureToCubic.length,
-      (i) {
-        final ix = featureToCubic[i].$2;
-        return ProgressableFeature(
-          positiveModulo(
-            (outlineProgress[ix] + outlineProgress[ix + 1]) / 2,
-            1,
-          ),
-          featureToCubic[i].$1,
-        );
-      },
-    );
+    final features = List<ProgressableFeature>.generate(featureToCubic.length, (
+      i,
+    ) {
+      final ix = featureToCubic[i].$2;
+      return ProgressableFeature(
+        positiveModulo((outlineProgress[ix] + outlineProgress[ix + 1]) / 2, 1),
+        featureToCubic[i].$1,
+      );
+    });
 
     return MeasuredPolygon._(
       measurer: measurer,
@@ -242,21 +242,21 @@ class MeasuredCubic {
     required this.cubic,
     required double startOutlineProgress,
     required double endOutlineProgress,
-  })  : assert(
-          startOutlineProgress >= 0 && startOutlineProgress <= 1,
-          'startOutlineProgress has to be in [0..1] range',
-        ),
-        assert(
-          endOutlineProgress >= 0 && endOutlineProgress <= 1,
-          'endOutlineProgress has to be in range [0..1]',
-        ),
-        assert(
-          endOutlineProgress >= startOutlineProgress,
-          'endOutlineProgress is expected to be equal or greater than '
-          'startOutlineProgress',
-        ),
-        _startOutlineProgress = startOutlineProgress,
-        _endOutlineProgress = endOutlineProgress {
+  }) : assert(
+         startOutlineProgress >= 0 && startOutlineProgress <= 1,
+         'startOutlineProgress has to be in [0..1] range',
+       ),
+       assert(
+         endOutlineProgress >= 0 && endOutlineProgress <= 1,
+         'endOutlineProgress has to be in range [0..1]',
+       ),
+       assert(
+         endOutlineProgress >= startOutlineProgress,
+         'endOutlineProgress is expected to be equal or greater than '
+         'startOutlineProgress',
+       ),
+       _startOutlineProgress = startOutlineProgress,
+       _endOutlineProgress = endOutlineProgress {
     measuredSize = measurer.measureCubic(cubic);
   }
 
@@ -332,7 +332,7 @@ class MeasuredCubic {
         cubic: c2,
         startOutlineProgress: boundedCutOutlineProgress,
         endOutlineProgress: _endOutlineProgress,
-      )
+      ),
     );
   }
 
@@ -393,10 +393,7 @@ class LengthMeasurer implements Measurer {
       final segment = (point - prev).getDistance();
 
       if (segment >= remainder) {
-        return (
-          progress - (1.0 - remainder / segment) / _segments,
-          threshold,
-        );
+        return (progress - (1.0 - remainder / segment) / _segments, threshold);
       }
 
       remainder -= segment;

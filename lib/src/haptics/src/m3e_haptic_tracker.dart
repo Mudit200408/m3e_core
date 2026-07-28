@@ -35,47 +35,49 @@ class M3EHapticConfig {
     this.additionalVelocityMaxBump = 0.25,
     this.maxVelocityToScale = 200.0,
     this.minimumDragInterval = const Duration(milliseconds: 10),
-  })  : assert(deltaProgressForDragThreshold >= 0.0),
-        assert(lowerBookendThreshold >= 0.0 && lowerBookendThreshold <= 1.0),
-        assert(upperBookendThreshold >= 0.0 && upperBookendThreshold <= 1.0),
-        assert(lowerBookendThreshold <= upperBookendThreshold),
-        assert(progressBasedDragMinScale >= 0.0 &&
-            progressBasedDragMinScale <= 1.0),
-        assert(progressBasedDragMaxScale >= 0.0 &&
-            progressBasedDragMaxScale <= 1.0),
-        assert(progressBasedDragMinScale <= progressBasedDragMaxScale),
-        assert(additionalVelocityMaxBump >= 0.0),
-        assert(maxVelocityToScale > 0.0);
+  }) : assert(deltaProgressForDragThreshold >= 0.0),
+       assert(lowerBookendThreshold >= 0.0 && lowerBookendThreshold <= 1.0),
+       assert(upperBookendThreshold >= 0.0 && upperBookendThreshold <= 1.0),
+       assert(lowerBookendThreshold <= upperBookendThreshold),
+       assert(
+         progressBasedDragMinScale >= 0.0 && progressBasedDragMinScale <= 1.0,
+       ),
+       assert(
+         progressBasedDragMaxScale >= 0.0 && progressBasedDragMaxScale <= 1.0,
+       ),
+       assert(progressBasedDragMinScale <= progressBasedDragMaxScale),
+       assert(additionalVelocityMaxBump >= 0.0),
+       assert(maxVelocityToScale > 0.0);
 
   const M3EHapticConfig.continuous()
-      : this(
-          enableContinuousDrag: true,
-          deltaProgressForDragThreshold: 0.02,
-          vibrateOnLowerBookend: true,
-          vibrateOnUpperBookend: true,
-          lowerBookendThreshold: 0.01,
-          upperBookendThreshold: 0.99,
-          progressBasedDragMinScale: 0.10,
-          progressBasedDragMaxScale: 0.85,
-          additionalVelocityMaxBump: 0.1,
-          maxVelocityToScale: 200.0,
-          minimumDragInterval: const Duration(milliseconds: 10),
-        );
+    : this(
+        enableContinuousDrag: true,
+        deltaProgressForDragThreshold: 0.02,
+        vibrateOnLowerBookend: true,
+        vibrateOnUpperBookend: true,
+        lowerBookendThreshold: 0.01,
+        upperBookendThreshold: 0.99,
+        progressBasedDragMinScale: 0.10,
+        progressBasedDragMaxScale: 0.85,
+        additionalVelocityMaxBump: 0.1,
+        maxVelocityToScale: 200.0,
+        minimumDragInterval: const Duration(milliseconds: 10),
+      );
 
   const M3EHapticConfig.discrete()
-      : this(
-          enableContinuousDrag: false,
-          deltaProgressForDragThreshold: 0.0,
-          vibrateOnLowerBookend: true,
-          vibrateOnUpperBookend: true,
-          lowerBookendThreshold: 0.0,
-          upperBookendThreshold: 1.0,
-          progressBasedDragMinScale: 0.20,
-          progressBasedDragMaxScale: 0.50,
-          additionalVelocityMaxBump: 0.20,
-          maxVelocityToScale: 100.0,
-          minimumDragInterval: Duration.zero,
-        );
+    : this(
+        enableContinuousDrag: false,
+        deltaProgressForDragThreshold: 0.0,
+        vibrateOnLowerBookend: true,
+        vibrateOnUpperBookend: true,
+        lowerBookendThreshold: 0.0,
+        upperBookendThreshold: 1.0,
+        progressBasedDragMinScale: 0.20,
+        progressBasedDragMaxScale: 0.50,
+        additionalVelocityMaxBump: 0.20,
+        maxVelocityToScale: 100.0,
+        minimumDragInterval: Duration.zero,
+      );
 
   @override
   bool operator ==(Object other) =>
@@ -96,18 +98,18 @@ class M3EHapticConfig {
 
   @override
   int get hashCode => Object.hash(
-        enableContinuousDrag,
-        deltaProgressForDragThreshold,
-        vibrateOnLowerBookend,
-        vibrateOnUpperBookend,
-        lowerBookendThreshold,
-        upperBookendThreshold,
-        progressBasedDragMinScale,
-        progressBasedDragMaxScale,
-        additionalVelocityMaxBump,
-        maxVelocityToScale,
-        minimumDragInterval,
-      );
+    enableContinuousDrag,
+    deltaProgressForDragThreshold,
+    vibrateOnLowerBookend,
+    vibrateOnUpperBookend,
+    lowerBookendThreshold,
+    upperBookendThreshold,
+    progressBasedDragMinScale,
+    progressBasedDragMaxScale,
+    additionalVelocityMaxBump,
+    maxVelocityToScale,
+    minimumDragInterval,
+  );
 }
 
 class M3EHapticTracker {
@@ -157,8 +159,11 @@ class M3EHapticTracker {
 
   void triggerTick(double progress) {
     if (baseHaptic == M3EHapticFeedback.none) return;
-    final amplitude = _computeAmplitude(progress,
-        config.progressBasedDragMinScale, config.progressBasedDragMaxScale);
+    final amplitude = _computeAmplitude(
+      progress,
+      config.progressBasedDragMinScale,
+      config.progressBasedDragMaxScale,
+    );
     applyTypedHaptic('tickCrossing', amplitude);
   }
 
@@ -208,8 +213,8 @@ class M3EHapticTracker {
     final t = progress.clamp(0.0, 1.0);
     final progressScale =
         minScale + (maxScale - minScale) * pow(t, exponent).toDouble();
-    final velocityFraction =
-        (_currentVelocity / config.maxVelocityToScale).clamp(0.0, 1.0);
+    final velocityFraction = (_currentVelocity / config.maxVelocityToScale)
+        .clamp(0.0, 1.0);
     final velocityBump = config.additionalVelocityMaxBump * velocityFraction;
 
     return (progressScale + velocityBump).clamp(0.0, 1.0);

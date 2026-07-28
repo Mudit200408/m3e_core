@@ -616,12 +616,12 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     final dataIndex = visible.indexOf(slotIndex);
     if (dataIndex < 0) return;
 
-    // ── Ask the consumer if dismissal is allowed ──                                                                                                 
-    final allowed = await onDismissCallback?.call(dataIndex, direction) ?? true;                                                                      
-    if (!allowed) {                                                                                                                                   
-      _springBack(speedMul);                                                                                                                          
-      return;                                                                                                                                         
-    }                                                                                                                                                                                                                                                                                                  
+    // ── Ask the consumer if dismissal is allowed ──
+    final allowed = await onDismissCallback?.call(dataIndex, direction) ?? true;
+    if (!allowed) {
+      _springBack(speedMul);
+      return;
+    }
 
     // Capture size & freeze the child.
     final size = _cardSize(slot);
@@ -727,7 +727,6 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         }
       })
       ..animateTo(flyTarget);
-
   }
 
   // ── Widget builders ──

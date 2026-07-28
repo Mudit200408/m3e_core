@@ -110,5 +110,3 @@ class M3ESliderDecoration {
     thumbHeight,
   );
 }
-
-

@@ -21,11 +21,7 @@ class Point {
     final off = this - center;
     final cos = math.cos(radians);
     final sin = math.sin(radians);
-    return Point(
-          off.x * cos - off.y * sin,
-          off.x * sin + off.y * cos,
-        ) +
-        center;
+    return Point(off.x * cos - off.y * sin, off.x * sin + off.y * cos) + center;
   }
 
   Point translate(double dx, double dy) => Point(x + dx, y + dy);

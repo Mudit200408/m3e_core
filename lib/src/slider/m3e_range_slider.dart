@@ -254,16 +254,16 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
 
   void _initHapticTracker(Offset globalPosition) {
     final haptic = widget.decoration?.haptic ?? M3EHapticFeedback.none;
-    final config = widget.decoration?.hapticConfig ??
+    final config =
+        widget.decoration?.hapticConfig ??
         (widget.divisions != null
             ? const M3EHapticConfig.discrete()
             : const M3EHapticConfig.continuous());
 
-    _hapticTracker = M3EHapticTracker(
-      baseHaptic: haptic,
-      config: config,
-    );
-    final activeValue = _isDraggingStart ? widget.value.start : widget.value.end;
+    _hapticTracker = M3EHapticTracker(baseHaptic: haptic, config: config);
+    final activeValue = _isDraggingStart
+        ? widget.value.start
+        : widget.value.end;
     _hapticTracker!.start(_valueToFraction(activeValue), globalPosition);
   }
 
