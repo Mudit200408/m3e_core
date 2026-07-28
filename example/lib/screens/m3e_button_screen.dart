@@ -1802,6 +1802,7 @@ class _TbgConnectedRoundGroupState extends State<_TbgConnectedRoundGroup> {
     type: M3EButtonGroupType.connected,
     shape: M3EButtonShape.round,
     style: M3EButtonStyle.tonal,
+    size: M3EButtonSize.custom(height: 50, width: 50),
     spacing: 8.0,
     selectedIndex: _index,
     onSelectedIndexChanged: (i) => setState(() => _index = i ?? _index),
@@ -1845,7 +1846,7 @@ class _TbgConnectedSquareGroupState extends State<_TbgConnectedSquareGroup> {
     type: M3EButtonGroupType.connected,
     shape: M3EButtonShape.square,
     style: M3EButtonStyle.filled,
-    spacing: 8.0,
+    size: M3EButtonSize.custom(height: 50), // No width, let that be Dynamic!!
     selectedIndex: _index,
     decoration: M3EToggleButtonDecoration.styleFrom(
       connectedInnerRadius: 10,
@@ -1887,7 +1888,7 @@ class _TbgConnectedExampleState extends State<_TbgConnectedExample> {
     type: M3EButtonGroupType.connected,
     shape: M3EButtonShape.square,
     style: M3EButtonStyle.filled,
-    spacing: 8.0,
+
     selectedIndex: _index,
     decoration: M3EToggleButtonDecoration.styleFrom(
       connectedInnerRadius: 10,
