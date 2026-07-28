@@ -1,3 +1,12 @@
+# 0.1.4
+- pubspec: Bump the flutter version to min 3.44.0
+- progress-indicator: Improve reverse animation
+- fix: respect onDismiss return value to allow canceling dismissals (#2) [Contributed by RZI3D]
+- toggle-button: fix connected toggle button layout on mobile devices
+- example: update connected button group demo
+- chore: Update the spacing API doc comment
+- example: Add example showing the onDismiss fixup in M3EDismissible
+
 # 0.1.3
 - Adds `M3ELoadingIndicator` and `M3EContainedLoadingIndicator` components with shape morphing animations.
 - Adds polygon shape morphing engine (`RoundedPolygon`, `Morph`, etc.) used by the loading indicator.
