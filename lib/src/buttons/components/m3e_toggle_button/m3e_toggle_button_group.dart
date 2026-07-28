@@ -280,6 +280,9 @@ class M3EToggleButtonGroup extends StatefulWidget {
   /// Custom spacing between buttons in logical pixels.
   ///
   /// When null, uses the default spacing from [density].
+  ///
+  /// Ignored when [type] is [M3EButtonGroupType.connected], as connected
+  /// button groups use fixed token spacing to maintain visual continuity.
   final double? spacing;
 
   /// Main axis direction for the button group layout.
