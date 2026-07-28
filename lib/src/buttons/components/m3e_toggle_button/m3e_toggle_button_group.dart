@@ -1534,8 +1534,8 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
         return AnimatedContainer(
           duration: const Duration(milliseconds: 100),
           curve: Curves.easeOutCubic,
-          width: widget.direction == Axis.horizontal ? null : width,
-          height: widget.direction == Axis.vertical ? null : height,
+          width: width,
+          height: height,
           constraints: BoxConstraints(minWidth: width, minHeight: height),
         );
       },

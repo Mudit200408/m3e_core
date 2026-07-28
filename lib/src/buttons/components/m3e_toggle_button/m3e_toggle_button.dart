@@ -649,6 +649,7 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
       }),
       animationDuration: _kDurationZero,
       visualDensity: _kVisualDensityStandard,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       splashFactory: widget.splashFactory ?? _kDefaultSplashFactory,
       overlayColor: widget.decorationOverlayColor,
       surfaceTintColor: widget.decorationSurfaceTintColor,
