@@ -831,7 +831,10 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                                   Theme.of(
                                     context,
                                   ).colorScheme.surfaceContainerHighest,
-                              elevation: s.elevation + 6,
+                              elevation: s.elevation > 0
+                                  ? s.elevation + 6
+                                  : 0.0,
+                              boxShadow: s.boxShadow,
                               border: s.border,
                               padding: s.padding ?? const EdgeInsets.all(16),
                               child: slot.frozenChild!,
@@ -929,7 +932,10 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                     color:
                         s.color ??
                         Theme.of(context).colorScheme.surfaceContainerHighest,
-                    elevation: isDragged ? s.elevation + 6 : s.elevation,
+                    elevation: (isDragged && s.elevation > 0)
+                        ? s.elevation + 6
+                        : s.elevation,
+                    boxShadow: s.boxShadow,
                     border: s.border,
                     isDragged: isDragged,
                     hasActiveDrag: _dragSlotRef != null,
@@ -1018,6 +1024,7 @@ class _AnimatedCard extends StatefulWidget {
   final BorderRadius borderRadius;
   final Color color;
   final double elevation;
+  final List<BoxShadow>? boxShadow;
   final BorderSide? border;
   final bool isDragged;
   final bool hasActiveDrag;
@@ -1029,6 +1036,7 @@ class _AnimatedCard extends StatefulWidget {
     required this.borderRadius,
     required this.color,
     required this.elevation,
+    this.boxShadow,
     required this.isDragged,
     required this.hasActiveDrag,
     this.border,
@@ -1059,26 +1067,40 @@ class _AnimatedCardState extends State<_AnimatedCard> {
         old.borderRadius != widget.borderRadius ||
         old.elevation != widget.elevation ||
         old.isDragged != widget.isDragged ||
-        old.border != widget.border) {
+        old.border != widget.border ||
+        old.boxShadow != widget.boxShadow) {
       _decoration = _buildDecoration();
     }
   }
 
-  BoxDecoration _buildDecoration() => BoxDecoration(
-    color: widget.color,
-    borderRadius: widget.borderRadius,
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withValues(alpha: 0.06 + widget.elevation * 0.015),
-        blurRadius: 4 + widget.elevation * 2,
-        spreadRadius: widget.isDragged ? 1 : 0,
-        offset: Offset(0, widget.isDragged ? 4 : 2),
-      ),
-    ],
-    border: widget.border != null
-        ? Border.all(color: widget.border!.color, width: widget.border!.width)
-        : null,
-  );
+  BoxDecoration _buildDecoration() {
+    final List<BoxShadow>? effectiveShadow;
+    if (widget.boxShadow != null) {
+      effectiveShadow = widget.boxShadow;
+    } else if (widget.elevation <= 0) {
+      effectiveShadow = const [];
+    } else {
+      effectiveShadow = [
+        BoxShadow(
+          color: Colors.black.withValues(
+            alpha: 0.06 + widget.elevation * 0.015,
+          ),
+          blurRadius: 4 + widget.elevation * 2,
+          spreadRadius: widget.isDragged ? 1 : 0,
+          offset: Offset(0, widget.isDragged ? 4 : 2),
+        ),
+      ];
+    }
+
+    return BoxDecoration(
+      color: widget.color,
+      borderRadius: widget.borderRadius,
+      boxShadow: effectiveShadow,
+      border: widget.border != null
+          ? Border.all(color: widget.border!.color, width: widget.border!.width)
+          : null,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1107,6 +1129,7 @@ class _FlyingCard extends StatelessWidget {
   final BorderRadius borderRadius;
   final Color color;
   final double elevation;
+  final List<BoxShadow>? boxShadow;
   final BorderSide? border;
   final EdgeInsetsGeometry padding;
   final Widget child;
@@ -1116,6 +1139,7 @@ class _FlyingCard extends StatelessWidget {
     required this.borderRadius,
     required this.color,
     required this.elevation,
+    this.boxShadow,
     this.border,
     required this.padding,
     required this.child,
@@ -1123,18 +1147,27 @@ class _FlyingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<BoxShadow>? effectiveShadow;
+    if (boxShadow != null) {
+      effectiveShadow = boxShadow;
+    } else if (elevation <= 0) {
+      effectiveShadow = const [];
+    } else {
+      effectiveShadow = [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.06 + elevation * 0.015),
+          blurRadius: 4 + elevation * 2,
+          spreadRadius: 1,
+          offset: const Offset(0, 4),
+        ),
+      ];
+    }
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color,
         borderRadius: borderRadius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06 + elevation * 0.015),
-            blurRadius: 4 + elevation * 2,
-            spreadRadius: 1,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: effectiveShadow,
         border: border != null
             ? Border.all(color: border!.color, width: border!.width)
             : null,
