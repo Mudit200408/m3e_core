@@ -34,7 +34,7 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 
 ```yaml
 dependencies:
-  m3e_core: ^0.1.4
+  m3e_core: ^0.1.5
 ```
 
 ```dart

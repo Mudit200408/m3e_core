@@ -1,3 +1,8 @@
+# 0.1.5
+- Allow overriding or disabling drop shadows via `boxShadow` in `M3EDismissibleCardStyle` (#1)
+- Fix drop shadow rendering so setting `elevation` to `0` eliminates shadows automatically (#1)
+- Add `AGENTS.md` for enforcing sticter rules on AI Agents working on this package.
+
 # 0.1.4
 - pubspec: Bump the flutter version to min 3.44.0
 - progress-indicator: Improve reverse animation
