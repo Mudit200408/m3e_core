@@ -24,6 +24,9 @@ class M3ELinearProgressIndicator extends StatefulWidget {
   /// The color of the active progress indicator.
   final Color? color;
 
+  /// The animation of the active progress indicator color.
+  final Animation<Color?>? valueColor;
+
   /// The background color of the track.
   final Color? backgroundColor;
 
@@ -46,6 +49,7 @@ class M3ELinearProgressIndicator extends StatefulWidget {
     super.key,
     this.value,
     this.color,
+    this.valueColor,
     this.backgroundColor,
     this.minHeight = M3EProgressIndicatorDefaults.linearStrokeWidth,
     this.strokeCap = StrokeCap.round,
@@ -97,47 +101,94 @@ class _M3ELinearProgressIndicatorState extends State<M3ELinearProgressIndicator>
   @override
   Widget build(BuildContext context) {
     final activeColor =
-        widget.color ?? M3EProgressIndicatorDefaults.activeColor(context);
+        widget.valueColor?.value ??
+        widget.color ??
+        M3EProgressIndicatorDefaults.activeColor(context);
     final trackColor =
         widget.backgroundColor ??
         M3EProgressIndicatorDefaults.trackColor(context);
+
+    if (widget.value != null) {
+      if (widget.valueColor != null) {
+        return Container(
+          constraints: BoxConstraints.tightFor(
+            width: widget.width,
+            height: widget.minHeight,
+          ),
+          child: AnimatedBuilder(
+            animation: widget.valueColor!,
+            builder: (context, child) {
+              final color =
+                  widget.valueColor?.value ??
+                  widget.color ??
+                  M3EProgressIndicatorDefaults.activeColor(context);
+              return CustomPaint(
+                painter: _LinearProgressPainter(
+                  progress: widget.value!.clamp(0.0, 1.0),
+                  color: color,
+                  trackColor: trackColor,
+                  strokeHeight: widget.minHeight,
+                  strokeCap: widget.strokeCap,
+                  gapSize: widget.gapSize,
+                  stopSize: widget.stopSize,
+                  isLtr: Directionality.of(context) == TextDirection.ltr,
+                ),
+              );
+            },
+          ),
+        );
+      }
+      return Container(
+        constraints: BoxConstraints.tightFor(
+          width: widget.width,
+          height: widget.minHeight,
+        ),
+        child: CustomPaint(
+          painter: _LinearProgressPainter(
+            progress: widget.value!.clamp(0.0, 1.0),
+            color: activeColor,
+            trackColor: trackColor,
+            strokeHeight: widget.minHeight,
+            strokeCap: widget.strokeCap,
+            gapSize: widget.gapSize,
+            stopSize: widget.stopSize,
+            isLtr: Directionality.of(context) == TextDirection.ltr,
+          ),
+        ),
+      );
+    }
+
+    final animation = widget.valueColor != null
+        ? Listenable.merge([_animationController, widget.valueColor!])
+        : _animationController;
 
     return Container(
       constraints: BoxConstraints.tightFor(
         width: widget.width,
         height: widget.minHeight,
       ),
-      child: widget.value != null
-          ? CustomPaint(
-              painter: _LinearProgressPainter(
-                progress: widget.value!.clamp(0.0, 1.0),
-                color: activeColor,
-                trackColor: trackColor,
-                strokeHeight: widget.minHeight,
-                strokeCap: widget.strokeCap,
-                gapSize: widget.gapSize,
-                stopSize: widget.stopSize,
-                isLtr: Directionality.of(context) == TextDirection.ltr,
-              ),
-            )
-          : AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: _LinearProgressPainter(
-                    progress: null,
-                    animationValue: _animationController.value,
-                    color: activeColor,
-                    trackColor: trackColor,
-                    strokeHeight: widget.minHeight,
-                    strokeCap: widget.strokeCap,
-                    gapSize: widget.gapSize,
-                    stopSize: widget.stopSize,
-                    isLtr: Directionality.of(context) == TextDirection.ltr,
-                  ),
-                );
-              },
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          final color =
+              widget.valueColor?.value ??
+              widget.color ??
+              M3EProgressIndicatorDefaults.activeColor(context);
+          return CustomPaint(
+            painter: _LinearProgressPainter(
+              progress: null,
+              animationValue: _animationController.value,
+              color: color,
+              trackColor: trackColor,
+              strokeHeight: widget.minHeight,
+              strokeCap: widget.strokeCap,
+              gapSize: widget.gapSize,
+              stopSize: widget.stopSize,
+              isLtr: Directionality.of(context) == TextDirection.ltr,
             ),
+          );
+        },
+      ),
     );
   }
 }

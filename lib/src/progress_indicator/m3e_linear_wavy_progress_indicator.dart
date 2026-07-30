@@ -21,6 +21,9 @@ class M3ELinearWavyProgressIndicator extends StatefulWidget {
   /// The color of the active progress indicator.
   final Color? color;
 
+  /// The animation of the active progress indicator color.
+  final Animation<Color?>? valueColor;
+
   /// The background color of the track.
   final Color? backgroundColor;
 
@@ -55,6 +58,7 @@ class M3ELinearWavyProgressIndicator extends StatefulWidget {
     super.key,
     this.value,
     this.color,
+    this.valueColor,
     this.backgroundColor,
     this.strokeWidth = M3EProgressIndicatorDefaults.linearStrokeWidth,
     this.trackStrokeWidth = M3EProgressIndicatorDefaults.linearTrackStrokeWidth,
@@ -63,7 +67,7 @@ class M3ELinearWavyProgressIndicator extends StatefulWidget {
     this.wavelength = M3EProgressIndicatorDefaults.linearDeterminateWavelength,
     this.waveSpeed = M3EProgressIndicatorDefaults.linearWaveSpeed,
     this.height = M3EProgressIndicatorDefaults.linearContainerHeight,
-    this.width = 240.0,
+    this.width = double.infinity,
     this.amplitude,
   });
 
@@ -204,10 +208,7 @@ class _M3ELinearWavyProgressIndicatorState
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
-    final activeColor =
-        widget.color ?? M3EProgressIndicatorDefaults.activeColor(context);
     final trackColor =
         widget.backgroundColor ??
         M3EProgressIndicatorDefaults.trackColor(context);
@@ -223,8 +224,13 @@ class _M3ELinearWavyProgressIndicatorState
           _amplitudeController,
           _indeterminateController,
           _progressController,
+          if (widget.valueColor != null) widget.valueColor!,
         ]),
         builder: (context, child) {
+          final activeColor =
+              widget.valueColor?.value ??
+              widget.color ??
+              M3EProgressIndicatorDefaults.activeColor(context);
           final double? animatedProgress = widget.value != null
               ? lerpDouble(_fromProgress, _toProgress, _progressCurve.value)
               : null;

@@ -24,6 +24,9 @@ class M3ECircularWavyProgressIndicator extends StatefulWidget {
   /// The color of the active progress indicator.
   final Color? color;
 
+  /// The animation of the active progress indicator color.
+  final Animation<Color?>? valueColor;
+
   /// The background color of the track.
   final Color? backgroundColor;
 
@@ -53,6 +56,7 @@ class M3ECircularWavyProgressIndicator extends StatefulWidget {
     super.key,
     this.value,
     this.color,
+    this.valueColor,
     this.backgroundColor,
     this.strokeWidth = M3EProgressIndicatorDefaults.circularStrokeWidth,
     this.trackStrokeWidth = M3EProgressIndicatorDefaults.circularStrokeWidth,
@@ -246,8 +250,6 @@ class _M3ECircularWavyProgressIndicatorState
 
   @override
   Widget build(BuildContext context) {
-    final activeColor =
-        widget.color ?? M3EProgressIndicatorDefaults.activeColor(context);
     final trackColor =
         widget.backgroundColor ??
         M3EProgressIndicatorDefaults.trackColor(context);
@@ -263,8 +265,13 @@ class _M3ECircularWavyProgressIndicatorState
           _additionalRotController,
           _sweepController,
           _progressController,
+          if (widget.valueColor != null) widget.valueColor!,
         ]),
         builder: (context, child) {
+          final activeColor =
+              widget.valueColor?.value ??
+              widget.color ??
+              M3EProgressIndicatorDefaults.activeColor(context);
           final double sweepFraction = lerpDouble(
             _CircularWavyProgressPainter.minSweep,
             _CircularWavyProgressPainter.maxSweep,

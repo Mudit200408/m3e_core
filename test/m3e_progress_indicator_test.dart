@@ -268,5 +268,71 @@ void main() {
         expect(find.byType(M3ECircularWavyProgressIndicator), findsOneWidget);
       },
     );
+
+    testWidgets('renders circular wavy indicator with valueColor', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: M3ECircularWavyProgressIndicator(
+              value: 0.6,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(M3ECircularWavyProgressIndicator), findsOneWidget);
+    });
+  });
+
+  group('valueColor tests for all progress indicators', () {
+    testWidgets('renders linear indicator with valueColor', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: M3ELinearProgressIndicator(
+              value: 0.5,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(M3ELinearProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('renders circular indicator with valueColor', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: M3ECircularProgressIndicator(
+              value: 0.7,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(M3ECircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('renders linear wavy indicator with valueColor', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: M3ELinearWavyProgressIndicator(
+              value: 0.4,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(M3ELinearWavyProgressIndicator), findsOneWidget);
+    });
   });
 }

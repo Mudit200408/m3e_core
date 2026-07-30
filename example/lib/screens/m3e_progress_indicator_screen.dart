@@ -24,7 +24,16 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
   double _waveSpeed = 20.0;
   bool _autoAnimate = false;
   bool _isRtl = false;
+  bool _useValueColor = false;
   late AnimationController _progressAnimationController;
+
+  Animation<Color?>? get _activeValueColor => _useValueColor
+      ? AlwaysStoppedAnimation<Color>(
+          _determinateProgress >= 0.7
+              ? Colors.green
+              : (_determinateProgress >= 0.4 ? Colors.orange : Colors.red),
+        )
+      : null;
 
   @override
   void initState() {
@@ -111,6 +120,25 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(_autoAnimate ? 'Looping' : 'Paused'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const SizedBox(width: 100, child: Text('valueColor:')),
+                    Switch(
+                      value: _useValueColor,
+                      onChanged: (val) {
+                        setState(() {
+                          _useValueColor = val;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _useValueColor
+                          ? 'Dynamic (Red/Orange/Green)'
+                          : 'Default Theme Color',
+                    ),
                   ],
                 ),
                 Row(
@@ -229,6 +257,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                   textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
                   child: M3ELinearProgressIndicator(
                     value: _determinateProgress,
+                    valueColor: _activeValueColor,
                     minHeight: _strokeWidth,
                     gapSize: _gapSize,
                     stopSize: _stopSize,
@@ -241,6 +270,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                   textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
                   child: M3ELinearProgressIndicator(
                     value: null,
+                    valueColor: _activeValueColor,
                     minHeight: _strokeWidth,
                     gapSize: _gapSize,
                   ),
@@ -265,6 +295,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                   textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
                   child: M3ELinearWavyProgressIndicator(
                     value: _determinateProgress,
+                    valueColor: _activeValueColor,
                     strokeWidth: _strokeWidth,
                     trackStrokeWidth: _strokeWidth * 0.75,
                     width: double.infinity,
@@ -281,6 +312,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                   textDirection: _isRtl ? TextDirection.rtl : TextDirection.ltr,
                   child: M3ELinearWavyProgressIndicator(
                     value: null,
+                    valueColor: _activeValueColor,
                     strokeWidth: _strokeWidth,
                     width: double.infinity,
                     trackStrokeWidth: _strokeWidth * 0.75,
@@ -315,6 +347,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                               : TextDirection.ltr,
                           child: M3ECircularProgressIndicator(
                             value: _determinateProgress,
+                            valueColor: _activeValueColor,
                             strokeWidth: _strokeWidth,
                             gapSize: _gapSize,
                           ),
@@ -331,6 +364,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                               : TextDirection.ltr,
                           child: M3ECircularProgressIndicator(
                             value: null,
+                            valueColor: _activeValueColor,
                             strokeWidth: _strokeWidth,
                             gapSize: _gapSize,
                           ),
@@ -366,6 +400,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                               : TextDirection.ltr,
                           child: M3ECircularWavyProgressIndicator(
                             value: _determinateProgress,
+                            valueColor: _activeValueColor,
                             strokeWidth: _strokeWidth,
                             gapSize: _gapSize,
                             wavelength: _wavelength,
@@ -384,6 +419,7 @@ class _M3EProgressIndicatorScreenState extends State<M3EProgressIndicatorScreen>
                               : TextDirection.ltr,
                           child: M3ECircularWavyProgressIndicator(
                             value: null,
+                            valueColor: _activeValueColor,
                             strokeWidth: _strokeWidth,
                             gapSize: _gapSize,
                             wavelength: _wavelength,

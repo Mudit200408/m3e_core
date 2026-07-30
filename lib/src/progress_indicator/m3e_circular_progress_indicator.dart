@@ -24,6 +24,9 @@ class M3ECircularProgressIndicator extends StatefulWidget {
   /// The color of the active progress indicator.
   final Color? color;
 
+  /// The animation of the active progress indicator color.
+  final Animation<Color?>? valueColor;
+
   /// The background color of the track.
   final Color? backgroundColor;
 
@@ -43,6 +46,7 @@ class M3ECircularProgressIndicator extends StatefulWidget {
     super.key,
     this.value,
     this.color,
+    this.valueColor,
     this.backgroundColor,
     this.strokeWidth = M3EProgressIndicatorDefaults.circularStrokeWidth,
     this.strokeCap = StrokeCap.round,
@@ -94,43 +98,85 @@ class _M3ECircularProgressIndicatorState
   @override
   Widget build(BuildContext context) {
     final activeColor =
-        widget.color ?? M3EProgressIndicatorDefaults.activeColor(context);
+        widget.valueColor?.value ??
+        widget.color ??
+        M3EProgressIndicatorDefaults.activeColor(context);
     final trackColor =
         widget.backgroundColor ??
         M3EProgressIndicatorDefaults.trackColor(context);
 
+    if (widget.value != null) {
+      if (widget.valueColor != null) {
+        return SizedBox(
+          width: widget.size,
+          height: widget.size,
+          child: AnimatedBuilder(
+            animation: widget.valueColor!,
+            builder: (context, child) {
+              final color =
+                  widget.valueColor?.value ??
+                  widget.color ??
+                  M3EProgressIndicatorDefaults.activeColor(context);
+              return CustomPaint(
+                painter: _CircularProgressPainter(
+                  progress: widget.value!.clamp(0.0, 1.0),
+                  color: color,
+                  trackColor: trackColor,
+                  strokeWidth: widget.strokeWidth,
+                  strokeCap: widget.strokeCap,
+                  gapSize: widget.gapSize,
+                  isLtr: Directionality.of(context) == TextDirection.ltr,
+                ),
+              );
+            },
+          ),
+        );
+      }
+      return SizedBox(
+        width: widget.size,
+        height: widget.size,
+        child: CustomPaint(
+          painter: _CircularProgressPainter(
+            progress: widget.value!.clamp(0.0, 1.0),
+            color: activeColor,
+            trackColor: trackColor,
+            strokeWidth: widget.strokeWidth,
+            strokeCap: widget.strokeCap,
+            gapSize: widget.gapSize,
+            isLtr: Directionality.of(context) == TextDirection.ltr,
+          ),
+        ),
+      );
+    }
+
+    final animation = widget.valueColor != null
+        ? Listenable.merge([_animationController, widget.valueColor!])
+        : _animationController;
+
     return SizedBox(
       width: widget.size,
       height: widget.size,
-      child: widget.value != null
-          ? CustomPaint(
-              painter: _CircularProgressPainter(
-                progress: widget.value!.clamp(0.0, 1.0),
-                color: activeColor,
-                trackColor: trackColor,
-                strokeWidth: widget.strokeWidth,
-                strokeCap: widget.strokeCap,
-                gapSize: widget.gapSize,
-                isLtr: Directionality.of(context) == TextDirection.ltr,
-              ),
-            )
-          : AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: _CircularProgressPainter(
-                    progress: null,
-                    animationValue: _animationController.value,
-                    color: activeColor,
-                    trackColor: trackColor,
-                    strokeWidth: widget.strokeWidth,
-                    strokeCap: widget.strokeCap,
-                    gapSize: widget.gapSize,
-                    isLtr: Directionality.of(context) == TextDirection.ltr,
-                  ),
-                );
-              },
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          final color =
+              widget.valueColor?.value ??
+              widget.color ??
+              M3EProgressIndicatorDefaults.activeColor(context);
+          return CustomPaint(
+            painter: _CircularProgressPainter(
+              progress: null,
+              animationValue: _animationController.value,
+              color: color,
+              trackColor: trackColor,
+              strokeWidth: widget.strokeWidth,
+              strokeCap: widget.strokeCap,
+              gapSize: widget.gapSize,
+              isLtr: Directionality.of(context) == TextDirection.ltr,
             ),
+          );
+        },
+      ),
     );
   }
 }
