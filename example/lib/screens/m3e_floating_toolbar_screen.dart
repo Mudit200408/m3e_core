@@ -1144,25 +1144,28 @@ class _FloatingToolbarM3EScreenState extends State<FloatingToolbarM3EScreen>
           left: 16,
           right: 16,
           bottom: 16,
-          child: M3EFabHorizontalFloatingToolbar(
-            expanded: true,
-            decoration: decoration,
-            fabPosition: M3EFloatingToolbarHorizontalFabPosition.end,
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('FAB pressed!'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-              },
-              backgroundColor: cs.primaryContainer,
-              foregroundColor: cs.onPrimaryContainer,
-              elevation: 0,
-              child: const Icon(Icons.add_rounded),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: M3EFabHorizontalFloatingToolbar(
+              expanded: true,
+              decoration: decoration,
+              fabPosition: M3EFloatingToolbarHorizontalFabPosition.end,
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('FAB pressed!'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                },
+                backgroundColor: cs.primaryContainer,
+                foregroundColor: cs.onPrimaryContainer,
+                elevation: 0,
+                child: const Icon(Icons.add_rounded),
+              ),
+              content: content,
             ),
-            content: content,
           ),
         ),
       ],
@@ -1283,17 +1286,13 @@ class _M3ENavBarTabState extends State<_M3ENavBarTab>
 
         final double width = lerpDouble(48.0, 110.0, progress)!;
 
-        final Color? bgColor = Color.lerp(
-          Colors.transparent,
-          theme.colorScheme.surface,
-          progress,
-        );
+        final Color bgColor = widget.isSelected
+            ? theme.colorScheme.surface
+            : Colors.transparent;
 
-        final Color? contentColor = Color.lerp(
-          theme.colorScheme.onPrimary,
-          theme.colorScheme.primary,
-          progress,
-        );
+        final Color contentColor = widget.isSelected
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onPrimary;
 
         return Container(
           width: width,
@@ -1308,8 +1307,18 @@ class _M3ENavBarTabState extends State<_M3ENavBarTab>
             child: InkWell(
               borderRadius: BorderRadius.circular(24),
               onTap: widget.onTap,
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
+              overlayColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return contentColor.withValues(alpha: 0.12);
+                }
+                if (states.contains(WidgetState.hovered)) {
+                  return contentColor.withValues(alpha: 0.08);
+                }
+                if (states.contains(WidgetState.focused)) {
+                  return contentColor.withValues(alpha: 0.12);
+                }
+                return null;
+              }),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
