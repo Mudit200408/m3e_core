@@ -30,6 +30,7 @@ class M3ELoadingIndicator extends ProgressIndicator {
 
   const M3ELoadingIndicator({
     super.key,
+    super.value,
     super.color,
     this.shapes,
     this.constraints,
@@ -104,6 +105,44 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     final shapesScaleFactor =
         _calculateScaleFactor(_polygons) * activeIndicatorScale;
 
+    if (widget.value != null) {
+      final double progressValue = widget.value!.clamp(0.0, 1.0);
+      final int totalMorphs = _morphSequence.length;
+      final double scaled = progressValue * totalMorphs;
+      final int morphIndex = scaled.floor().clamp(0, totalMorphs - 1);
+      final double morphProgress = scaled - morphIndex;
+      final double rotationDegrees =
+          morphIndex * _quarterRotation + morphProgress * _quarterRotation;
+      final double rotationRadians = rotationDegrees * (math.pi / 180.0);
+
+      return Semantics.fromProperties(
+        properties: SemanticsProperties(
+          label: widget.semanticsLabel,
+          value: widget.semanticsValue,
+        ),
+        child: RepaintBoundary(
+          child: ConstrainedBox(
+            constraints: _constraints,
+            child: AspectRatio(
+              aspectRatio: 1.0,
+              child: Transform.rotate(
+                angle: rotationRadians,
+                child: CustomPaint(
+                  painter: _MorphPainter(
+                    morph: _morphSequence[morphIndex],
+                    progress: morphProgress,
+                    color: _color,
+                    scaleFactor: shapesScaleFactor,
+                  ),
+                  child: const SizedBox.expand(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Semantics.fromProperties(
       properties: SemanticsProperties(
         label: widget.semanticsLabel,
@@ -159,7 +198,7 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
 
   @override
   void dispose() {
-    _morphTimer?.cancel();
+    _stopAnimations();
     _morphController.dispose();
     _globalRotationController.dispose();
     super.dispose();
@@ -182,7 +221,29 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
       vsync: this,
     );
 
-    _startAnimations();
+    if (widget.value == null) {
+      _startAnimations();
+    }
+  }
+
+  @override
+  void didUpdateWidget(M3ELoadingIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value) {
+      if (widget.value == null) {
+        _startAnimations();
+      } else {
+        _stopAnimations();
+      }
+    }
+  }
+
+  void _stopAnimations() {
+    _morphTimer?.cancel();
+    _morphTimer = null;
+    if (_globalRotationController.isAnimating) {
+      _globalRotationController.stop();
+    }
   }
 
   List<Morph> _createMorphSequence(
@@ -240,6 +301,7 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
   }
 
   void _startAnimations() {
+    _stopAnimations();
     // infinite global rotation
     _globalRotationController.repeat();
 

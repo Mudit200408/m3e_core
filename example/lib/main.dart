@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +20,16 @@ void main() {
 }
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
+
+class DesktopScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse, // Enables mouse click-and-drag
+    PointerDeviceKind.trackpad, // Enables trackpad drag
+    PointerDeviceKind.stylus,
+  };
+}
 
 class ThemeSettings {
   final Color seedColor;
@@ -133,6 +145,7 @@ class MyApp extends StatelessWidget {
 
                 return MaterialApp(
                   debugShowCheckedModeBanner: false,
+                  scrollBehavior: DesktopScrollBehavior(),
                   title: 'M3E Card List Demo',
                   themeMode: currentMode,
                   theme: ThemeData(

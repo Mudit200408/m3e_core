@@ -38,6 +38,10 @@ class M3EContainedLoadingIndicator extends StatelessWidget {
   /// If null, defaults to a fully rounded circular container ([BorderRadius.circular(9999.0)]).
   final BorderRadiusGeometry? borderRadius;
 
+  /// Optional deterministic progress value between 0.0 and 1.0.
+  /// If null, the indicator continuously animates and morphs.
+  final double? progress;
+
   /// Semantic label for accessibility.
   final String? semanticsLabel;
 
@@ -53,6 +57,7 @@ class M3EContainedLoadingIndicator extends StatelessWidget {
     this.containerColor,
     this.indicatorColor,
     this.borderRadius,
+    this.progress,
     this.semanticsLabel,
     this.semanticsValue,
   });
@@ -104,6 +109,7 @@ class M3EContainedLoadingIndicator extends StatelessWidget {
       child: M3ELoadingIndicator(
         shapes: shapes,
         color: effectiveIndicatorColor,
+        value: progress,
         constraints: innerConstraints,
         semanticsLabel: semanticsLabel,
         semanticsValue: semanticsValue,
