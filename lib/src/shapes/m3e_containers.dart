@@ -65,6 +65,14 @@ class M3EContainer extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final Clip clipBehavior;
 
+  /// Controls how [child] is aligned within the clipped shape.
+  ///
+  /// Defaults to [Alignment.center]. For shapes with asymmetric visual mass
+  /// (e.g. [Shapes.pentagon] pointing upward), a small positive Y offset like
+  /// `Alignment(0, 0.15)` can compensate for the optical illusion that makes
+  /// a geometrically centered icon appear to sit too high.
+  final AlignmentGeometry childAlignment;
+
   const M3EContainer(
     this.shape, {
     super.key,
@@ -78,6 +86,7 @@ class M3EContainer extends StatelessWidget {
     this.padding,
     this.margin,
     this.clipBehavior = Clip.antiAlias,
+    this.childAlignment = Alignment.center,
   });
 
   @override
@@ -96,7 +105,12 @@ class M3EContainer extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(color: color, gradient: gradient),
           padding: padding,
-          child: child,
+          child: Align(
+            heightFactor: 1.0,
+            widthFactor: 1.0,
+            alignment: childAlignment,
+            child: child,
+          ),
         ),
       ),
     );
