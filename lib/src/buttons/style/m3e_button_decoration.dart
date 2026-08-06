@@ -421,6 +421,9 @@ class M3EToggleButtonDecoration {
   /// Inner corner radius for connected button groups.
   final double? connectedInnerRadius;
 
+  /// Custom alignment.
+  final AlignmentGeometry? alignment;
+
   const M3EToggleButtonDecoration({
     this.backgroundColor,
     this.foregroundColor,
@@ -436,6 +439,7 @@ class M3EToggleButtonDecoration {
     this.pressedRadius,
     this.hoveredRadius,
     this.connectedInnerRadius,
+    this.alignment,
   });
 
   /// Factory constructor to seamlessly migrate from Flutter's official `ButtonStyle` / `styleFrom()`.
@@ -461,6 +465,7 @@ class M3EToggleButtonDecoration {
     MouseCursor? disabledMouseCursor,
     Color? overlayColor,
     Color? surfaceTintColor,
+    AlignmentGeometry? alignment,
   }) {
     final WidgetStateProperty<Color?>? backgroundColorProp =
         (backgroundColor == null &&
@@ -515,6 +520,7 @@ class M3EToggleButtonDecoration {
       mouseCursor: mouseCursorProp,
       overlayColor: overlayColorProp,
       surfaceTintColor: surfaceTintColorProp,
+      alignment: alignment,
     );
   }
 
