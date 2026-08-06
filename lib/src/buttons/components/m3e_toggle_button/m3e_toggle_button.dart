@@ -63,6 +63,7 @@ class M3EToggleButton extends StatefulWidget {
     this.onHover,
     this.enableFeedback = _kDefaultEnableFeedback,
     this.splashFactory,
+    this.allowMultilineLabel = false,
   });
 
   /// Icon displayed in the unchecked state.
@@ -138,6 +139,7 @@ class M3EToggleButton extends StatefulWidget {
       decoration?.overlayColor;
   WidgetStateProperty<Color?>? get decorationSurfaceTintColor =>
       decoration?.surfaceTintColor;
+  AlignmentGeometry? get decorationAlignment => decoration?.alignment;
 
   /// Optional controller for managing widget states externally.
   ///
@@ -174,6 +176,14 @@ class M3EToggleButton extends StatefulWidget {
   ///
   /// See [InteractiveInkFeatureFactory] for available options.
   final InteractiveInkFeatureFactory? splashFactory;
+
+  /// Whether the label is allowed to wrap onto multiple lines.
+  ///
+  /// When false (the default), the label is forced to a single line and
+  /// clipped to the button height, which is the standard behavior for
+  /// icon-row toggle buttons. Set to true when the label content (e.g. a
+  /// full-width MCQ option) should expand vertically to fit its text.
+  final bool allowMultilineLabel;
 
   @override
   State<M3EToggleButton> createState() => _M3EToggleButtonState();
@@ -567,7 +577,7 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
         widget.style == M3EButtonStyle.text;
 
     return ButtonStyle(
-      alignment: _kAlignmentCenter,
+      alignment: widget.decorationAlignment ?? _kAlignmentCenter,
       textStyle: WidgetStateProperty.all(labelStyle),
       minimumSize: WidgetStateProperty.all(Size(0, _measurements.height)),
       padding: padding,
@@ -756,14 +766,14 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (!constraints.hasBoundedWidth) {
+        if (!constraints.hasBoundedWidth || widget.allowMultilineLabel) {
           return naturalRow;
         }
         return SizedBox(
           height: m.height,
           child: FittedBox(
             fit: BoxFit.none,
-            alignment: _kAlignmentCenter,
+            alignment: widget.decorationAlignment ?? _kAlignmentCenter,
             clipBehavior: Clip.hardEdge,
             child: naturalRow,
           ),
@@ -775,7 +785,9 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
   Widget _buildLabelText(Widget child, {required bool checked}) {
     return KeyedSubtree(
       key: ValueKey('toggle-label-$checked-${child.hashCode}'),
-      child: DefaultTextStyle.merge(maxLines: 1, softWrap: false, child: child),
+      child: widget.allowMultilineLabel
+          ? child
+          : DefaultTextStyle.merge(maxLines: 1, softWrap: false, child: child),
     );
   }
 
