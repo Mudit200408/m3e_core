@@ -41,3 +41,6 @@ export 'src/loading-indicator/m3e_contained_loading_indicator.dart';
 export 'src/loading-indicator/m3e_pull_to_refresh_indicator.dart';
 export 'src/loading-indicator/m3e_pull_to_refresh_style.dart';
 export 'src/loading-indicator/m3e_pull_to_refresh_controller.dart';
+
+// M3E Seekbar
+export 'src/seekbar/seekbar.dart';
