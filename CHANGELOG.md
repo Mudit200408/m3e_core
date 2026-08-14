@@ -1,3 +1,13 @@
+# 0.1.6
+- progress-indicator: Add valueColor parameter
+- shapes: Add childAlignment parameter
+- loading-indicator: Add M3EPullToRefreshIndicator
+- seekbar: add M3ESeekbar and M3EWavySeekbar
+- toggle-button: expose alignment parameter in `M3EToggleButtonDecoration` and `styleFrom`
+- toggle-button: add allowMultilineLabel flag to enable wrapping label content
+- buttons: update label text style to match M3E typography specs [Contributed by @paul-ube]
+- example: fix bottom nav tab selection highlight stuttering and add splash overlay
+
 # 0.1.5
 - Allow overriding or disabling drop shadows via `boxShadow` in `M3EDismissibleCardStyle` (#1)
 - Fix drop shadow rendering so setting `elevation` to `0` eliminates shadows automatically (#1)

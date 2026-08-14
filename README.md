@@ -11,6 +11,16 @@ A comprehensive Flutter package providing **Expressive Material 3** components: 
 
 ---
 
+## Live Demo
+
+Try the hosted example app here: [m3e_core](https://mudit200408.github.io/m3e_core/)
+
+Browse the example source here:
+
+[Example App](https://github.com/Mudit200408/m3e_core/tree/main/example)
+
+---
+
 ## 📦 Individual Packages
 
 This package (`m3e_core`) bundles multiple M3E components. For detailed documentation and standalone usage, please refer to the individual packages:
@@ -27,6 +37,7 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 - [m3e_haptics](https://pub.dev/packages/m3e_haptics) - Expressive haptic feedback engine with spring-synchronized patterns.
 - [m3e_progress_indicator](https://pub.dev/packages/m3e_progress_indicator) - Material 3 Expressive circular and linear progress indicators.
 - [m3e_loading_indicator](https://pub.dev/packages/m3e_loading_indicator) - Expressive loading indicator with shape morphing animations.
+- [m3e_seekbar](https://pub.dev/packages/m3e_seekbar) - Material 3 Expressive Seekbar with standard and wavy variants.
 
 ---
 
@@ -106,17 +117,9 @@ Material 3 Expressive circular and linear progress indicators with wavy and anim
 Expressive loading indicator with fluid shape morphing animations.
 [Detailed Documentation →](https://pub.dev/packages/m3e_loading_indicator)
 
----
-
-## Live Demo
-
-Try the hosted example app here:
-
-https://mudit200408.github.io/m3e_core/
-
-Browse the example source here:
-
-[Example App](https://github.com/Mudit200408/m3e_core/tree/main/example)
+### 13. M3E Seekbar
+Material 3 Expressive Seekbar with standard, wavy, and animated variants, custom handle shapes, and spring physics.
+[Detailed Documentation →](https://pub.dev/packages/m3e_seekbar)
 
 ---
 
