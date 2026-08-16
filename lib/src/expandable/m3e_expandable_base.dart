@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../common/m3e_common.dart';
 import 'm3e_expandable_item.dart';
 import 'm3e_expandable_style.dart';

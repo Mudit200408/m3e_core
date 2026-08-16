@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:m3e_core/m3e_core.dart';
 
@@ -86,6 +86,46 @@ final Map<String, Color> seedColors = {
   'Pink': Colors.pink,
 };
 
+ColorScheme? _convertDynamicScheme(dynamic scheme, Brightness brightness) {
+  if (scheme == null) return null;
+  return ColorScheme(
+    brightness: brightness,
+    primary: scheme.primary,
+    onPrimary: scheme.onPrimary,
+    primaryContainer: scheme.primaryContainer,
+    onPrimaryContainer: scheme.onPrimaryContainer,
+    secondary: scheme.secondary,
+    onSecondary: scheme.onSecondary,
+    secondaryContainer: scheme.secondaryContainer,
+    onSecondaryContainer: scheme.onSecondaryContainer,
+    tertiary: scheme.tertiary,
+    onTertiary: scheme.onTertiary,
+    tertiaryContainer: scheme.tertiaryContainer,
+    onTertiaryContainer: scheme.onTertiaryContainer,
+    error: scheme.error,
+    onError: scheme.onError,
+    errorContainer: scheme.errorContainer,
+    onErrorContainer: scheme.onErrorContainer,
+    surface: scheme.surface,
+    onSurface: scheme.onSurface,
+    surfaceBright: scheme.surfaceBright,
+    surfaceDim: scheme.surfaceDim,
+    surfaceContainerLowest: scheme.surfaceContainerLowest,
+    surfaceContainerLow: scheme.surfaceContainerLow,
+    surfaceContainer: scheme.surfaceContainer,
+    surfaceContainerHigh: scheme.surfaceContainerHigh,
+    surfaceContainerHighest: scheme.surfaceContainerHighest,
+    outline: scheme.outline,
+    outlineVariant: scheme.outlineVariant,
+    shadow: scheme.shadow,
+    scrim: scheme.scrim,
+    inverseSurface: scheme.inverseSurface,
+    onInverseSurface: scheme.onInverseSurface,
+    inversePrimary: scheme.inversePrimary,
+    surfaceTint: scheme.surfaceTint,
+  );
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -112,17 +152,26 @@ class MyApp extends StatelessWidget {
                     ? systemDarkColor
                     : settings.seedColor;
 
+                final convertedLight = _convertDynamicScheme(
+                  lightDynamic,
+                  Brightness.light,
+                );
+                final convertedDark = _convertDynamicScheme(
+                  darkDynamic,
+                  Brightness.dark,
+                );
+
                 final lightScheme = settings.useM3EColorScheme
                     ? M3EColorScheme.light(
                         seedColor: lightSeed,
                         systemColorScheme: settings.useSystemColor
-                            ? lightDynamic
+                            ? convertedLight
                             : null,
                         variant: settings.variant,
                         contrastLevel: settings.contrastLevel,
                       )
-                    : ((settings.useSystemColor && lightDynamic != null)
-                          ? lightDynamic
+                    : ((settings.useSystemColor && convertedLight != null)
+                          ? convertedLight
                           : ColorScheme.fromSeed(
                               seedColor: lightSeed,
                               brightness: Brightness.light,
@@ -132,13 +181,13 @@ class MyApp extends StatelessWidget {
                     ? M3EColorScheme.dark(
                         seedColor: darkSeed,
                         systemColorScheme: settings.useSystemColor
-                            ? darkDynamic
+                            ? convertedDark
                             : null,
                         variant: settings.variant,
                         contrastLevel: settings.contrastLevel,
                       )
-                    : ((settings.useSystemColor && darkDynamic != null)
-                          ? darkDynamic
+                    : ((settings.useSystemColor && convertedDark != null)
+                          ? convertedDark
                           : ColorScheme.fromSeed(
                               seedColor: darkSeed,
                               brightness: Brightness.dark,
@@ -380,141 +429,145 @@ class ThemeSettingsSheet extends StatelessWidget {
     return ValueListenableBuilder<ThemeSettings>(
       valueListenable: themeSettingsNotifier,
       builder: (context, settings, _) {
-        return Container(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-          decoration: BoxDecoration(
-            color: cs.surfaceContainerHigh,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 32,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: cs.outlineVariant,
-                    borderRadius: BorderRadius.circular(2),
+        return Material(
+          color: cs.surfaceContainerHigh,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          clipBehavior: Clip.antiAlias,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 32,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: cs.outlineVariant,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Theme Settings',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 20),
+                Text(
+                  'Theme Settings',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Enable M3E Color Scheme'),
-                subtitle: const Text('AOSP ColorSpec2026 overrides'),
-                value: settings.useM3EColorScheme,
-                onChanged: (val) {
-                  themeSettingsNotifier.value = settings.copyWith(
-                    useM3EColorScheme: val,
-                  );
-                },
-              ),
-
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Use System Dynamic Colors'),
-                subtitle: const Text(
-                  'Syncs with wallpaper colors if supported',
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Enable M3E Color Scheme'),
+                  subtitle: const Text('AOSP ColorSpec2026 overrides'),
+                  value: settings.useM3EColorScheme,
+                  onChanged: (val) {
+                    themeSettingsNotifier.value = settings.copyWith(
+                      useM3EColorScheme: val,
+                    );
+                  },
                 ),
-                value: settings.useSystemColor,
-                onChanged: (val) {
-                  themeSettingsNotifier.value = settings.copyWith(
-                    useSystemColor: val,
-                  );
-                },
-              ),
 
-              if (!settings.useSystemColor) ...[
-                const SizedBox(height: 12),
-                Text('Manual Seed Color', style: theme.textTheme.titleSmall),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 48,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: seedColors.entries.map((entry) {
-                      final isSelected = settings.seedColor == entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: GestureDetector(
-                          onTap: () {
-                            themeSettingsNotifier.value = settings.copyWith(
-                              seedColor: entry.value,
-                            );
-                          },
-                          child: Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: entry.value,
-                              shape: BoxShape.circle,
-                              border: isSelected
-                                  ? Border.all(color: cs.onSurface, width: 3)
-                                  : null,
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Use System Dynamic Colors'),
+                  subtitle: const Text(
+                    'Syncs with wallpaper colors if supported',
+                  ),
+                  value: settings.useSystemColor,
+                  onChanged: (val) {
+                    themeSettingsNotifier.value = settings.copyWith(
+                      useSystemColor: val,
+                    );
+                  },
+                ),
+
+                if (!settings.useSystemColor) ...[
+                  const SizedBox(height: 12),
+                  Text('Manual Seed Color', style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 48,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: seedColors.entries.map((entry) {
+                        final isSelected = settings.seedColor == entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: GestureDetector(
+                            onTap: () {
+                              themeSettingsNotifier.value = settings.copyWith(
+                                seedColor: entry.value,
+                              );
+                            },
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: entry.value,
+                                shape: BoxShape.circle,
+                                border: isSelected
+                                    ? Border.all(color: cs.onSurface, width: 3)
+                                    : null,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-
-              if (settings.useM3EColorScheme) ...[
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    const Text('Color Variant: '),
-                    const Spacer(),
-                    DropdownButton<M3EColorVariant>(
-                      value: settings.variant,
-                      onChanged: (val) {
-                        if (val != null) {
-                          themeSettingsNotifier.value = settings.copyWith(
-                            variant: val,
-                          );
-                        }
-                      },
-                      items: M3EColorVariant.values.map((v) {
-                        return DropdownMenuItem(value: v, child: Text(v.name));
+                        );
                       }).toList(),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Text('Contrast Level: '),
-                    Expanded(
-                      child: Slider(
-                        value: settings.contrastLevel,
-                        min: -1.0,
-                        max: 1.0,
-                        divisions: 8,
-                        label: settings.contrastLevel.toStringAsFixed(2),
+                  ),
+                ],
+
+                if (settings.useM3EColorScheme) ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Text('Color Variant: '),
+                      const Spacer(),
+                      DropdownButton<M3EColorVariant>(
+                        value: settings.variant,
                         onChanged: (val) {
-                          themeSettingsNotifier.value = settings.copyWith(
-                            contrastLevel: val,
-                          );
+                          if (val != null) {
+                            themeSettingsNotifier.value = settings.copyWith(
+                              variant: val,
+                            );
+                          }
                         },
+                        items: M3EColorVariant.values.map((v) {
+                          return DropdownMenuItem(
+                            value: v,
+                            child: Text(v.name),
+                          );
+                        }).toList(),
                       ),
-                    ),
-                    Text(settings.contrastLevel.toStringAsFixed(2)),
-                  ],
-                ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Text('Contrast Level: '),
+                      Expanded(
+                        child: Slider(
+                          value: settings.contrastLevel,
+                          min: -1.0,
+                          max: 1.0,
+                          divisions: 8,
+                          label: settings.contrastLevel.toStringAsFixed(2),
+                          onChanged: (val) {
+                            themeSettingsNotifier.value = settings.copyWith(
+                              contrastLevel: val,
+                            );
+                          },
+                        ),
+                      ),
+                      Text(settings.contrastLevel.toStringAsFixed(2)),
+                    ],
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         );
       },

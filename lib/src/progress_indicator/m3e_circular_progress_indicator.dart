@@ -5,7 +5,7 @@
 
 import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'm3e_progress_indicator_defaults.dart';
 
 /// A Material 3 Expressive circular progress indicator.

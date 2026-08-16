@@ -4,7 +4,7 @@
 // LICENSE file in the root directory of this source tree.
 
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'm3e_progress_indicator_defaults.dart';
 import 'm3e_progress_indicator_utils.dart';
 

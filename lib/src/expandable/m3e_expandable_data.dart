@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A data container used to configure items for [M3EExpandableCardList],
 /// [M3EExpandableCardColumn], and [SliverM3EExpandableCardList].

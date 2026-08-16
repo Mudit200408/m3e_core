@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:m3e_core/src/shapes/clipper.dart';
 import 'package:m3e_core/src/shapes/enums/shapes.dart';
 

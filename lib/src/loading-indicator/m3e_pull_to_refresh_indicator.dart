@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:motor/motor.dart';
 import '../common/m3e_common.dart';
 import '../shapes/m3e_shapes_core.dart';

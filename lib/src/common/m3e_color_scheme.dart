@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: deprecated_member_use
+
+import 'package:material_ui/material_ui.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 
 /// A generator utility for creating Material 3 Expressive [ColorScheme]s
