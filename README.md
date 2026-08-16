@@ -43,12 +43,23 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 
 ## 📦 Installation
 
+> [!IMPORTANT]
+> **Flutter 3.47+ & `material_ui` Requirement (v1.1.0+)**:
+> Starting with `v1.1.0`, `m3e_core` is migrated to use the standalone `material_ui` package decoupled in **Flutter 3.47.0**.
+> - Requires Flutter SDK **`>=3.47.0`**.
+> - Ensure your app imports `package:material_ui/material_ui.dart` (or run `dart fix --apply --code=migrate_design_widgets`).
+> - If you are on Flutter `< 3.47.0`, please use `m3e_core: ^0.1.6`.
+
+Add `m3e_core` and `material_ui` to your `pubspec.yaml`:
+
 ```yaml
 dependencies:
-  m3e_core: ^0.1.5
+  material_ui: ^1.0.0
+  m3e_core: ^1.1.0
 ```
 
 ```dart
+import 'package:material_ui/material_ui.dart';
 import 'package:m3e_core/m3e_core.dart';
 ```
 
@@ -128,6 +139,12 @@ Feel free to open an [Issue](https://github.com/Mudit200408/m3e_core/issues) or 
 
 ---
 
+## ❤️ Support & Like
+
+If you loved using **M3E Core**, please consider dropping a 👍 like on [pub.dev](https://pub.dev/packages/m3e_core) and a ⭐ star on [GitHub](https://github.com/Mudit200408/m3e_core) — it helps the project grow!
+
+---
+
 ## Credits
 - [Motor](https://pub.dev/packages/motor) for Expressive Animations
 - [Multi_dropdown](https://pub.dev/packages/multi_dropdown) for Dropdown Menu base
@@ -135,3 +152,4 @@ Feel free to open an [Issue](https://github.com/Mudit200408/m3e_core/issues) or 
 - [M3E Collection](https://pub.dev/packages/m3e_collection) for helping with buttons implementation
 
 ### Radhe Radhe 🙏
+
