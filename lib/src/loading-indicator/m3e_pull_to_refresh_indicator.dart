@@ -417,10 +417,12 @@ class _M3EPullToRefreshIndicatorState extends State<M3EPullToRefreshIndicator>
 
     Widget containerWidget = headerChild;
     if (style?.elevation != null && style!.elevation! > 0) {
+      final effectiveRadius =
+          style.borderRadius ?? BorderRadius.circular(9999.0);
       containerWidget = Material(
         elevation: style.elevation!,
         color: Colors.transparent,
-        borderRadius: style.borderRadius,
+        borderRadius: effectiveRadius,
         child: containerWidget,
       );
     }
