@@ -38,6 +38,8 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 - [m3e_progress_indicator](https://pub.dev/packages/m3e_progress_indicator) - Material 3 Expressive circular and linear progress indicators.
 - [m3e_loading_indicator](https://pub.dev/packages/m3e_loading_indicator) - Expressive loading indicator with shape morphing animations.
 - [m3e_seekbar](https://pub.dev/packages/m3e_seekbar) - Material 3 Expressive Seekbar with standard and wavy variants.
+- [m3e_typography](https://pub.dev/packages/m3e_typography) - Material 3 Expressive Emphasized Typography scale and variable font extensions.
+
 
 ---
 
@@ -131,6 +133,11 @@ Expressive loading indicator with fluid shape morphing animations.
 ### 13. M3E Seekbar
 Material 3 Expressive Seekbar with standard, wavy, and animated variants, custom handle shapes, and spring physics.
 [Detailed Documentation →](https://pub.dev/packages/m3e_seekbar)
+
+### 14. M3E Typography
+Material 3 Expressive Emphasized Typography scale elevating font weights, optical sizes, and variable font axes across all 15 M3 roles.
+[Detailed Documentation →](https://pub.dev/packages/m3e_typography)
+
 
 ---
 

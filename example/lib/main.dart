@@ -15,6 +15,7 @@ import 'screens/m3e_slider_screen.dart';
 import 'screens/m3e_progress_indicator_screen.dart';
 import 'screens/m3e_loading_indicator_screen.dart';
 import 'screens/m3e_seekbar_screen.dart';
+import 'screens/m3e_typography_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -201,10 +202,12 @@ class MyApp extends StatelessWidget {
                   theme: ThemeData(
                     colorScheme: lightScheme,
                     useMaterial3: true,
+                    fontFamily: 'GoogleSansFlex',
                   ),
                   darkTheme: ThemeData(
                     colorScheme: darkScheme,
                     useMaterial3: true,
+                    fontFamily: 'GoogleSansFlex',
                   ),
                   home: const ExampleHomePage(),
                 );
@@ -411,6 +414,14 @@ class ExampleHomePage extends StatelessWidget {
                 'Expressive loading indicators that morph smoothly between vector path shapes',
             icon: Icons.refresh_rounded,
             destination: const M3ELoadingIndicatorScreen(),
+          ),
+          _buildNavCard(
+            context,
+            title: 'M3E Typography',
+            subtitle:
+                'Material 3 Expressive emphasized typography scale with variable font axes',
+            icon: Icons.text_fields_rounded,
+            destination: const M3ETypographyScreen(),
           ),
         ],
       ),

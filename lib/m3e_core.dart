@@ -44,3 +44,6 @@ export 'src/loading-indicator/m3e_pull_to_refresh_controller.dart';
 
 // M3E Seekbar
 export 'src/seekbar/seekbar.dart';
+
+// M3E Typography
+export 'src/typography/typography.dart';
