@@ -1,3 +1,7 @@
+# 1.1.1
+- typography: add M3E emphasized text theme utilities and interactive typography playground demo
+- android: support AGP 9 built-in Kotlin (#4) [Contributed by @Hsukqilee]
+
 # 1.1.0
 - pubspec: migrate to standalone material_ui package for flutter 3.47
 - pubspec: Update the minimum flutter SDK to 3.47.0

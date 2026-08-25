@@ -217,6 +217,6 @@ extension M3EEmphasizedThemeDataExtension on ThemeData {
 
 /// Extension on [BuildContext] for quick access to the current theme's emphasized typography.
 extension M3EEmphasizedContextExtension on BuildContext {
-  /// Returns the current theme's [TextTheme.emphasized].
+  /// Returns the current theme's [M3EEmphasizedTextThemeExtension.emphasized].
   TextTheme get emphasizedTextTheme => Theme.of(this).emphasizedTextTheme;
 }

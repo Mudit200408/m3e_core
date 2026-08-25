@@ -1,6 +1,6 @@
 name: m3e_core
 description: "A single Flutter package providing Material 3 expressive components like material shapes, card list, dismissible cards, expandable cards and dropdown menu."
-version: 1.1.0
+version: 1.1.1
 homepage: https://github.com/Mudit200408/m3e_core
 repository: https://github.com/Mudit200408/m3e_core
 issue_tracker: https://github.com/Mudit200408/m3e_core/issues
@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  material_ui: ^1.0.0
+  material_ui: ^1.1.0
   motor: ^1.1.0
   path_drawing: ^1.0.1
   vector_math: ^2.2.0

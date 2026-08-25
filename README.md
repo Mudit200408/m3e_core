@@ -7,7 +7,7 @@
 
 ![M3E Intro](https://raw.githubusercontent.com/Mudit200408/m3e_core/main/doc/intro.png)
 
-A comprehensive Flutter package providing **Expressive Material 3** components: Card Lists, Dismissible Cards, Expandable Cards, Dropdown Menus, Buttons, Floating Toolbars, and Extended M3 Shapes.
+A comprehensive Flutter package providing **Expressive Material 3** components: Card Lists, Dismissible Cards, Expandable Cards, Dropdown Menus, Buttons, Floating Toolbars, Extended M3 Shapes, Seekbars, Progress & Loading Indicators, and Emphasized Typography.
 
 ---
 
@@ -56,8 +56,8 @@ Add `m3e_core` and `material_ui` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  material_ui: ^1.0.0
-  m3e_core: ^1.1.0
+  material_ui: ^1.1.0
+  m3e_core: ^1.1.1
 ```
 
 ```dart
