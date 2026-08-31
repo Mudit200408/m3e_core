@@ -72,12 +72,10 @@ class _M3EDropdownMenuItemWidgetState<T>
     // 1. Determine the "dynamic" radius (Selected vs Hover vs Pressed vs Inner)
     double targetR = id.innerRadius;
 
-    if (widget.item.selected) {
-      targetR = id.selectedBorderRadius ?? id.outerRadius ?? 12.0;
-    }
-
     if (_isPressed) {
       targetR = id.pressedRadius;
+    } else if (widget.item.selected) {
+      targetR = id.selectedBorderRadius ?? id.outerRadius ?? 12.0;
     } else if (_isHovered) {
       targetR = id.hoverRadius;
     }

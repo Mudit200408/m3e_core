@@ -524,6 +524,8 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   }
 
   void _close() {
+    if (!mounted) return;
+    if (_controller.isDisposed) return;
     if (!_controller.isOpen && !_portalController.isShowing) return;
 
     if (_controller.isOpen) {
@@ -582,7 +584,9 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
     if (widget.singleSelect) {
       _controller.toggleOnly(item);
-      WidgetsBinding.instance.addPostFrameCallback((_) => _close());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _close();
+      });
     } else {
       // Check max selections
       if (!item.selected &&
@@ -773,7 +777,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     final cs = theme.colorScheme;
     final fd = widget.fieldStyle;
 
-    final bgColor = fd.backgroundColor ?? cs.surfaceContainerHighest;
+    final bgColor = fd.backgroundColor ?? cs.surfaceContainer;
     final fgColor = fd.foregroundColor ?? cs.onSurface;
     final borderSide =
         (formState.hasError
@@ -1241,7 +1245,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         constraints: BoxConstraints(maxHeight: dd.maxHeight),
         child: Material(
           elevation: dd.elevation,
-          color: dd.backgroundColor ?? cs.surfaceContainerHighest,
+          color: dd.backgroundColor ?? cs.surfaceContainer,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
               widget.dropdownStyle.containerRadius ?? widget.containerRadius,

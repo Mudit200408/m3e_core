@@ -140,15 +140,19 @@ class M3ESpringChipState<T> extends State<M3ESpringChip<T>>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              widget.item.label,
-              style:
-                  widget.labelStyle?.copyWith(
-                    color: widget.enabled
-                        ? widget.labelStyle?.color
-                        : Colors.grey,
-                  ) ??
-                  TextStyle(color: widget.enabled ? null : Colors.grey),
+            Flexible(
+              child: Text(
+                widget.item.label,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style:
+                    widget.labelStyle?.copyWith(
+                      color: widget.enabled
+                          ? widget.labelStyle?.color
+                          : Colors.grey,
+                    ) ??
+                    TextStyle(color: widget.enabled ? null : Colors.grey),
+              ),
             ),
             if (widget.enabled) ...[
               const SizedBox(width: 4),

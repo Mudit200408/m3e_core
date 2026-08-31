@@ -88,6 +88,8 @@ class M3EDropdownController<T> extends ChangeNotifier {
 
   @override
   void notifyListeners() {
+    if (_isDisposed) return;
+
     _cachedSelectedItems = null;
     super.notifyListeners();
   }
