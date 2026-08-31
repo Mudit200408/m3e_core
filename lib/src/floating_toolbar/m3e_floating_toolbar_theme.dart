@@ -64,8 +64,29 @@ class M3EFloatingToolbarColors {
 
 /// Token defaults and helper methods for Material 3 Expressive FloatingToolbar.
 abstract class M3EFloatingToolbarDefaults {
-  /// Container height (horizontal) or width (vertical).
+  /// Standard container height (horizontal) or width (vertical).
   static const double containerSize = 64.0;
+
+  /// Compact container height (horizontal) or width (vertical).
+  static const double containerHeightCompact = 48.0;
+
+  /// Standard container height (horizontal) or width (vertical).
+  static const double containerHeightStandard = 64.0;
+
+  /// Standard height for docked bottom toolbar.
+  static const double dockedHeight = 64.0;
+
+  /// Minimum horizontal edge padding for docked bottom toolbar.
+  static const double dockedHorizontalPadding = 16.0;
+
+  /// Default shadow elevation for docked bottom toolbar.
+  static const double dockedElevation = 2.0;
+
+  /// Standard divider length (height for horizontal, width for vertical).
+  static const double dividerHeight = 24.0;
+
+  /// Standard spacing between toolbar actions.
+  static const double itemSpacing = 4.0;
 
   /// Default shape of the floating toolbar container.
   static const ShapeBorder containerShape = StadiumBorder();
@@ -89,16 +110,16 @@ abstract class M3EFloatingToolbarDefaults {
   static const double fabMediumSize = 80.0;
 
   /// Default shadow elevation when toolbar is expanded (no-FAB variants).
-  static const double expandedElevation = 0.0;
+  static const double expandedElevation = 2.0;
 
   /// Default shadow elevation when toolbar is collapsed (no-FAB variants).
   static const double collapsedElevation = 0.0;
 
   /// Default shadow elevation when toolbar is expanded (with-FAB variants).
-  static const double expandedElevationWithFab = 1.0;
+  static const double expandedElevationWithFab = 2.0;
 
   /// Default shadow elevation when toolbar is collapsed (with-FAB variants).
-  static const double collapsedElevationWithFab = 0.0;
+  static const double collapsedElevationWithFab = 3.0;
 
   /// Default layout container height for the horizontal FAB variant.
   static const double fabVariantTotalHeight = 80.0;

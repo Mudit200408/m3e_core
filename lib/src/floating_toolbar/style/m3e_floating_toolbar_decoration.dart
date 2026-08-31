@@ -32,6 +32,14 @@ class M3EFloatingToolbarDecoration {
   /// Elevation when collapsed.
   final double? collapsedShadowElevation;
 
+  /// Custom container height (for horizontal) or width (for vertical).
+  ///
+  /// If null, defaults to [M3EFloatingToolbarDefaults.containerSize] (64.0).
+  final double? containerSize;
+
+  /// Alignment of the floating toolbar within its parent container or stack.
+  final AlignmentGeometry? alignment;
+
   const M3EFloatingToolbarDecoration({
     this.colors,
     this.contentPadding,
@@ -39,6 +47,8 @@ class M3EFloatingToolbarDecoration {
     this.motion,
     this.expandedShadowElevation,
     this.collapsedShadowElevation,
+    this.containerSize,
+    this.alignment,
   });
 
   /// Creates a copy of this decoration with the given fields replaced.
@@ -49,6 +59,8 @@ class M3EFloatingToolbarDecoration {
     M3EMotion? motion,
     double? expandedShadowElevation,
     double? collapsedShadowElevation,
+    double? containerSize,
+    AlignmentGeometry? alignment,
   }) {
     return M3EFloatingToolbarDecoration(
       colors: colors ?? this.colors,
@@ -59,6 +71,8 @@ class M3EFloatingToolbarDecoration {
           expandedShadowElevation ?? this.expandedShadowElevation,
       collapsedShadowElevation:
           collapsedShadowElevation ?? this.collapsedShadowElevation,
+      containerSize: containerSize ?? this.containerSize,
+      alignment: alignment ?? this.alignment,
     );
   }
 
@@ -71,7 +85,9 @@ class M3EFloatingToolbarDecoration {
           shape == other.shape &&
           motion == other.motion &&
           expandedShadowElevation == other.expandedShadowElevation &&
-          collapsedShadowElevation == other.collapsedShadowElevation;
+          collapsedShadowElevation == other.collapsedShadowElevation &&
+          containerSize == other.containerSize &&
+          alignment == other.alignment;
 
   @override
   int get hashCode => Object.hash(
@@ -81,5 +97,7 @@ class M3EFloatingToolbarDecoration {
     motion,
     expandedShadowElevation,
     collapsedShadowElevation,
+    containerSize,
+    alignment,
   );
 }

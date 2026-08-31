@@ -83,10 +83,17 @@ class M3EFloatingToolbarScrollBehavior {
   /// The motion configuration for the exit/settle animation.
   final M3EMotion motion;
 
+  /// The distance (in pixels) beyond the toolbar's edge to translate off-screen.
+  ///
+  /// Useful for accounting for custom container margins, padding, or [SafeArea] insets.
+  /// Defaults to [M3EFloatingToolbarDefaults.screenOffset] (16.0).
+  final double screenOffset;
+
   M3EFloatingToolbarScrollBehavior({
     required this.exitDirection,
     required this.state,
     this.motion = M3EMotion.expressiveSpatialFast,
+    this.screenOffset = M3EFloatingToolbarDefaults.screenOffset,
   });
 
   /// Creates a default scroll behavior that exits the toolbar when scrolling.
@@ -94,11 +101,13 @@ class M3EFloatingToolbarScrollBehavior {
     required M3EFloatingToolbarExitDirection exitDirection,
     M3EFloatingToolbarState? state,
     M3EMotion motion = M3EMotion.expressiveSpatialFast,
+    double screenOffset = M3EFloatingToolbarDefaults.screenOffset,
   }) {
     return M3EFloatingToolbarScrollBehavior(
       exitDirection: exitDirection,
       state: state ?? M3EFloatingToolbarState.create(),
       motion: motion,
+      screenOffset: screenOffset,
     );
   }
 }

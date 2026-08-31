@@ -11,6 +11,7 @@ class AnimatedContentVisibility extends StatefulWidget {
   final bool visible;
   final bool isVertical;
   final Widget child;
+  final Alignment alignment;
   final M3EMotion sizeMotion;
   final M3EMotion opacityMotion;
 
@@ -19,6 +20,7 @@ class AnimatedContentVisibility extends StatefulWidget {
     required this.visible,
     required this.isVertical,
     required this.child,
+    this.alignment = Alignment.center,
     this.sizeMotion = M3EMotion.expressiveSpatialFast,
     this.opacityMotion = M3EMotion.standardEffectsFast,
   });
@@ -72,7 +74,7 @@ class _AnimatedContentVisibilityState extends State<AnimatedContentVisibility>
         return SizeTransition(
           sizeFactor: _controller,
           axis: widget.isVertical ? Axis.vertical : Axis.horizontal,
-          alignment: Alignment.center,
+          alignment: widget.alignment,
           child: Opacity(opacity: value.clamp(0.0, 1.0), child: widget.child),
         );
       },
