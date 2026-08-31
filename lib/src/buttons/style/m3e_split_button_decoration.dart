@@ -457,6 +457,7 @@ class M3ESplitButtonDecoration extends M3EButtonDecoration {
       foregroundBuilder: base.foregroundBuilder,
       motion: base.motion,
       haptic: base.haptic,
+      borderRadius: base.borderRadius,
       hoveredRadius: base.hoveredRadius,
       pressedRadius: base.pressedRadius,
       trailingBackgroundColor: trailingBackgroundColor,

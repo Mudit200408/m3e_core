@@ -331,10 +331,7 @@ class M3EButtonTokensAdapter {
   }) {
     final base = _tokenMeasurements(size);
     if (override == null) {
-      if (size.name == 'custom') {
-        return base.applyCustomSize(size);
-      }
-      return base;
+      return base.applyCustomSize(size);
     }
 
     // If the override is a standard size (e.g. M3EButtonSize.sm),

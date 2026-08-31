@@ -113,6 +113,25 @@ class M3EButtonSize {
     );
   }
 
+  /// Creates a size variant based on an existing [base] size with dimension overrides.
+  factory M3EButtonSize.fromBase(
+    M3EButtonSize base, {
+    double? height,
+    double? hPadding,
+    double? iconSize,
+    double? iconGap,
+    double? width,
+  }) {
+    return M3EButtonSize._(
+      base.name,
+      height: height ?? base.height,
+      hPadding: hPadding ?? base.hPadding,
+      iconSize: iconSize ?? base.iconSize,
+      iconGap: iconGap ?? base.iconGap,
+      width: width ?? base.width,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

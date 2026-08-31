@@ -383,10 +383,10 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
 
           targetRadius = (effectivelyEnabled && pressed)
               ? pressRadius
-              : (effectivelyEnabled && hovered)
-              ? hoverRadius
               : checked
               ? checkedConnectedShape
+              : (effectivelyEnabled && hovered)
+              ? hoverRadius
               : restingRadius;
         } else {
           final BorderRadius hoverShape =
@@ -398,10 +398,10 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
 
           targetRadius = (effectivelyEnabled && pressed)
               ? pressSquish
-              : (effectivelyEnabled && hovered)
-              ? hoverShape
               : checked
               ? squareShape
+              : (effectivelyEnabled && hovered)
+              ? hoverShape
               : restingShape;
         }
 

@@ -857,6 +857,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
       _widgetContentHash(action.checkedLabel),
       action.enabled,
       action.decoration,
+      action.width,
     );
   }
 
@@ -1825,23 +1826,9 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   M3EButtonSize _mapSize(M3EButtonSize s, {double? actionWidth}) {
-    final base = switch (s.name) {
-      'xs' => M3EButtonSize.xs,
-      'sm' => M3EButtonSize.sm,
-      'md' => M3EButtonSize.md,
-      'lg' => M3EButtonSize.lg,
-      'xl' => M3EButtonSize.xl,
-      _ => M3EButtonSize.md,
-    };
-    if (actionWidth != null || s.name == 'custom') {
-      return M3EButtonSize.custom(
-        height: s.height ?? base.height,
-        hPadding: s.hPadding ?? base.hPadding,
-        iconSize: s.iconSize ?? base.iconSize,
-        iconGap: s.iconGap ?? base.iconGap,
-        width: actionWidth ?? s.width ?? base.width,
-      );
+    if (actionWidth != null) {
+      return M3EButtonSize.fromBase(s, width: actionWidth);
     }
-    return base;
+    return s;
   }
 }
