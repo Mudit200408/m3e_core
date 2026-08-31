@@ -35,6 +35,9 @@ class SliverM3EDismissibleCardList extends StatefulWidget {
   /// Visual and interaction configuration.
   final M3EDismissibleCardStyle style;
 
+  /// Builder displayed when there are no items to show and no collapsing animations running.
+  final WidgetBuilder? emptyBuilder;
+
   const SliverM3EDismissibleCardList({
     super.key,
     required this.itemCount,
@@ -42,6 +45,7 @@ class SliverM3EDismissibleCardList extends StatefulWidget {
     this.onDismiss,
     this.onTap,
     this.style = const M3EDismissibleCardStyle(),
+    this.emptyBuilder,
   });
 
   @override
@@ -95,6 +99,12 @@ class _SliverM3EDismissibleCardListState
 
   @override
   Widget build(BuildContext context) {
+    if (slots.isEmpty) {
+      if (widget.emptyBuilder != null) {
+        return SliverToBoxAdapter(child: widget.emptyBuilder!(context));
+      }
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
     final visible = computeVisibleIndices();
     return SliverList(
       delegate: SliverChildBuilderDelegate(

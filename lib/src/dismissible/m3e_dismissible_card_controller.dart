@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:material_ui/material_ui.dart';
@@ -5,6 +6,7 @@ import 'package:motor/motor.dart';
 
 import '../common/m3e_common.dart';
 import 'm3e_dismissible_card_style.dart';
+import 'm3e_swipe_action.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Spring presets (Material 3 Expressive via motor)
@@ -23,9 +25,9 @@ final _kDetachPush = MaterialSpringMotion.expressiveSpatialDefault().copyWith(
 final _kRoundnessSnap = MaterialSpringMotion.expressiveSpatialDefault()
     .copyWith(stiffness: 1000, damping: 0.4);
 
-// Named easing used by _AnimatedCard when no drag is active — a springy
-// overshoot curve that smoothly settles the card's border-radius.
-const _kCardSettleCurve = Cubic(0.34, 1.56, 0.64, 1);
+// Easing used by _AnimatedCard when no drag is active — settles the card's
+// border-radius and shadow smoothly without overshooting into negative blur radii.
+const _kCardSettleCurve = Curves.easeOutCubic;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Slot — lightweight per-item bookkeeping
@@ -206,8 +208,8 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
           toRemove--;
         }
       }
-    } else if (visibleCount < swipeItemCount) {
-      final toAdd = swipeItemCount - visibleCount;
+    } else if (visibleCount + _collapsingCount < swipeItemCount) {
+      final toAdd = swipeItemCount - (visibleCount + _collapsingCount);
       for (int i = 0; i < toAdd; i++) {
         _slots.add(DismissibleSlot());
       }
@@ -268,8 +270,18 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     final or = s.outerRadius;
     final sr = s.selectedBorderRadius ?? or;
     final ir = s.innerRadius;
+    final isDragged = slotIndex == _dragSlotIndex;
 
-    if (total == 1) return BorderRadius.circular(or);
+    if (total == 1) {
+      if (isDragged) {
+        if (_pastThreshold) {
+          return BorderRadius.circular(sr);
+        }
+        final facingR = lerpDouble(or, sr, _roundnessFraction)!;
+        return BorderRadius.circular(facingR);
+      }
+      return BorderRadius.circular(or);
+    }
 
     // No active drag or far from dragged card — static radius.
     if (dragPos < 0 || (slotPos - dragPos).abs() > 1) {
@@ -287,10 +299,25 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         ? ir
         : lerpDouble(ir, or, _roundnessFraction * 0.3)!;
 
-    final isDragged = slotIndex == _dragSlotIndex;
     final isAbove = slotPos < dragPos;
 
     if (isDragged) {
+      final actionList = _dragOffset > 0
+          ? style.actions
+          : (style.secondaryActions ?? style.actions);
+      final bool hasActions = actionList != null && actionList.isNotEmpty;
+
+      // When action buttons are used, morph smoothly with facingR (no hard _pastThreshold snap)
+      // and return to resting inner radius when snapped back.
+      if (hasActions) {
+        return BorderRadius.only(
+          topLeft: Radius.circular(isFirst ? or : facingR),
+          topRight: Radius.circular(isFirst ? or : facingR),
+          bottomLeft: Radius.circular(isLast ? or : facingR),
+          bottomRight: Radius.circular(isLast ? or : facingR),
+        );
+      }
+
       // Once past threshold, snap all corners to selectedBorderRadius.
       if (_pastThreshold) {
         return BorderRadius.circular(sr);
@@ -302,6 +329,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         bottomRight: Radius.circular(isLast ? or : facingR),
       );
     }
+
     if (isAbove) {
       return BorderRadius.only(
         topLeft: Radius.circular(isFirst ? or : subtleR),
@@ -339,7 +367,10 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   // ── Gesture handlers ──
 
   void handleDragStart(DismissibleSlot slot) {
-    if (slot._status != _SlotStatus.visible) return;
+    if (slot._status != _SlotStatus.visible ||
+        style.direction == DismissDirection.none) {
+      return;
+    }
 
     _springCtrl?.stop(canceled: true);
     _nbrCtrl?.stop(canceled: true);
@@ -347,23 +378,51 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     _roundnessCtrl?.stop(canceled: true);
 
     setState(() {
+      final isSameSlot = _dragSlotRef == slot;
       _dragSlotRef = slot;
       _dragSlotIndex = _slots.indexOf(slot);
-      _dragOffset = 0.0;
-      _neighbourFraction = 0.0;
-      _pastThreshold = false;
-      _detachPush = 0.0;
-      _roundnessFraction = 0.0;
+      if (!isSameSlot) {
+        _dragOffset = 0.0;
+        _neighbourFraction = 0.0;
+        _pastThreshold = false;
+        _detachPush = 0.0;
+        _roundnessFraction = 0.0;
+      }
     });
   }
 
   void handleDragUpdate(DragUpdateDetails d) {
-    if (_dragSlotRef == null) return;
+    if (_dragSlotRef == null || style.direction == DismissDirection.none) {
+      return;
+    }
 
     final double swipeSpeed = d.delta.dx.abs();
     final double multiplier = (1.0 + (swipeSpeed / 5.0)).clamp(1.0, 4.0);
 
     double newOffset = _dragOffset + d.delta.dx;
+    if (style.direction == DismissDirection.startToEnd && newOffset < 0) {
+      newOffset = 0.0;
+    } else if (style.direction == DismissDirection.endToStart &&
+        newOffset > 0) {
+      newOffset = 0.0;
+    }
+
+    final swipingRight = newOffset > 0;
+    final actionList = swipingRight
+        ? style.actions
+        : (style.secondaryActions ?? style.actions);
+    final bool hasActions = actionList != null && actionList.isNotEmpty;
+
+    if (hasActions) {
+      final actionsWidth = _computeActionsWidth(actionList);
+      final maxExtent = actionsWidth + 24.0;
+      if (newOffset.abs() > maxExtent) {
+        final overdrag = newOffset.abs() - maxExtent;
+        final dampedOverdrag = math.sqrt(overdrag) * 3.0;
+        newOffset = (maxExtent + dampedOverdrag) * newOffset.sign;
+      }
+    }
+
     double newNeighbour = _neighbourFraction;
     double newRoundness = _roundnessFraction;
 
@@ -373,7 +432,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     final newProgress = _dragProgress;
     _dragOffset = savedOffset;
 
-    final crossedNow = newProgress >= 1.0;
+    final crossedNow = hasActions ? false : (newProgress >= 1.0);
 
     if (crossedNow && !_pastThreshold) {
       // ── Crossed threshold ──
@@ -519,13 +578,29 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     final velocity = d.velocity.pixelsPerSecond.dx.abs();
     final double speedMul = (1.0 + (velocity / 1000.0)).clamp(1.0, 4.0);
 
-    if (_dragProgress >= 1.0) {
-      final direction = _dragOffset > 0
-          ? DismissDirection.startToEnd
-          : DismissDirection.endToStart;
-      _dismiss(_dragSlotIndex, speedMul, direction);
+    final swipingRight = _dragOffset > 0;
+    final actionList = swipingRight
+        ? style.actions
+        : (style.secondaryActions ?? style.actions);
+
+    final bool hasActions = actionList != null && actionList.isNotEmpty;
+
+    if (hasActions) {
+      final actionsWidth = _computeActionsWidth(actionList);
+      if (_dragOffset.abs() >= actionsWidth * 0.35) {
+        _snapToRevealed(actionsWidth * (swipingRight ? 1.0 : -1.0), speedMul);
+      } else {
+        _springBack(speedMul);
+      }
     } else {
-      _springBack(speedMul);
+      if (_dragProgress >= 1.0) {
+        final direction = swipingRight
+            ? DismissDirection.startToEnd
+            : DismissDirection.endToStart;
+        _dismiss(_dragSlotIndex, speedMul, direction);
+      } else {
+        _springBack(speedMul);
+      }
     }
   }
 
@@ -551,15 +626,125 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     applyTypedHaptic('dragTexture', amplitude);
   }
 
+  /// Toggles revealing or hiding actions for a card slot.
+  void toggleRevealActions(DismissibleSlot slot, {bool endToStart = true}) {
+    if (slot._status != _SlotStatus.visible) return;
+
+    // If this slot is already revealed, close it
+    if (_dragSlotRef == slot && _dragOffset.abs() > 0) {
+      _springBack(1.0);
+      return;
+    }
+
+    _springCtrl?.stop(canceled: true);
+    _nbrCtrl?.stop(canceled: true);
+    _pushCtrl?.stop(canceled: true);
+    _roundnessCtrl?.stop(canceled: true);
+
+    final actionList = endToStart
+        ? (style.secondaryActions ?? style.actions)
+        : style.actions;
+
+    if (actionList == null || actionList.isEmpty) return;
+
+    final actionsWidth = _computeActionsWidth(actionList);
+    final targetOffset = actionsWidth * (endToStart ? -1.0 : 1.0);
+
+    setState(() {
+      _dragSlotRef = slot;
+      _dragSlotIndex = _slots.indexOf(slot);
+      _detachPush = 0.0;
+      _neighbourFraction = 0.0;
+      _pastThreshold = false;
+      _roundnessFraction = 0.0;
+    });
+
+    _snapToRevealed(targetOffset, 1.0);
+  }
+
+  /// Programmatically reveals or hides action buttons for the card at [index].
+  void revealActionsAtIndex(int index, {bool endToStart = true}) {
+    final visible = computeVisibleIndices();
+    if (index >= 0 && index < visible.length) {
+      final slot = _slots[visible[index]];
+      toggleRevealActions(slot, endToStart: endToStart);
+    }
+  }
+
+  void _snapToRevealed(double targetOffset, double speedMul) {
+    _pushCtrl?.dispose();
+    _pushCtrl = null;
+    _detachPush = 0.0;
+    _pastThreshold = false;
+    _reEngaging = false;
+
+    _springCtrl?.dispose();
+    _springCtrl =
+        SingleMotionController(
+            motion: M3EMotion.custom(
+              stiffness: style.snapBackMotion.stiffness * speedMul,
+              damping: style.snapBackMotion.damping,
+            ).toMotion(),
+            vsync: this,
+            initialValue: _dragOffset,
+          )
+          ..addListener(() {
+            if (mounted) setState(() => _dragOffset = _springCtrl!.value);
+          })
+          ..animateTo(targetOffset);
+
+    _nbrCtrl?.dispose();
+    _nbrCtrl =
+        SingleMotionController(
+            motion: M3EMotion.custom(
+              stiffness: style.snapBackMotion.stiffness * speedMul,
+              damping: style.snapBackMotion.damping,
+            ).toMotion(),
+            vsync: this,
+            initialValue: _neighbourFraction,
+          )
+          ..addListener(() {
+            if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
+          })
+          ..animateTo(0.0);
+
+    _roundnessCtrl?.dispose();
+    _roundnessCtrl =
+        SingleMotionController(
+            motion: M3EMotion.custom(
+              stiffness: style.snapBackMotion.stiffness * speedMul,
+              damping: style.snapBackMotion.damping,
+            ).toMotion(),
+            vsync: this,
+            initialValue: _roundnessFraction,
+          )
+          ..addListener(() {
+            if (mounted) {
+              setState(() => _roundnessFraction = _roundnessCtrl!.value);
+            }
+          })
+          ..animateTo(0.0);
+  }
+
+  double _computeActionsWidth(List<M3ESwipeAction> actionList) {
+    if (actionList.isEmpty) return 0.0;
+    double total = 0.0;
+    for (final action in actionList) {
+      total += action.width;
+    }
+    // Gaps between adjacent buttons plus gaps at both ends (outer edge and card edge)
+    total += (actionList.length + 1) * style.actionSpacing;
+    return total;
+  }
+
   // ── Spring-back (below threshold release) ──
 
   void _springBack(double speedMul) {
     _pushCtrl?.dispose();
     _pushCtrl = null;
     _detachPush = 0.0;
-    _roundnessCtrl?.dispose();
-    _roundnessCtrl = null;
-    _roundnessFraction = 0.0;
+    _pastThreshold = false;
+    _reEngaging = false;
 
     final ref = _dragSlotRef;
 
@@ -600,6 +785,23 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
             if (mounted) setState(() => _neighbourFraction = _nbrCtrl!.value);
           })
           ..animateTo(0.0);
+
+    _roundnessCtrl?.dispose();
+    _roundnessCtrl =
+        SingleMotionController(
+            motion: M3EMotion.custom(
+              stiffness: style.snapBackMotion.stiffness * speedMul,
+              damping: style.snapBackMotion.damping,
+            ).toMotion(),
+            vsync: this,
+            initialValue: _roundnessFraction,
+          )
+          ..addListener(() {
+            if (mounted) {
+              setState(() => _roundnessFraction = _roundnessCtrl!.value);
+            }
+          })
+          ..animateTo(0.0);
   }
 
   // ── Dismiss (above threshold release) ──
@@ -616,15 +818,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     final dataIndex = visible.indexOf(slotIndex);
     if (dataIndex < 0) return;
 
-    // ── Ask the consumer if dismissal is allowed ──
-    final allowed = await onDismissCallback?.call(dataIndex, direction) ?? true;
-    if (!allowed) {
-      _springBack(speedMul);
-      return;
-    }
-    if (!mounted) return;
-
-    // Capture size & freeze the child.
+    // Capture size & freeze the child before notifying consumer.
     final size = _cardSize(slot);
     slot.capturedHeight = size.height;
     slot.capturedWidth = size.width;
@@ -728,6 +922,40 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         }
       })
       ..animateTo(flyTarget);
+
+    // ── Auto-execute primary action on full swipe if configured ──
+    if (style.autoExecutePrimaryOnFullSwipe) {
+      final swipingRight = direction == DismissDirection.startToEnd;
+      final actionList = swipingRight
+          ? style.actions
+          : (style.secondaryActions ?? style.actions);
+      if (actionList != null && actionList.isNotEmpty) {
+        final primary = actionList.firstWhere(
+          (a) => a.isPrimary,
+          orElse: () => actionList.last,
+        );
+        primary.onTap?.call();
+      }
+    }
+
+    // ── Ask the consumer if dismissal is allowed ──
+    final allowed = await onDismissCallback?.call(dataIndex, direction) ?? true;
+    if (!allowed) {
+      flyCtrl.dispose();
+      slot.flyCtrl = null;
+      colCtrl.dispose();
+      slot.collapseCtrl = null;
+      slot.frozenChild = null;
+      if (mounted) {
+        setState(() {
+          slot._status = _SlotStatus.visible;
+          _collapsingCount--;
+        });
+        _syncSlots();
+      }
+      _springBack(speedMul);
+      return;
+    }
   }
 
   // ── Widget builders ──
@@ -762,6 +990,16 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         : (s.secondaryBackgroundBorderRadius ?? s.backgroundBorderRadius);
     final cardRadius = s.selectedBorderRadius ?? s.outerRadius;
 
+    final List<M3ESwipeAction>? activeActions = swipingRight
+        ? s.actions
+        : (s.secondaryActions ?? s.actions);
+    final Widget? effectiveBg =
+        activeActions != null && activeActions.isNotEmpty
+        ? _buildActionsRow(activeActions, 1.0, swipingRight)
+        : (swipingRight
+              ? s.background
+              : (s.secondaryBackground ?? s.background));
+
     return IgnorePointer(
       child: AnimatedBuilder(
         animation: ctrl,
@@ -772,7 +1010,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
             : Stack(
                 children: [
                   // ── Background (stays visible during fly-out) ──
-                  if (slot.dismissedDirection != null)
+                  if (slot.dismissedDirection != null && effectiveBg != null)
                     ValueListenableBuilder<double>(
                       valueListenable: slot.flyNotifier,
                       builder: (_, flyOff, child) {
@@ -793,9 +1031,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                                 padding: s.margin ?? EdgeInsets.zero,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(bgRadius),
-                                  child: swipingRight
-                                      ? s.background
-                                      : (s.secondaryBackground ?? s.background),
+                                  child: effectiveBg,
                                 ),
                               ),
                             ),
@@ -831,7 +1067,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                                   s.color ??
                                   Theme.of(
                                     context,
-                                  ).colorScheme.surfaceContainerHighest,
+                                  ).colorScheme.surfaceContainer,
                               elevation: s.elevation > 0
                                   ? s.elevation + 6
                                   : 0.0,
@@ -876,9 +1112,15 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
 
     // Active background based on swipe direction.
     final bool swipingRight = _dragOffset > 0;
-    final Widget? activeBg = swipingRight
-        ? s.background
-        : (s.secondaryBackground ?? s.background);
+    final List<M3ESwipeAction>? activeActions = swipingRight
+        ? s.actions
+        : (s.secondaryActions ?? s.actions);
+
+    final Widget? activeBg = activeActions != null && activeActions.isNotEmpty
+        ? _buildActionsRow(activeActions, _dragProgress, swipingRight)
+        : (swipingRight
+              ? s.background
+              : (s.secondaryBackground ?? s.background));
 
     final borderRadius = swipingRight
         ? s.backgroundBorderRadius
@@ -899,20 +1141,26 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                     alignment: swipingRight
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(borderRadius),
-                      child: SizedBox(
-                        width: _dragOffset.abs(),
-                        height: double.infinity,
-                        child: Opacity(
-                          opacity: (_dragProgress * 3.0).clamp(0.0, 1.0),
-                          child: _buildActiveBackground(
-                            activeBg,
-                            _dragProgress,
+                    child: activeActions != null && activeActions.isNotEmpty
+                        ? SizedBox(
+                            width: _dragOffset.abs(),
+                            height: double.infinity,
+                            child: activeBg,
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(borderRadius),
+                            child: SizedBox(
+                              width: _dragOffset.abs(),
+                              height: double.infinity,
+                              child: Opacity(
+                                opacity: (_dragProgress * 3.0).clamp(0.0, 1.0),
+                                child: _buildActiveBackground(
+                                  activeBg,
+                                  _dragProgress,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
                   ),
                 ),
               ),
@@ -923,16 +1171,22 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
               child: Transform.translate(
                 offset: Offset(isDragged ? _dragOffset + _detachPush : nOff, 0),
                 child: GestureDetector(
-                  onHorizontalDragStart: (_) => handleDragStart(slot),
-                  onHorizontalDragUpdate: handleDragUpdate,
-                  onHorizontalDragEnd: handleDragEnd,
+                  onHorizontalDragStart: s.direction == DismissDirection.none
+                      ? null
+                      : (_) => handleDragStart(slot),
+                  onHorizontalDragUpdate: s.direction == DismissDirection.none
+                      ? null
+                      : handleDragUpdate,
+                  onHorizontalDragEnd: s.direction == DismissDirection.none
+                      ? null
+                      : handleDragEnd,
                   child: _AnimatedCard(
                     key: ValueKey('card_${slot.identity.hashCode}'),
                     cardKey: _measureKey(slot),
                     borderRadius: br,
                     color:
                         s.color ??
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                        Theme.of(context).colorScheme.surfaceContainer,
                     elevation: (isDragged && s.elevation > 0)
                         ? s.elevation + 6
                         : s.elevation,
@@ -945,13 +1199,35 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                       highlightColor: s.highlightColor,
                       splashFactory: s.splashFactory,
                       enableFeedback: s.enableFeedback,
-                      // ── Mistouch fix: block taps during drag / dismiss ──
-                      onTap: isInteractionLocked || onTapCallback == null
-                          ? null
-                          : () {
-                              onTapCallback!(slotPos);
-                              applyHaptic(s.hapticOnTap);
-                            },
+                      onTap: () {
+                        if (_dragSlotRef != null && _dragOffset.abs() > 0) {
+                          _springBack(1.0);
+                          return;
+                        }
+                        if (s.actionRevealTrigger ==
+                            M3EActionRevealTrigger.tap) {
+                          final actionList = s.secondaryActions ?? s.actions;
+                          if (actionList != null && actionList.isNotEmpty) {
+                            toggleRevealActions(slot, endToStart: true);
+                            return;
+                          }
+                        }
+                        if (isInteractionLocked || onTapCallback == null) {
+                          return;
+                        }
+                        onTapCallback!(slotPos);
+                        applyHaptic(s.hapticOnTap);
+                      },
+                      onDoubleTap:
+                          s.actionRevealTrigger ==
+                              M3EActionRevealTrigger.doubleTap
+                          ? () => toggleRevealActions(slot, endToStart: true)
+                          : null,
+                      onLongPress:
+                          s.actionRevealTrigger ==
+                              M3EActionRevealTrigger.longPress
+                          ? () => toggleRevealActions(slot, endToStart: true)
+                          : null,
                       child: Padding(
                         padding: s.padding ?? const EdgeInsets.all(16.0),
                         child: swipeItemBuilder(context, slotPos),
@@ -1013,6 +1289,107 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       );
     }
     return wrapChild(bg);
+  }
+
+  Widget _buildActionsRow(
+    List<M3ESwipeAction> actionList,
+    double progress,
+    bool swipingRight,
+  ) {
+    final s = style;
+    final baseWidth = _computeActionsWidth(actionList);
+    final currentOffset = _dragOffset.abs();
+    final numActions = actionList.length;
+
+    // Fixed spacing between action buttons
+    final double spacing = s.actionSpacing;
+
+    // Dynamic width expansion distributed to action buttons on overdrag
+    final double overdrag = (currentOffset > baseWidth && baseWidth > 0)
+        ? (currentOffset - baseWidth)
+        : 0.0;
+    final double extraWidthPerButton = numActions > 0
+        ? ((overdrag / numActions) * 0.75).clamp(0.0, 48.0)
+        : 0.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight.clamp(36.0, 300.0)
+            : 64.0;
+
+        return Container(
+          color: Colors.transparent,
+          alignment: swipingRight
+              ? Alignment.centerLeft
+              : Alignment.centerRight,
+          child: OverflowBox(
+            alignment: swipingRight
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            minWidth: 0,
+            maxWidth: double.infinity,
+            minHeight: 0,
+            maxHeight: double.infinity,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: swipingRight
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.end,
+                children: [
+                  for (int i = 0; i < actionList.length; i++) ...[
+                    if (i > 0 && spacing > 0) SizedBox(width: spacing),
+                    () {
+                      final orderIndex = swipingRight
+                          ? i
+                          : (actionList.length - 1 - i);
+                      final action = actionList[i];
+                      final targetWidth = action.width;
+
+                      // Staggered reveal window for each button
+                      final startOffset =
+                          orderIndex * (targetWidth * 0.7 + spacing);
+                      final endOffset = startOffset + targetWidth + 12.0;
+
+                      final double buttonProgress =
+                          (currentOffset <= startOffset)
+                          ? 0.0
+                          : (currentOffset >= endOffset)
+                          ? 1.0
+                          : ((currentOffset - startOffset) /
+                                    (endOffset - startOffset))
+                                .clamp(0.0, 1.0);
+
+                      final double pillWidth =
+                          (targetWidth * (0.2 + 0.8 * buttonProgress) +
+                                  extraWidthPerButton)
+                              .clamp(0.0, targetWidth + 48.0);
+
+                      return SizedBox(
+                        width: pillWidth,
+                        height: action.height ?? availableHeight,
+                        child: ClipRRect(
+                          borderRadius:
+                              action.borderRadius ?? BorderRadius.circular(100),
+                          child: action.buildButton(
+                            context,
+                            onTriggered: () {
+                              _springBack(1.0);
+                            },
+                          ),
+                        ),
+                      );
+                    }(),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

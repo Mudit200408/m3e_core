@@ -1,6 +1,23 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../common/m3e_common.dart';
+import 'm3e_swipe_action.dart';
+
+/// Defines single-point interaction triggers to reveal hidden actions on a card
+/// as specified in Material 3 Accessibility Guidelines.
+enum M3EActionRevealTrigger {
+  /// Only horizontal swipe gestures reveal action buttons.
+  none,
+
+  /// A single tap on the card reveals or closes action buttons.
+  tap,
+
+  /// A double tap on the card reveals or closes action buttons.
+  doubleTap,
+
+  /// A long press on the card reveals or closes action buttons.
+  longPress,
+}
 
 /// Immutable visual and interaction configuration for dismissible M3E cards.
 ///
@@ -24,7 +41,7 @@ class M3EDismissibleCardStyle {
   /// Vertical gap between cards.
   final double gap;
 
-  /// Card background colour (defaults to [ColorScheme.surfaceContainerHighest]).
+  /// Card background colour (defaults to [ColorScheme.surfaceContainer]).
   final Color? color;
 
   /// Inner padding of each card's content area.
@@ -43,7 +60,15 @@ class M3EDismissibleCardStyle {
   /// Set to empty list `[]` to remove shadow completely.
   final List<BoxShadow>? boxShadow;
 
-  // ── Swipe backgrounds ──
+  // ── Swipe backgrounds & actions ──
+
+  /// The direction in which the card can be dismissed or swiped.
+  ///
+  /// Defaults to [DismissDirection.horizontal] (allows swiping both left and right).
+  /// Set to [DismissDirection.startToEnd] for right-swipe only,
+  /// [DismissDirection.endToStart] for left-swipe only, or
+  /// [DismissDirection.none] to disable swipe gestures completely.
+  final DismissDirection direction;
 
   /// Background revealed when swiping start‑to‑end (left→right in LTR).
   final Widget? background;
@@ -51,6 +76,31 @@ class M3EDismissibleCardStyle {
   /// Background revealed when swiping end‑to‑start (right→left in LTR).
   /// Falls back to [background] if null.
   final Widget? secondaryBackground;
+
+  /// Expressive action buttons revealed when swiping start‑to‑end (left→right in LTR).
+  final List<M3ESwipeAction>? actions;
+
+  /// Expressive action buttons revealed when swiping end‑to‑start (right→left in LTR).
+  final List<M3ESwipeAction>? secondaryActions;
+
+  /// Spacing between revealed action buttons.
+  ///
+  /// Defaults to `8.0`.
+  final double actionSpacing;
+
+  /// Whether exceeding the dismiss threshold automatically triggers the primary action
+  /// (if defined in [actions] or [secondaryActions]) and clears the card off-screen.
+  ///
+  /// Defaults to `true`.
+  final bool autoExecutePrimaryOnFullSwipe;
+
+  /// Alternative single-point interaction to reveal hidden action buttons for accessibility.
+  ///
+  /// As specified in the Material 3 Accessibility Guidelines, swipeable items can support
+  /// single tap, double tap, or long press to reveal actions.
+  ///
+  /// Defaults to [M3EActionRevealTrigger.none].
+  final M3EActionRevealTrigger actionRevealTrigger;
 
   /// Background Border Radius
   final double backgroundBorderRadius;
@@ -123,8 +173,14 @@ class M3EDismissibleCardStyle {
     this.border,
     this.elevation = 0.0,
     this.boxShadow,
+    this.direction = DismissDirection.horizontal,
     this.background,
     this.secondaryBackground,
+    this.actions,
+    this.secondaryActions,
+    this.actionSpacing = 8.0,
+    this.autoExecutePrimaryOnFullSwipe = true,
+    this.actionRevealTrigger = M3EActionRevealTrigger.none,
     this.splashColor,
     this.highlightColor,
     this.splashFactory,
@@ -155,8 +211,14 @@ class M3EDismissibleCardStyle {
     BorderSide? border,
     double? elevation,
     List<BoxShadow>? boxShadow,
+    DismissDirection? direction,
     Widget? background,
     Widget? secondaryBackground,
+    List<M3ESwipeAction>? actions,
+    List<M3ESwipeAction>? secondaryActions,
+    double? actionSpacing,
+    bool? autoExecutePrimaryOnFullSwipe,
+    M3EActionRevealTrigger? actionRevealTrigger,
     Color? splashColor,
     Color? highlightColor,
     InteractiveInkFeatureFactory? splashFactory,
@@ -185,8 +247,15 @@ class M3EDismissibleCardStyle {
       border: border ?? this.border,
       elevation: elevation ?? this.elevation,
       boxShadow: boxShadow ?? this.boxShadow,
+      direction: direction ?? this.direction,
       background: background ?? this.background,
       secondaryBackground: secondaryBackground ?? this.secondaryBackground,
+      actions: actions ?? this.actions,
+      secondaryActions: secondaryActions ?? this.secondaryActions,
+      actionSpacing: actionSpacing ?? this.actionSpacing,
+      autoExecutePrimaryOnFullSwipe:
+          autoExecutePrimaryOnFullSwipe ?? this.autoExecutePrimaryOnFullSwipe,
+      actionRevealTrigger: actionRevealTrigger ?? this.actionRevealTrigger,
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
       splashFactory: splashFactory ?? this.splashFactory,

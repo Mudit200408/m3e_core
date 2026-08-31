@@ -48,6 +48,9 @@ class M3EDismissibleCardList extends StatefulWidget {
   /// Clip behavior for the list.
   final Clip clipBehavior;
 
+  /// Builder displayed when there are no items to show and no collapsing animations running.
+  final WidgetBuilder? emptyBuilder;
+
   const M3EDismissibleCardList({
     super.key,
     required this.itemCount,
@@ -60,6 +63,7 @@ class M3EDismissibleCardList extends StatefulWidget {
     this.listPadding,
     this.shrinkWrap = false,
     this.clipBehavior = Clip.hardEdge,
+    this.emptyBuilder,
   });
 
   @override
@@ -111,6 +115,9 @@ class _M3EDismissibleCardListState extends State<M3EDismissibleCardList>
 
   @override
   Widget build(BuildContext context) {
+    if (slots.isEmpty) {
+      return widget.emptyBuilder?.call(context) ?? const SizedBox.shrink();
+    }
     final visible = computeVisibleIndices();
     return ListView.builder(
       controller: widget.scrollController,

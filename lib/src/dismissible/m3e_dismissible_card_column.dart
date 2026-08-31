@@ -33,6 +33,9 @@ class M3EDismissibleCardColumn extends StatefulWidget {
   /// Visual and interaction configuration.
   final M3EDismissibleCardStyle style;
 
+  /// Builder displayed when there are no items to show and no collapsing animations running.
+  final WidgetBuilder? emptyBuilder;
+
   const M3EDismissibleCardColumn({
     super.key,
     required this.itemCount,
@@ -40,6 +43,7 @@ class M3EDismissibleCardColumn extends StatefulWidget {
     this.onDismiss,
     this.onTap,
     this.style = const M3EDismissibleCardStyle(),
+    this.emptyBuilder,
   });
 
   /// Convenience constructor for a pre-built list of widgets.
@@ -49,6 +53,7 @@ class M3EDismissibleCardColumn extends StatefulWidget {
     Future<bool> Function(int index, DismissDirection direction)? onDismiss,
     void Function(int index)? onTap,
     M3EDismissibleCardStyle style = const M3EDismissibleCardStyle(),
+    WidgetBuilder? emptyBuilder,
   }) {
     return M3EDismissibleCardColumn(
       key: key,
@@ -57,6 +62,7 @@ class M3EDismissibleCardColumn extends StatefulWidget {
       onDismiss: onDismiss,
       onTap: onTap,
       style: style,
+      emptyBuilder: emptyBuilder,
     );
   }
 
@@ -110,6 +116,9 @@ class _M3EDismissibleCardColumnState extends State<M3EDismissibleCardColumn>
 
   @override
   Widget build(BuildContext context) {
+    if (slots.isEmpty) {
+      return widget.emptyBuilder?.call(context) ?? const SizedBox.shrink();
+    }
     final visible = computeVisibleIndices();
     return Column(
       mainAxisSize: MainAxisSize.min,
