@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
@@ -44,6 +45,19 @@ mixin M3EExpandableStateMixin<T extends M3EExpandableListBase> on State<T> {
     _expandedIndices = Set<int>.from(initiallyExpanded);
   }
 
+  @override
+  void didUpdateWidget(covariant T oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!setEquals(oldWidget.initiallyExpanded, widget.initiallyExpanded)) {
+      _expandedIndices = Set<int>.from(widget.initiallyExpanded);
+    }
+    final effectiveAllowMultiple = widget.allowMultipleExpanded ?? false;
+    if (!effectiveAllowMultiple && _expandedIndices.length > 1) {
+      _expandedIndices = {_expandedIndices.first};
+    }
+    _expandedIndices.removeWhere((i) => i >= widget.itemCount);
+  }
+
   Set<int> get initiallyExpanded;
 
   void handleToggle(
@@ -79,6 +93,7 @@ mixin M3EExpandableStateMixin<T extends M3EExpandableListBase> on State<T> {
         widget.allowMultipleExpanded ?? theme.allowMultipleExpanded;
 
     return buildM3EExpandableItem(
+      key: ValueKey('m3e_expandable_item_$index'),
       index: index,
       totalCount: widget.itemCount,
       isExpanded: isExpanded(index),
@@ -104,17 +119,17 @@ Widget buildM3ESimpleHeader(
 ) {
   final clampedProgress = progress.clamp(0.0, 1.0);
 
-  TextStyle resolvedStyle;
+  TextStyle resolvedTitleStyle;
   if (data.titleStyle != null && data.titleStyle!.length == 2) {
-    resolvedStyle = TextStyle.lerp(
+    resolvedTitleStyle = TextStyle.lerp(
       data.titleStyle![0],
       data.titleStyle![1],
       clampedProgress,
     )!;
   } else if (data.titleStyle != null && data.titleStyle!.length == 1) {
-    resolvedStyle = data.titleStyle![0];
+    resolvedTitleStyle = data.titleStyle![0];
   } else {
-    resolvedStyle = TextStyle.lerp(
+    resolvedTitleStyle = TextStyle.lerp(
       Theme.of(
         context,
       ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w400),
@@ -125,10 +140,44 @@ Widget buildM3ESimpleHeader(
     )!;
   }
 
+  TextStyle? resolvedSubtitleStyle;
+  if (data.subtitle != null && data.subtitle!.isNotEmpty) {
+    if (data.subtitleStyle != null && data.subtitleStyle!.length == 2) {
+      resolvedSubtitleStyle = TextStyle.lerp(
+        data.subtitleStyle![0],
+        data.subtitleStyle![1],
+        clampedProgress,
+      );
+    } else if (data.subtitleStyle != null && data.subtitleStyle!.length == 1) {
+      resolvedSubtitleStyle = data.subtitleStyle![0];
+    } else {
+      resolvedSubtitleStyle = Theme.of(context).textTheme.bodyMedium;
+    }
+  }
+
   return Row(
     children: [
       if (data.leading != null) ...[data.leading!, const SizedBox(width: 16)],
-      Expanded(child: Text(data.title, style: resolvedStyle)),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(data.title, style: resolvedTitleStyle),
+            if (data.subtitle != null && data.subtitle!.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                data.subtitle!,
+                style: resolvedSubtitleStyle,
+                maxLines: clampedProgress > 0.5
+                    ? null
+                    : (data.subtitleMaxLines ?? 1),
+                overflow: clampedProgress > 0.5 ? null : TextOverflow.ellipsis,
+              ),
+            ],
+          ],
+        ),
+      ),
       if (data.trailing != null) ...[const SizedBox(width: 16), data.trailing!],
     ],
   );
@@ -140,102 +189,13 @@ Widget buildM3ESimpleBody(
   double progress,
   M3EExpandableStyle decoration,
 ) {
-  final List<Widget> children = [];
-
-  if (data.subtitle != null && data.subtitle!.isNotEmpty) {
-    // Resolve subtitle styles based on user input
-    TextStyle collapsedSubtitleStyle;
-    TextStyle expandedSubtitleStyle;
-
-    if (data.subtitleStyle != null && data.subtitleStyle!.length == 2) {
-      collapsedSubtitleStyle = data.subtitleStyle![0];
-      expandedSubtitleStyle = data.subtitleStyle![1];
-    } else if (data.subtitleStyle != null && data.subtitleStyle!.length == 1) {
-      collapsedSubtitleStyle = data.subtitleStyle![0];
-      expandedSubtitleStyle = data.subtitleStyle![0];
-    } else {
-      final defaultStyle = Theme.of(context).textTheme.bodyMedium!;
-      collapsedSubtitleStyle = defaultStyle;
-      expandedSubtitleStyle = defaultStyle;
-    }
-
-    final alignment = decoration.bodyAlignment;
-    final maxLines = data.subtitleMaxLines ?? 1;
-
-    // Determine TextAlign based on AlignmentGeometry roughly
-    TextAlign mappedTextAlign = TextAlign.start;
-    if (alignment == Alignment.topCenter ||
-        alignment == Alignment.center ||
-        alignment == Alignment.bottomCenter) {
-      mappedTextAlign = TextAlign.center;
-    } else if (alignment == Alignment.topRight ||
-        alignment == Alignment.centerRight ||
-        alignment == Alignment.bottomRight) {
-      mappedTextAlign = TextAlign.right;
-    }
-
-    // Smooth crossfade: use hard switch at midpoint to avoid flicker
-    // We keep the Stack based approach to preserve the exact UI requested,
-    // but ensure it's clean and handles progress correctly.
-    final showCollapsedSubtitle = progress < 0.5;
-    final showExpandedSubtitle = progress >= 0.5;
-
-    children.add(
-      Padding(
-        padding: EdgeInsets.only(top: decoration.titleSubtitleGap),
-        child: Stack(
-          children: [
-            if (showCollapsedSubtitle)
-              Align(
-                alignment: alignment,
-                child: Text(
-                  data.subtitle!,
-                  maxLines: maxLines,
-                  overflow: TextOverflow.ellipsis,
-                  style: collapsedSubtitleStyle,
-                  textAlign: mappedTextAlign,
-                ),
-              ),
-            if (showExpandedSubtitle)
-              ClipRect(
-                child: Align(
-                  alignment: alignment,
-                  heightFactor: 1.0,
-                  child: Text(
-                    data.subtitle!,
-                    style: expandedSubtitleStyle,
-                    textAlign: mappedTextAlign,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
+  if (data.body == null && data.bodyBuilder == null) {
+    return const SizedBox.shrink();
   }
 
-  if ((data.body != null || data.bodyBuilder != null) && progress > 0.0) {
-    children.add(
-      ClipRect(
-        child: Align(
-          alignment: decoration.bodyAlignment,
-          heightFactor: progress.clamp(0.0, 1.0),
-          child: Padding(
-            padding: EdgeInsets.only(top: children.isEmpty ? 0 : 12),
-            child: data.bodyBuilder?.call(context) ?? data.body!,
-          ),
-        ),
-      ),
-    );
-  }
-
-  if (children.isEmpty) return const SizedBox.shrink();
-  if (children.length == 1) return children.first;
-
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: children,
+  return Align(
+    alignment: decoration.bodyAlignment,
+    child: data.bodyBuilder?.call(context) ?? data.body!,
   );
 }
 
