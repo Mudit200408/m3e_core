@@ -706,9 +706,13 @@ class _AOSPSquigglyTrackPainter extends CustomPainter {
       currentX = nextX;
     }
 
-    final strokeCap = (trackCornerRadius != null && trackCornerRadius! <= 0.0)
-        ? StrokeCap.butt
-        : StrokeCap.round;
+    final double maxRadius = strokeWidth / 2;
+    final double effectiveRadius = trackCornerRadius != null
+        ? trackCornerRadius!.clamp(0.0, maxRadius)
+        : maxRadius;
+    final radius = Radius.circular(effectiveRadius);
+
+    final strokeCap = effectiveRadius <= 0.0 ? StrokeCap.butt : StrokeCap.round;
 
     final wavePaint = Paint()
       ..color = enabled
@@ -722,23 +726,22 @@ class _AOSPSquigglyTrackPainter extends CustomPainter {
       ..color = enabled
           ? colors.inactiveTrackColor
           : colors.disabledInactiveTrackColor
-      ..style = PaintingStyle.stroke
-      ..strokeCap = strokeCap
-      ..strokeWidth = strokeWidth;
+      ..style = PaintingStyle.fill;
 
     final secondaryPaint = Paint()
       ..color = enabled
           ? colors.secondaryTrackColor
           : colors.disabledSecondaryTrackColor
-      ..style = PaintingStyle.stroke
-      ..strokeCap = strokeCap
-      ..strokeWidth = strokeWidth;
+      ..style = PaintingStyle.fill;
 
     final clipTop = lineAmplitude + strokeWidth + 4.0;
     final capPadding = strokeCap == StrokeCap.round ? strokeWidth : 0.0;
 
     canvas.save();
     canvas.translate(margin, size.height / 2);
+
+    final trackTop = -strokeWidth / 2;
+    final trackBottom = strokeWidth / 2;
 
     // 1. Draw Active Progress Squiggle (clipped up to totalProgressPx)
     if (totalProgressPx > 0) {
@@ -750,41 +753,32 @@ class _AOSPSquigglyTrackPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // 2. Draw Secondary (Buffered) Track line if present (always flat)
+    // 2. Draw Secondary (Buffered) Track line if present
     if (secondaryFraction != null && secondaryFraction! > valueFraction) {
-      final secPx = trackLength * secondaryFraction!;
-      canvas.save();
-      canvas.clipRect(Rect.fromLTRB(totalProgressPx, -clipTop, secPx, clipTop));
-      canvas.drawLine(
-        Offset(totalProgressPx, 0.0),
-        Offset(secPx, 0.0),
-        secondaryPaint,
-      );
-      canvas.restore();
+      final secPx = (trackLength * secondaryFraction!).clamp(0.0, trackLength);
+      if (secPx > totalProgressPx) {
+        final secRRect = RRect.fromRectAndCorners(
+          Rect.fromLTRB(totalProgressPx, trackTop, secPx, trackBottom),
+          topRight: radius,
+          bottomRight: radius,
+        );
+        canvas.drawRRect(secRRect, secondaryPaint);
+      }
     }
 
-    // 3. Draw Remaining Line (from progress/buffer to end of track - ALWAYS FLAT)
+    // 3. Draw Remaining Inactive Track Line (from progress/buffer to end of track)
     final double remainingStartPx =
         secondaryFraction != null && secondaryFraction! > valueFraction
         ? (trackLength * secondaryFraction!)
         : totalProgressPx;
 
     if (remainingStartPx < trackLength) {
-      canvas.save();
-      canvas.clipRect(
-        Rect.fromLTRB(
-          remainingStartPx,
-          -clipTop,
-          trackLength + capPadding,
-          clipTop,
-        ),
+      final lineRRect = RRect.fromRectAndCorners(
+        Rect.fromLTRB(remainingStartPx, trackTop, trackLength, trackBottom),
+        topRight: radius,
+        bottomRight: radius,
       );
-      canvas.drawLine(
-        Offset(remainingStartPx, 0.0),
-        Offset(trackLength, 0.0),
-        linePaint,
-      );
-      canvas.restore();
+      canvas.drawRRect(lineRRect, linePaint);
     }
 
     canvas.restore();

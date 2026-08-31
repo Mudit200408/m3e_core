@@ -848,6 +848,7 @@ class _SeekbarTrackPainter extends CustomPainter {
         oldDelegate.isFocused != isFocused ||
         oldDelegate.orientation != orientation ||
         oldDelegate.trackHeight != trackHeight ||
+        oldDelegate.trackCornerRadius != trackCornerRadius ||
         oldDelegate.handleShape != handleShape ||
         oldDelegate.circleHandleRadius != circleHandleRadius ||
         oldDelegate.rectHandleWidth != rectHandleWidth;
