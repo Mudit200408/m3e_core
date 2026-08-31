@@ -53,6 +53,11 @@ class M3ESlider extends StatefulWidget {
   /// The layout orientation of the slider. Defaults to [Axis.horizontal].
   final Axis orientation;
 
+  /// The spring motion used for track-icon docking animations.
+  ///
+  /// Defaults to [M3EMotion.expressiveSpatialFast].
+  final M3EMotion motion;
+
   /// An optional label shown in a pill above the thumb while pressed.
   final String? label;
 
@@ -79,6 +84,7 @@ class M3ESlider extends StatefulWidget {
     this.autofocus = false,
     this.decoration,
     this.orientation = Axis.horizontal,
+    this.motion = M3EMotion.expressiveSpatialFast,
     this.label,
     this.icon,
     this.trailingIcon = true,
@@ -134,7 +140,7 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
 
     _dockController =
         SingleMotionController(
-          motion: M3EMotion.expressiveSpatialFast.toMotion(),
+          motion: widget.motion.toMotion(),
           vsync: this,
           initialValue: 0.0,
         )..addListener(() {
@@ -143,6 +149,14 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
 
     _isHovered.addListener(_updateInteractionAnimation);
     _isPressed.addListener(_updateInteractionAnimation);
+  }
+
+  @override
+  void didUpdateWidget(covariant M3ESlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.motion != widget.motion) {
+      _dockController.motion = widget.motion.toMotion();
+    }
   }
 
   void _clearSnapListener() {
