@@ -7,7 +7,7 @@
 
 ![M3E Intro](https://raw.githubusercontent.com/Mudit200408/m3e_core/main/doc/intro.png)
 
-A comprehensive Flutter package providing **Expressive Material 3** components: Card Lists, Dismissible Cards, Expandable Cards, Dropdown Menus, Buttons, Floating Toolbars, Extended M3 Shapes, Seekbars, Progress & Loading Indicators, and Emphasized Typography.
+A comprehensive Flutter package providing **Expressive Material 3** components: Segmented Lists, Dismissible Cards, Expandable Cards, Bottom Sheets, Dropdown Menus, Buttons, Floating Toolbars, Extended M3 Shapes, Seekbars, Progress & Loading Indicators, and Emphasized Typography.
 
 ---
 
@@ -25,9 +25,11 @@ Browse the example source here:
 
 This package (`m3e_core`) bundles multiple M3E components. For detailed documentation and standalone usage, please refer to the individual packages:
 
-- [m3e_card_list](https://pub.dev/packages/m3e_card_list) - Expressive card list with dynamic radii.
+- [m3e_segmented_list](https://pub.dev/packages/m3e_segmented_list) - Expressive segmented list with dynamic radii, selection, and spring-physics reordering.
+- [m3e_card_list](https://pub.dev/packages/m3e_card_list) - *(Deprecated in favor of `m3e_segmented_list`)* Expressive card list with dynamic radii.
 - [m3e_dismissible](https://pub.dev/packages/m3e_dismissible) - Swipe-to-dismiss with "neighbour pull" physics.
 - [m3e_expandable](https://pub.dev/packages/m3e_expandable) - Spring-animated expandable card lists.
+- [m3e_bottom_sheet](https://pub.dev/packages/m3e_bottom_sheet) - Expressive bottom sheets with spring physics and shape transitions.
 - [m3e_dropdown_menu](https://pub.dev/packages/m3e_dropdown_menu) - Fluid dropdown with search and chip tags.
 - [m3e_buttons](https://pub.dev/packages/m3e_buttons) - Expressive button system with neighbor squish and shape morphing.
 - [flutter_m3shapes_extended](https://pub.dev/packages/flutter_m3shapes_extended) - Full suite of M3 expressive shapes.
@@ -52,12 +54,17 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 > - Ensure your app imports `package:material_ui/material_ui.dart` (or run `dart fix --apply --code=migrate_design_widgets`).
 > - If you are on Flutter `< 3.47.0`, please use `m3e_core: ^0.1.6`.
 
+> [!WARNING]
+> **Deprecation Notice — `M3ECardList` is deprecated (v1.1.2+)**:
+> `M3ECardList`, `M3ECardColumn`, `SliverM3ECardList`, `M3ECard`, and `M3ECardPosition` are now **deprecated** in favor of **`M3ESegmentedList`**, **`M3ESegmentedColumn`**, **`SliverM3ESegmentedList`**, and **`M3ESegmentedItem`**.
+> The new segmented list components introduce full reordering support (`M3EReorderableSegmentedList`), spring item morphing, and selection modes while maintaining complete feature parity. Legacy card list types will be removed in a future major release.
+
 Add `m3e_core` and `material_ui` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
   material_ui: ^1.1.0
-  m3e_core: ^1.1.1
+  m3e_core: ^1.1.2
 ```
 
 ```dart
@@ -79,16 +86,19 @@ Please refer to the documentation on their respective individual package pages (
 
 Detailed documentation for each component is available in their respective packages linked above.
 
-### 1. M3E Card List
-Static or scrollable interactive card lists with expressive styling, custom radii, and various list/column/sliver variants.
-[Detailed Documentation →](https://pub.dev/packages/m3e_card_list)
+### 1. M3E Segmented List (formerly M3E Card List)
+> [!WARNING]
+> `M3ECardList` is deprecated in v1.1.2. Use `M3ESegmentedList` instead.
+
+Interactive segmented lists with expressive corner rounding, spring physics reordering (`M3EReorderableSegmentedList`), selection modes (single/multi), and sliver variants (`SliverM3ESegmentedList`).
+[Detailed Documentation →](https://pub.dev/packages/m3e_segmented_list)
 
 ### 2. M3E Dismissible Cards
-Swipe-to-dismiss items with a beautiful spring-driven "neighbour pull" effect. Supports Gmail-style dismissal and high-damping physics.
+Swipe-to-dismiss items with a beautiful spring-driven "neighbour pull" effect. Supports multi-action reveal, spring stretch, and custom swipe directions.
 [Detailed Documentation →](https://pub.dev/packages/m3e_dismissible)
 
 ### 3. M3E Expandable Cards
-Smoothly expand and collapse individual cards using `motor` spring animations. Supports auto-collapse and multiple expanded items.
+Smoothly expand and collapse individual cards using `motor` spring animations. Supports auto-collapse, bouncy collapse transitions, and multiple expanded items.
 [Detailed Documentation →](https://pub.dev/packages/m3e_expandable)
 
 ### 4. M3E Dropdown Menu
@@ -99,6 +109,7 @@ A powerful, stylized dropdown with support for single/multi-selection, fuzzy sea
 A robust button system featuring:
 - **Neighbor Squish**: Adjacent buttons compress when one is pressed.
 - **Shape Morphing**: Smooth transitions between different shapes (e.g., pill to square).
+- **Floating Action Buttons**: `M3EFab` and `M3EFabMenu` adhering to M3E token specifications.
 - **Overflow Management**: Supports scroll, menu, and paging for constrained spaces.
 [Detailed Documentation →](https://pub.dev/packages/m3e_buttons)
 
@@ -107,11 +118,11 @@ A wide variety of predefined Material 3 expressive shapes (Gem, Slanted, Flower,
 [Detailed Documentation →](https://pub.dev/packages/flutter_m3shapes_extended)
 
 ### 7. M3E Floating Toolbar
-A faithful Flutter port of the Material 3 Expressive FloatingToolbar component family with spring physics.
+A faithful Flutter port of the Material 3 Expressive FloatingToolbar component family with docked toolbar support and spring physics.
 [Detailed Documentation →](https://pub.dev/packages/m3e_floating_toolbar)
 
 ### 8. M3E Slider
-Material 3 Expressive Slider and RangeSlider with docking animations, spring physics, and support for track shapes.
+Material 3 Expressive Slider and RangeSlider with docking animations, customizable spring physics (`M3ESliderMotion`), and support for track shapes.
 [Detailed Documentation →](https://pub.dev/packages/m3e_slider)
 
 ### 9. M3E Color Scheme
@@ -127,16 +138,20 @@ Material 3 Expressive circular and linear progress indicators with wavy and anim
 [Detailed Documentation →](https://pub.dev/packages/m3e_progress_indicator)
 
 ### 12. M3E Loading Indicator
-Expressive loading indicator with fluid shape morphing animations.
+Expressive loading indicator with fluid shape morphing animations and pull-to-refresh indicators.
 [Detailed Documentation →](https://pub.dev/packages/m3e_loading_indicator)
 
 ### 13. M3E Seekbar
-Material 3 Expressive Seekbar with standard, wavy, and animated variants, custom handle shapes, and spring physics.
+Material 3 Expressive Seekbar with standard, wavy, and animated variants, custom handle shapes, synchronized corner radii, and spring physics.
 [Detailed Documentation →](https://pub.dev/packages/m3e_seekbar)
 
 ### 14. M3E Typography
 Material 3 Expressive Emphasized Typography scale elevating font weights, optical sizes, and variable font axes across all 15 M3 roles.
 [Detailed Documentation →](https://pub.dev/packages/m3e_typography)
+
+### 15. M3E Bottom Sheet
+Material 3 Expressive standard and modal bottom sheets (`M3EBottomSheet`, `showM3EModalBottomSheet`) with spring dismiss animations, drag handle support, and full theme customization.
+[Detailed Documentation →](https://pub.dev/packages/m3e_bottom_sheet)
 
 
 ---

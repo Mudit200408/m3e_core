@@ -1,3 +1,16 @@
+# 1.1.2
+- segmented-list: introduce `M3ESegmentedList`, `M3EReorderableSegmentedList`, and `SliverM3ESegmentedList` with spring physics reordering, selection modes, and dynamic corner morphing
+- card: deprecate legacy `M3ECardList`, `M3ECardColumn`, `SliverM3ECardList`, and related aliases in favor of `M3ESegmentedList`
+- bottom-sheet: introduce `M3EBottomSheet` and `showM3EModalBottomSheet` with expressive spring dismiss and shape transitions
+- buttons: introduce `M3EFab` and `M3EFabMenu` with M3E tokens, preserve base token size on custom action widths, and prioritize checked radius
+- dismissible: add multi-action swipe-to-reveal, spring stretch, and custom swipe direction support
+- floating-toolbar: introduce docked toolbar variants and align with Material 3 Expressive specifications
+- expandable: streamline header layout, add bouncy header collapse animations, and improve state morphing stability on web hover
+- slider: expose motion spring configuration via `M3ESliderMotion`
+- seekbar: synchronize track and buffer corner radius
+- dropdown: update container tokens, selection radius, and overflow handling
+- example: comprehensive revamp with interactive playgrounds, live controls, code snippets, and theme customizer for all components
+
 # 1.1.1
 - typography: add M3E emphasized text theme utilities and interactive typography playground demo
 - android: support AGP 9 built-in Kotlin (#4) [Contributed by @Hsukqilee]
