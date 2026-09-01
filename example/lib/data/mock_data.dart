@@ -72,9 +72,19 @@ final List<Map<String, dynamic>> richExpandableItemsData = [
       builder: (context) {
         return Row(
           children: [
-            FilledButton(onPressed: () {}, child: const Text('Approve')),
+            M3EButton(
+              style: M3EButtonStyle.filled,
+              size: M3EButtonSize.sm,
+              onPressed: () {},
+              child: const Text('Approve'),
+            ),
             const SizedBox(width: 8),
-            OutlinedButton(onPressed: () {}, child: const Text('Reject')),
+            M3EButton(
+              style: M3EButtonStyle.outlined,
+              size: M3EButtonSize.sm,
+              onPressed: () {},
+              child: const Text('Reject'),
+            ),
           ],
         );
       },
@@ -113,9 +123,11 @@ final List<Map<String, dynamic>> richExpandableItemsData = [
               ),
             ),
             const SizedBox(height: 8),
-            FilledButton.icon(
+            M3EButton.icon(
+              style: M3EButtonStyle.filled,
+              size: M3EButtonSize.sm,
               onPressed: () {},
-              icon: const Icon(Icons.send),
+              icon: const Icon(Icons.send, size: 16),
               label: const Text('Submit Feedback'),
             ),
           ],
@@ -382,7 +394,7 @@ class LoadingTile extends StatelessWidget {
           const SizedBox(
             width: 18,
             height: 18,
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: M3ECircularProgressIndicator(),
           ),
           const SizedBox(width: 12),
           Text(
@@ -431,22 +443,12 @@ class SliderRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 3,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
-              activeTrackColor: cs.primary,
-              inactiveTrackColor: cs.surfaceContainerHighest,
-              thumbColor: cs.primary,
-            ),
-            child: Slider(
-              value: value,
-              min: min,
-              max: max,
-              divisions: divisions,
-              onChanged: onChanged,
-            ),
+          child: M3ESlider(
+            value: value,
+            min: min,
+            max: max,
+            divisions: divisions,
+            onChanged: onChanged,
           ),
         ),
         SizedBox(
