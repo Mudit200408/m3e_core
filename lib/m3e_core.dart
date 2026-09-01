@@ -8,7 +8,8 @@ library;
 // Common components.
 export 'src/common/m3e_common.dart';
 
-// Non-dismissible variants (static layout).
+// Segmented list variants (static, builder, sliver, selection).
+export 'src/segmented_list/segmented_list.dart';
 export 'src/card/m3e_card.dart';
 
 // Dismissible variants (interactive dismiss + neighbour pull).
@@ -47,3 +48,6 @@ export 'src/seekbar/seekbar.dart';
 
 // M3E Typography
 export 'src/typography/typography.dart';
+
+// M3E Bottom Sheet
+export 'src/bottom_sheet/bottom_sheet.dart';
