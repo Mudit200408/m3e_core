@@ -192,22 +192,12 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     super.dispose();
   }
 
-  bool _isStartFocusedFromPointer = false;
-  bool _isEndFocusedFromPointer = false;
-
   void _handleStartFocusChange() {
-    if (!_startFocusNode.hasFocus) {
-      _isStartFocusedFromPointer = false;
-    }
-    _isStartFocused.value =
-        _startFocusNode.hasFocus && !_isStartFocusedFromPointer;
+    _isStartFocused.value = _startFocusNode.hasFocus;
   }
 
   void _handleEndFocusChange() {
-    if (!_endFocusNode.hasFocus) {
-      _isEndFocusedFromPointer = false;
-    }
-    _isEndFocused.value = _endFocusNode.hasFocus && !_isEndFocusedFromPointer;
+    _isEndFocused.value = _endFocusNode.hasFocus;
   }
 
   @visibleForTesting
@@ -330,27 +320,26 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     final distStart = (rawValue - widget.value.start).abs();
     final distEnd = (rawValue - widget.value.end).abs();
 
+    if (_startFocusNode.hasFocus) {
+      _startFocusNode.unfocus();
+    }
+    if (_endFocusNode.hasFocus) {
+      _endFocusNode.unfocus();
+    }
+
     if (distStart < distEnd) {
       _isDraggingStart = true;
       _isStartPressed.value = true;
-      _isStartFocusedFromPointer = true;
-      _startFocusNode.requestFocus();
     } else if (distStart > distEnd) {
       _isDraggingStart = false;
       _isEndPressed.value = true;
-      _isEndFocusedFromPointer = true;
-      _endFocusNode.requestFocus();
     } else {
       // If equal, favor the side based on location
       _isDraggingStart = rawValue < widget.value.start;
       if (_isDraggingStart) {
         _isStartPressed.value = true;
-        _isStartFocusedFromPointer = true;
-        _startFocusNode.requestFocus();
       } else {
         _isEndPressed.value = true;
-        _isEndFocusedFromPointer = true;
-        _endFocusNode.requestFocus();
       }
     }
 
@@ -424,19 +413,22 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
     final distStart = (rawValue - widget.value.start).abs();
     final distEnd = (rawValue - widget.value.end).abs();
 
+    if (_startFocusNode.hasFocus) {
+      _startFocusNode.unfocus();
+    }
+    if (_endFocusNode.hasFocus) {
+      _endFocusNode.unfocus();
+    }
+
     if (distStart < distEnd) {
       _isDraggingStart = true;
       _isStartPressed.value = true;
-      _isStartFocusedFromPointer = true;
-      _startFocusNode.requestFocus();
       _initHapticTracker(details.globalPosition);
       widget.onChangeStart?.call(widget.value);
       _updateValue(start: rawValue.clamp(widget.min, widget.value.end));
     } else {
       _isDraggingStart = false;
       _isEndPressed.value = true;
-      _isEndFocusedFromPointer = true;
-      _endFocusNode.requestFocus();
       _initHapticTracker(details.globalPosition);
       widget.onChangeStart?.call(widget.value);
       _updateValue(end: rawValue.clamp(widget.value.start, widget.max));
@@ -517,10 +509,6 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
   }
 
   KeyEventResult _handleStartKeyEvent(FocusNode node, KeyEvent event) {
-    if (_isStartFocusedFromPointer) {
-      _isStartFocusedFromPointer = false;
-      _isStartFocused.value = _startFocusNode.hasFocus;
-    }
     if (!widget.enabled || widget.onChanged == null) {
       return KeyEventResult.ignored;
     }
@@ -575,10 +563,6 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
   }
 
   KeyEventResult _handleEndKeyEvent(FocusNode node, KeyEvent event) {
-    if (_isEndFocusedFromPointer) {
-      _isEndFocusedFromPointer = false;
-      _isEndFocused.value = _endFocusNode.hasFocus;
-    }
     if (!widget.enabled || widget.onChanged == null) {
       return KeyEventResult.ignored;
     }
@@ -724,6 +708,14 @@ class _M3ERangeSliderState extends State<M3ERangeSlider>
         }
 
         return Listener(
+          onPointerDown: (_) {
+            if (_startFocusNode.hasFocus) {
+              _startFocusNode.unfocus();
+            }
+            if (_endFocusNode.hasFocus) {
+              _endFocusNode.unfocus();
+            }
+          },
           onPointerCancel: (_) {
             _isStartPressed.value = false;
             _isEndPressed.value = false;

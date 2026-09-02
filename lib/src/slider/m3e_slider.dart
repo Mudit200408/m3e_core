@@ -184,13 +184,8 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  bool _isFocusedFromPointer = false;
-
   void _handleFocusChange() {
-    if (!_focusNode.hasFocus) {
-      _isFocusedFromPointer = false;
-    }
-    _isFocused.value = _focusNode.hasFocus && !_isFocusedFromPointer;
+    _isFocused.value = _focusNode.hasFocus;
   }
 
   @visibleForTesting
@@ -261,8 +256,9 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
 
   void _handleDragStart(DragStartDetails details) {
     if (!widget.enabled) return;
-    _isFocusedFromPointer = true;
-    _focusNode.requestFocus();
+    if (_focusNode.hasFocus) {
+      _focusNode.unfocus();
+    }
     _clearSnapListener();
     _snapController.stop();
     _isPressed.value = true;
@@ -307,8 +303,9 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
 
   void _handleTapDown(TapDownDetails details, double totalLength) {
     if (!widget.enabled || totalLength <= 0) return;
-    _isFocusedFromPointer = true;
-    _focusNode.requestFocus();
+    if (_focusNode.hasFocus) {
+      _focusNode.unfocus();
+    }
     _clearSnapListener();
     _snapController.stop();
     _isPressed.value = true;
@@ -393,10 +390,6 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
   }
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
-    if (_isFocusedFromPointer) {
-      _isFocusedFromPointer = false;
-      _isFocused.value = _focusNode.hasFocus;
-    }
     if (!widget.enabled || widget.onChanged == null) {
       return KeyEventResult.ignored;
     }
@@ -523,6 +516,11 @@ class _M3ESliderState extends State<M3ESlider> with TickerProviderStateMixin {
             final trackLength = dragLength - 2 * margin;
 
             return Listener(
+              onPointerDown: (_) {
+                if (_focusNode.hasFocus) {
+                  _focusNode.unfocus();
+                }
+              },
               onPointerCancel: (_) {
                 _isPressed.value = false;
               },
