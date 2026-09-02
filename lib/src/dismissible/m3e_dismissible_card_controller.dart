@@ -1159,10 +1159,13 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
                     child: activeActions != null && activeActions.isNotEmpty
-                        ? SizedBox(
-                            width: _dragOffset.abs(),
-                            height: double.infinity,
-                            child: activeBg,
+                        ? ClipRRect(
+                            borderRadius: br,
+                            child: SizedBox(
+                              width: _dragOffset.abs(),
+                              height: double.infinity,
+                              child: activeBg,
+                            ),
                           )
                         : ClipRRect(
                             borderRadius: BorderRadius.circular(borderRadius),
@@ -1384,17 +1387,21 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                                   extraWidthPerButton)
                               .clamp(0.0, targetWidth + 48.0);
 
-                      return SizedBox(
-                        width: pillWidth,
-                        height: action.height ?? availableHeight,
-                        child: ClipRRect(
-                          borderRadius:
-                              action.borderRadius ?? BorderRadius.circular(100),
-                          child: action.buildButton(
-                            context,
-                            onTriggered: () {
-                              _springBack(1.0);
-                            },
+                      return Opacity(
+                        opacity: buttonProgress.clamp(0.0, 1.0),
+                        child: SizedBox(
+                          width: pillWidth,
+                          height: action.height ?? availableHeight,
+                          child: ClipRRect(
+                            borderRadius:
+                                action.borderRadius ??
+                                BorderRadius.circular(100),
+                            child: action.buildButton(
+                              context,
+                              onTriggered: () {
+                                _springBack(1.0);
+                              },
+                            ),
                           ),
                         ),
                       );
