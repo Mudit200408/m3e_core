@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:m3e_core/m3e_core.dart';
@@ -208,6 +209,102 @@ void main() {
 
       expect(actionTapped, isTrue);
     });
+
+    testWidgets(
+      'triggers hapticOnThreshold when action buttons reach fully open threshold',
+      (tester) async {
+        final List<String> hapticCalls = [];
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+              const MethodChannel('m3e_haptics/haptics'),
+              (MethodCall methodCall) async {
+                if (methodCall.method == 'vibrate') {
+                  final arguments = methodCall.arguments as Map;
+                  hapticCalls.add(arguments['type'] as String);
+                }
+                return null;
+              },
+            );
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, (
+              MethodCall methodCall,
+            ) async {
+              if (methodCall.method == 'HapticFeedback.vibrate') {
+                hapticCalls.add(methodCall.arguments as String);
+              }
+              return null;
+            });
+
+        addTearDown(() {
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+              .setMockMethodCallHandler(
+                const MethodChannel('m3e_haptics/haptics'),
+                null,
+              );
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+              .setMockMethodCallHandler(SystemChannels.platform, null);
+        });
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 400,
+                height: 600,
+                child: M3EDismissibleCardColumn(
+                  itemCount: 2,
+                  style: const M3EDismissibleCardStyle(
+                    hapticOnThreshold: M3EHapticFeedback.light,
+                    actions: [
+                      M3ESwipeAction(icon: Icon(Icons.archive), width: 50.0),
+                    ],
+                    actionSpacing: 10.0,
+                  ),
+                  itemBuilder: (context, index) {
+                    return SizedBox(
+                      height: 80,
+                      child: Text('Card Item $index'),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Actions width = 50.0 + (1 + 1) * 10.0 = 70.0
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.text('Card Item 0')),
+        );
+
+        // Break touch slop so horizontal drag starts
+        await gesture.moveBy(const Offset(25, 0));
+        await tester.pump();
+
+        // Drag 30px (total drag offset ~30px < 70.0 threshold) -> no haptic
+        await gesture.moveBy(const Offset(30, 0));
+        await tester.pump();
+        expect(hapticCalls, isEmpty);
+
+        // Drag another 50px (total drag offset ~80px >= 70.0 threshold) -> triggers haptic once
+        await gesture.moveBy(const Offset(50, 0));
+        await tester.pump();
+        expect(hapticCalls, hasLength(1));
+
+        // Drag further to 100px (in overdrag) -> should not trigger again
+        await gesture.moveBy(const Offset(20, 0));
+        await tester.pump();
+        expect(hapticCalls, hasLength(1));
+
+        // Drag back below threshold (e.g. -40px to ~60px) -> should NOT trigger haptic
+        await gesture.moveBy(const Offset(-40, 0));
+        await tester.pump();
+        expect(hapticCalls, hasLength(1));
+
+        await gesture.up();
+        await tester.pumpAndSettle();
+      },
+    );
 
     testWidgets('does not dismiss when action buttons are used', (
       tester,

@@ -90,39 +90,41 @@ class DismissibleInteractionControls extends StatelessWidget {
                 }
               },
             ),
-            if (!isActionButtonsMode) ...[
-              const SizedBox(height: 14),
-              const Text(
-                'Haptic On Threshold',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+            const SizedBox(height: 14),
+            Text(
+              isActionButtonsMode
+                  ? 'Haptic On Threshold (Fully Open)'
+                  : 'Haptic On Threshold',
+              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+            ),
+            const SizedBox(height: 6),
+            M3EDropdownMenu<M3EHapticFeedback>(
+              key: ValueKey('threshold_haptic_$hapticOnThreshold'),
+              singleSelect: true,
+              searchEnabled: false,
+              items: M3EHapticFeedback.values
+                  .map(
+                    (h) => M3EDropdownItem<M3EHapticFeedback>(
+                      label: h.name.toUpperCase(),
+                      value: h,
+                      selected: hapticOnThreshold == h,
+                    ),
+                  )
+                  .toList(),
+              fieldStyle: M3EDropdownFieldStyle(
+                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                hintText: isActionButtonsMode
+                    ? 'Select Haptic On Fully Revealed'
+                    : 'Select Haptic On Threshold',
               ),
-              const SizedBox(height: 6),
-              M3EDropdownMenu<M3EHapticFeedback>(
-                key: ValueKey('threshold_haptic_$hapticOnThreshold'),
-                singleSelect: true,
-                searchEnabled: false,
-                items: M3EHapticFeedback.values
-                    .map(
-                      (h) => M3EDropdownItem<M3EHapticFeedback>(
-                        label: h.name.toUpperCase(),
-                        value: h,
-                        selected: hapticOnThreshold == h,
-                      ),
-                    )
-                    .toList(),
-                fieldStyle: const M3EDropdownFieldStyle(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                  hintText: 'Select Haptic On Threshold',
-                ),
-                dropdownStyle: const M3EDropdownStyle(containerRadius: 16),
-                onSelectionChanged: (selectedItems) {
-                  if (selectedItems.isNotEmpty &&
-                      selectedItems.first.value != hapticOnThreshold) {
-                    onHapticOnThresholdChanged(selectedItems.first.value);
-                  }
-                },
-              ),
-            ],
+              dropdownStyle: const M3EDropdownStyle(containerRadius: 16),
+              onSelectionChanged: (selectedItems) {
+                if (selectedItems.isNotEmpty &&
+                    selectedItems.first.value != hapticOnThreshold) {
+                  onHapticOnThresholdChanged(selectedItems.first.value);
+                }
+              },
+            ),
             const Divider(height: 16),
             M3ESegmentedSwitchGroup(
               items: [

@@ -129,6 +129,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
 
   double _dragOffset = 0.0;
   bool _pastThreshold = false;
+  bool _pastActionThreshold = false;
   bool _reEngaging = false;
 
   double _neighbourFraction = 0.0;
@@ -385,6 +386,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         _dragOffset = 0.0;
         _neighbourFraction = 0.0;
         _pastThreshold = false;
+        _pastActionThreshold = false;
         _detachPush = 0.0;
         _roundnessFraction = 0.0;
       }
@@ -420,6 +422,16 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         final overdrag = newOffset.abs() - maxExtent;
         final dampedOverdrag = math.sqrt(overdrag) * 3.0;
         newOffset = (maxExtent + dampedOverdrag) * newOffset.sign;
+      }
+
+      final crossedAction = newOffset.abs() >= actionsWidth;
+      if (crossedAction && !_pastActionThreshold) {
+        _pastActionThreshold = true;
+        if (style.enableFeedback) {
+          applyHaptic(style.hapticOnThreshold);
+        }
+      } else if (!crossedAction && _pastActionThreshold) {
+        _pastActionThreshold = false;
       }
     }
 
@@ -612,6 +624,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       _detachPush = 0.0;
       _neighbourFraction = 0.0;
       _pastThreshold = false;
+      _pastActionThreshold = false;
       _reEngaging = false;
       _roundnessFraction = 0.0;
     });
@@ -656,6 +669,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       _detachPush = 0.0;
       _neighbourFraction = 0.0;
       _pastThreshold = false;
+      _pastActionThreshold = false;
       _roundnessFraction = 0.0;
     });
 
@@ -676,6 +690,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     _pushCtrl = null;
     _detachPush = 0.0;
     _pastThreshold = false;
+    _pastActionThreshold = true;
     _reEngaging = false;
 
     _springCtrl?.dispose();
@@ -744,6 +759,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     _pushCtrl = null;
     _detachPush = 0.0;
     _pastThreshold = false;
+    _pastActionThreshold = false;
     _reEngaging = false;
 
     final ref = _dragSlotRef;
@@ -845,6 +861,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       _detachPush = 0.0;
       _neighbourFraction = 0.0;
       _pastThreshold = false;
+      _pastActionThreshold = false;
       _reEngaging = false;
       _roundnessFraction = 0.0;
     });
