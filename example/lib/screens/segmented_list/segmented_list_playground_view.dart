@@ -33,6 +33,7 @@ class _SegmentedListPlaygroundViewState
   SegmentedListType _listType = SegmentedListType.reorderable;
   SegmentedContainerMode _containerMode = SegmentedContainerMode.listView;
   SegmentedTileLayout _tileLayout = SegmentedTileLayout.email;
+  RowFlexPreset _rowFlexPreset = RowFlexPreset.none;
   bool _useDecoration = true;
   bool _enableLazyLoading = true;
   static const int _pageSize = 10;
@@ -184,35 +185,74 @@ class _SegmentedListPlaygroundViewState
     setState(() {
       _items = List.of(
         allItems.take(
-          _containerMode == SegmentedContainerMode.column ? 5 : _pageSize,
+          _containerMode == SegmentedContainerMode.row
+              ? 2
+              : _containerMode == SegmentedContainerMode.column
+              ? 5
+              : _pageSize,
         ),
       );
-      _selectedIndices = {0, 2};
+      if (_containerMode == SegmentedContainerMode.row) {
+        _selectionMode = M3ESelectionMode.none;
+        _selectedIndices = {};
+      } else {
+        _selectedIndices = {0, 2};
+      }
+      _rowFlexPreset = RowFlexPreset.none;
       _showEmpty = false;
       _isLoadingMore = false;
     });
   }
 
   void _addItem() {
+    if (_containerMode == SegmentedContainerMode.row && _items.length >= 3) {
+      showSnack(
+        context,
+        'Material 3 Expressive companion rows support up to 3 items.',
+      );
+      return;
+    }
     if (_items.length >= allItems.length) {
       showSnack(context, 'All mock emails are already in the list!');
       return;
     }
     setState(() {
-      _items.insert(0, allItems[_items.length]);
-      _selectedIndices = _selectedIndices.map((i) => i + 1).toSet();
+      if (_containerMode == SegmentedContainerMode.row) {
+        _items.add(allItems[_items.length]);
+      } else {
+        _items.insert(0, allItems[_items.length]);
+        _selectedIndices = _selectedIndices.map((i) => i + 1).toSet();
+      }
       _showEmpty = false;
     });
   }
 
   void _removeItem() {
+    if (_containerMode == SegmentedContainerMode.row && _items.length <= 2) {
+      showSnack(
+        context,
+        'Material 3 Expressive companion rows require at least 2 items.',
+      );
+      return;
+    }
     if (_items.isEmpty) return;
     setState(() {
-      _items.removeAt(0);
-      _selectedIndices = _selectedIndices
-          .where((i) => i != 0)
-          .map((i) => i - 1)
-          .toSet();
+      if (_containerMode == SegmentedContainerMode.row) {
+        final lastIdx = _items.length - 1;
+        _items.removeAt(lastIdx);
+        _selectedIndices = _selectedIndices.where((i) => i != lastIdx).toSet();
+        if (!RowFlexPreset.presetsForCount(
+          _items.length,
+        ).contains(_rowFlexPreset)) {
+          _rowFlexPreset = RowFlexPreset.none;
+        }
+      } else {
+        _items.removeAt(0);
+        _selectedIndices = _selectedIndices
+            .where((i) => i != 0)
+            .map((i) => i - 1)
+            .toSet();
+      }
     });
   }
 
@@ -311,6 +351,7 @@ class _SegmentedListPlaygroundViewState
       expandDamping: _expandDamping,
       collapseStiffness: _collapseStiffness,
       collapseDamping: _collapseDamping,
+      flexes: _rowFlexPreset.computeFlexes(_items.length),
     );
   }
 
@@ -321,6 +362,10 @@ class _SegmentedListPlaygroundViewState
         onListTypeChanged: (type) {
           setState(() {
             _listType = type;
+            if (_listType != SegmentedListType.normal &&
+                _containerMode == SegmentedContainerMode.row) {
+              _containerMode = SegmentedContainerMode.column;
+            }
             _resetItems();
           });
         },
@@ -328,9 +373,19 @@ class _SegmentedListPlaygroundViewState
         onContainerModeChanged: (mode) {
           setState(() {
             _containerMode = mode;
+            if (_containerMode == SegmentedContainerMode.row) {
+              _selectionMode = M3ESelectionMode.none;
+              _selectedIndices = {};
+            } else if (_selectionMode == M3ESelectionMode.none) {
+              _selectionMode = M3ESelectionMode.multiple;
+              _selectedIndices = {0, 2};
+            }
             _resetItems();
           });
         },
+        rowFlexPreset: _rowFlexPreset,
+        onRowFlexPresetChanged: (preset) =>
+            setState(() => _rowFlexPreset = preset),
         tileLayout: _tileLayout,
         onTileLayoutChanged: (layout) => setState(() => _tileLayout = layout),
         useDecoration: _useDecoration,
@@ -528,6 +583,7 @@ class _SegmentedListPlaygroundViewState
         listType: _listType,
         containerMode: _containerMode,
         tileLayout: _tileLayout,
+        flexes: _rowFlexPreset.computeFlexes(_items.length),
         items: _items,
         showEmpty: _showEmpty,
         isLoadingMore: _isLoadingMore,

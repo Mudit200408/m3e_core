@@ -4,5 +4,6 @@ export 'm3e_reorderable_segmented_list.dart';
 export 'm3e_segmented_column.dart';
 export 'm3e_segmented_item.dart';
 export 'm3e_segmented_list.dart';
+export 'm3e_segmented_row.dart';
 export 'sliver_m3e_segmented_list.dart';
 export 'style/m3e_segmented_list_decoration.dart';

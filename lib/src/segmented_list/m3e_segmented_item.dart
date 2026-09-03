@@ -55,12 +55,31 @@ M3ESegmentedItemPosition calculateSegmentedItemPosition(int index, int total) =>
     ? M3ESegmentedItemPosition.last
     : M3ESegmentedItemPosition.middle;
 
-/// Calculates [BorderRadius] based on [M3ESegmentedItemPosition].
+/// Calculates [BorderRadius] based on [M3ESegmentedItemPosition] and [axis].
 BorderRadius calculateSegmentedItemRadius({
   required M3ESegmentedItemPosition position,
   required double outerRadius,
   required double innerRadius,
+  Axis axis = Axis.vertical,
 }) {
+  if (axis == Axis.horizontal) {
+    switch (position) {
+      case M3ESegmentedItemPosition.single:
+        return BorderRadius.circular(outerRadius);
+      case M3ESegmentedItemPosition.first:
+        return BorderRadius.horizontal(
+          left: Radius.circular(outerRadius),
+          right: Radius.circular(innerRadius),
+        );
+      case M3ESegmentedItemPosition.last:
+        return BorderRadius.horizontal(
+          left: Radius.circular(innerRadius),
+          right: Radius.circular(outerRadius),
+        );
+      case M3ESegmentedItemPosition.middle:
+        return BorderRadius.circular(innerRadius);
+    }
+  }
   switch (position) {
     case M3ESegmentedItemPosition.single:
       return BorderRadius.circular(outerRadius);
@@ -242,11 +261,17 @@ class M3ESegmentedItem extends StatefulWidget {
   final bool suppressAnimation;
 
   /// Explicitly controls whether this item is treated as the last item in a segmented layout
-  /// (i.e. whether bottom gap padding should be omitted).
+  /// (i.e. whether bottom or right gap padding should be omitted).
   ///
   /// When null (default), this is automatically determined from [position]
   /// ([M3ESegmentedItemPosition.last] or [M3ESegmentedItemPosition.single]).
   final bool? isLast;
+
+  /// The layout axis of the segmented container enclosing this item.
+  ///
+  /// Controls how directional corner radii and gaps are calculated.
+  /// Defaults to [Axis.vertical].
+  final Axis axis;
 
   /// Creates a Material 3 Expressive segmented item.
   const M3ESegmentedItem({
@@ -257,6 +282,7 @@ class M3ESegmentedItem extends StatefulWidget {
     required this.outerRadius,
     required this.innerRadius,
     this.gap = 2.0,
+    this.axis = Axis.vertical,
     this.color,
     this.padding,
     this.onTap,
@@ -361,6 +387,7 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
       position: widget.position,
       outerRadius: widget.outerRadius,
       innerRadius: widget.innerRadius,
+      axis: widget.axis,
     );
 
     final effectiveSelectedRadius =
@@ -460,21 +487,36 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
               suppressAnimation: widget.suppressAnimation,
             );
 
-      content = Stack(
-        alignment: Alignment.center,
-        children: [
-          content,
-          Positioned.fill(
-            child: Align(
-              alignment: widget.selectionCheckmarkAlignment,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: checkmarkWidget,
+      if (widget.axis == Axis.horizontal) {
+        final isLeading =
+            widget.selectionCheckmarkAlignment == Alignment.centerLeft ||
+            widget.selectionCheckmarkAlignment == Alignment.topLeft ||
+            widget.selectionCheckmarkAlignment == Alignment.bottomLeft;
+        content = Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            if (isLeading) ...[checkmarkWidget, const SizedBox(width: 8)],
+            Expanded(child: content),
+            if (!isLeading) ...[const SizedBox(width: 8), checkmarkWidget],
+          ],
+        );
+      } else {
+        content = Stack(
+          alignment: Alignment.center,
+          children: [
+            content,
+            Positioned.fill(
+              child: Align(
+                alignment: widget.selectionCheckmarkAlignment,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: checkmarkWidget,
+                ),
               ),
             ),
-          ),
-        ],
-      );
+          ],
+        );
+      }
     }
 
     final SpringMotion activeSpring = _isPressed
@@ -495,8 +537,12 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
             _isFocused ||
             widget.isSelected != _wasSelected);
 
+    final gapPadding = widget.axis == Axis.vertical
+        ? EdgeInsets.only(bottom: isLast ? 0 : widget.gap)
+        : EdgeInsets.only(right: isLast ? 0 : widget.gap);
+
     Widget item = Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : widget.gap),
+      padding: gapPadding,
       child: M3ESegmentedRadiusMotion(
         motion: activeSpring,
         targetRadius: targetRadius,
@@ -699,6 +745,7 @@ class M3EDefaultSelectionBadge extends StatelessWidget {
         child: Container(
           width: 24,
           height: 24,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selectedColor,
             shape: BoxShape.circle,

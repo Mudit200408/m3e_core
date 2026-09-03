@@ -12,7 +12,7 @@ import '../../common/m3e_common.dart';
 /// Styling, geometry, motion, and interaction overrides for Material 3 Expressive Segmented Lists.
 ///
 /// Encapsulates all visual customization properties for [M3ESegmentedList], [M3ESegmentedColumn],
-/// [SliverM3ESegmentedList], and [M3EReorderableSegmentedList].
+/// [M3ESegmentedRow], [SliverM3ESegmentedList], and [M3EReorderableSegmentedList].
 @immutable
 class M3ESegmentedListDecoration {
   // --- Base Geometry & Styling ---

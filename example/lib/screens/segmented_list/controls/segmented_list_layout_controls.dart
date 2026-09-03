@@ -39,6 +39,8 @@ class SegmentedListLayoutControls extends StatelessWidget {
     this.onTrailingPillWidthChanged,
     this.trailingPillHeight = 48.0,
     this.onTrailingPillHeightChanged,
+    this.rowFlexPreset = RowFlexPreset.none,
+    this.onRowFlexPresetChanged,
   });
 
   final SegmentedListType listType;
@@ -70,6 +72,8 @@ class SegmentedListLayoutControls extends StatelessWidget {
   final ValueChanged<double>? onTrailingPillWidthChanged;
   final double trailingPillHeight;
   final ValueChanged<double>? onTrailingPillHeightChanged;
+  final RowFlexPreset rowFlexPreset;
+  final ValueChanged<RowFlexPreset>? onRowFlexPresetChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -120,32 +124,90 @@ class SegmentedListLayoutControls extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             ),
             const SizedBox(height: 8),
-            M3EToggleButtonGroup(
-              type: M3EButtonGroupType.connected,
-              style: M3EButtonStyle.tonal,
-              size: M3EButtonSize.sm,
-              selectedIndex: containerMode.index,
-              onSelectedIndexChanged: (i) {
-                if (i != null) {
-                  onContainerModeChanged(SegmentedContainerMode.values[i]);
-                }
-              },
-              actions: const [
-                M3EToggleButtonGroupAction(
-                  label: Text('Column'),
-                  icon: Icon(Icons.table_rows_rounded),
-                ),
-                M3EToggleButtonGroupAction(
-                  label: Text('Lazy Loading'),
-                  icon: Icon(Icons.view_list_rounded),
-                ),
-                M3EToggleButtonGroupAction(
-                  label: Text('Sliver'),
-                  icon: Icon(Icons.layers_rounded),
-                ),
-              ],
-            ),
-            if (listType != SegmentedListType.expandable) ...[
+            () {
+              final isNormal = listType == SegmentedListType.normal;
+              final availableModes = isNormal
+                  ? const [
+                      SegmentedContainerMode.column,
+                      SegmentedContainerMode.row,
+                      SegmentedContainerMode.listView,
+                      SegmentedContainerMode.sliver,
+                    ]
+                  : const [
+                      SegmentedContainerMode.column,
+                      SegmentedContainerMode.listView,
+                      SegmentedContainerMode.sliver,
+                    ];
+              final selectedIdx = availableModes.indexOf(containerMode);
+
+              return M3EToggleButtonGroup(
+                type: M3EButtonGroupType.connected,
+                style: M3EButtonStyle.tonal,
+                size: M3EButtonSize.sm,
+                selectedIndex: selectedIdx >= 0 ? selectedIdx : 0,
+                onSelectedIndexChanged: (i) {
+                  if (i != null && i < availableModes.length) {
+                    onContainerModeChanged(availableModes[i]);
+                  }
+                },
+                actions: [
+                  const M3EToggleButtonGroupAction(
+                    label: Text('Column'),
+                    icon: Icon(Icons.table_rows_rounded),
+                  ),
+                  if (isNormal)
+                    const M3EToggleButtonGroupAction(
+                      label: Text('Row'),
+                      icon: Icon(Icons.view_column_rounded),
+                    ),
+                  const M3EToggleButtonGroupAction(
+                    label: Text('Lazy Loading'),
+                    icon: Icon(Icons.view_list_rounded),
+                  ),
+                  const M3EToggleButtonGroupAction(
+                    label: Text('Sliver'),
+                    icon: Icon(Icons.layers_rounded),
+                  ),
+                ],
+              );
+            }(),
+            if (containerMode == SegmentedContainerMode.row) ...[
+              const Divider(height: 20),
+              const Text(
+                'Row Item Flex Ratios (flexes)',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+              const SizedBox(height: 8),
+              Builder(
+                builder: (context) {
+                  final availablePresets = RowFlexPreset.presetsForCount(
+                    itemCount,
+                  );
+                  final selectedIdx = availablePresets.indexOf(rowFlexPreset);
+                  return M3EToggleButtonGroup(
+                    type: M3EButtonGroupType.connected,
+                    style: M3EButtonStyle.outlined,
+                    size: M3EButtonSize.xs,
+                    selectedIndex: selectedIdx >= 0 ? selectedIdx : 0,
+                    onSelectedIndexChanged: (i) {
+                      if (i != null &&
+                          i < availablePresets.length &&
+                          onRowFlexPresetChanged != null) {
+                        onRowFlexPresetChanged!(availablePresets[i]);
+                      }
+                    },
+                    actions: [
+                      for (final preset in availablePresets)
+                        M3EToggleButtonGroupAction(
+                          label: Text(preset.labelForCount(itemCount)),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ],
+            if (listType != SegmentedListType.expandable &&
+                containerMode != SegmentedContainerMode.row) ...[
               const Divider(height: 20),
               const Text(
                 'Item Content & Slot Layout',
@@ -284,6 +346,16 @@ class SegmentedListLayoutControls extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
+                  if (containerMode == SegmentedContainerMode.row) ...[
+                    Text(
+                      'Material 3 Expressive companion rows support 2 to 3 items.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
@@ -293,14 +365,22 @@ class SegmentedListLayoutControls extends StatelessWidget {
                         style: M3EButtonStyle.outlined,
                         icon: const Icon(Icons.add_rounded),
                         label: const Text('Add'),
-                        onPressed: onAddItem,
+                        onPressed:
+                            (containerMode == SegmentedContainerMode.row &&
+                                itemCount >= 3)
+                            ? null
+                            : onAddItem,
                       ),
                       M3EButton.icon(
                         size: M3EButtonSize.xs,
                         style: M3EButtonStyle.outlined,
                         icon: const Icon(Icons.remove_rounded),
                         label: const Text('Remove'),
-                        onPressed: onRemoveItem,
+                        onPressed:
+                            (containerMode == SegmentedContainerMode.row &&
+                                itemCount <= 2)
+                            ? null
+                            : onRemoveItem,
                       ),
                       M3EButton.icon(
                         size: M3EButtonSize.xs,

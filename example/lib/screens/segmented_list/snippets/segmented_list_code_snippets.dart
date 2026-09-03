@@ -60,6 +60,7 @@ class SegmentedListCodeSnippets {
     double expandDamping = 0.6,
     double collapseStiffness = 800,
     double collapseDamping = 0.6,
+    List<int>? flexes,
   }) {
     final buf = StringBuffer();
 
@@ -198,6 +199,11 @@ class SegmentedListCodeSnippets {
           buf.writeln("  header: const PinnedHeaderTile(),");
           buf.writeln("  footer: const PinnedFooterTile(),");
         }
+      } else if (containerMode == SegmentedContainerMode.row) {
+        buf.writeln("M3ESegmentedRow(");
+        if (flexes != null) {
+          buf.writeln("  flexes: const $flexes,");
+        }
       } else if (containerMode == SegmentedContainerMode.column) {
         buf.writeln("M3ESegmentedColumn(");
       } else if (containerMode == SegmentedContainerMode.listView) {
@@ -279,6 +285,8 @@ class SegmentedListCodeSnippets {
           buf.writeln("  keyBuilder: (index) => ValueKey(items[index].id),");
           buf.writeln("  itemCount: ${showEmpty ? 0 : itemCount},");
         }
+      } else if (containerMode == SegmentedContainerMode.row) {
+        buf.writeln("M3ESegmentedRow(");
       } else if (containerMode == SegmentedContainerMode.column) {
         buf.writeln("M3ESegmentedColumn(");
       } else if (containerMode == SegmentedContainerMode.listView) {
@@ -303,7 +311,18 @@ class SegmentedListCodeSnippets {
       buf.writeln("  },");
     }
 
-    if (containerMode == SegmentedContainerMode.column) {
+    if (containerMode == SegmentedContainerMode.row) {
+      buf.writeln("  children: const [");
+      if (itemCount >= 3) {
+        buf.writeln("    DateCard(),");
+        buf.writeln("    TimeCard(),");
+        buf.writeln("    TimezoneCard(),");
+      } else {
+        buf.writeln("    DateCard(),");
+        buf.writeln("    TimeCard(),");
+      }
+      buf.writeln("  ],");
+    } else if (containerMode == SegmentedContainerMode.column) {
       buf.writeln("  children: [");
       buf.writeln("    for (final item in items)");
       buf.writeln("      _buildListItem(context, item),");

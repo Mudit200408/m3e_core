@@ -77,6 +77,7 @@ class SegmentedListPreviewArea extends StatelessWidget {
     this.showTrailingPillOnlyWhenExpanded = true,
     this.trailingPillColor,
     this.trailingPillSize = const Size(32.0, 48.0),
+    this.flexes,
   });
 
   final SegmentedListType listType;
@@ -145,6 +146,7 @@ class SegmentedListPreviewArea extends StatelessWidget {
   final bool showTrailingPillOnlyWhenExpanded;
   final Color? trailingPillColor;
   final Size trailingPillSize;
+  final List<int>? flexes;
 
   M3ESegmentedListDecoration _buildDecoration(ColorScheme cs) {
     return M3ESegmentedListDecoration(
@@ -434,6 +436,74 @@ class SegmentedListPreviewArea extends StatelessWidget {
       }
 
       return SizedBox(height: 540, child: reorderableWidget);
+    }
+
+    // ── Normal Mode: Row Architecture ──
+    if (containerMode == SegmentedContainerMode.row) {
+      final displayItems = items;
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            M3ESegmentedRow(
+              selectionMode: selectionMode,
+              selectionTrigger: selectionTrigger,
+              selectedIndices: selectedIndices,
+              showSelectionCheckmark: showSelectionCheckmark,
+              selectionCheckmarkAlignment: checkmarkAlignment,
+              onSelectionChanged: onSelectedIndicesChanged,
+              onTap: (i) {
+                const labels = [
+                  'Date picker tapped: Sep 1, 2026',
+                  'Time picker tapped: 11:39 AM',
+                  'Timezone picker tapped: GMT+5:30',
+                ];
+                showSnack(context, labels[i % labels.length]);
+              },
+              semanticLabelBuilder: semanticLabelBuilder,
+              decoration: decoration,
+              outerRadius: outerRadius,
+              innerRadius: innerRadius,
+              gap: gap,
+              padding: paddingInsets,
+              margin: marginInsets,
+              elevation: elevation,
+              equalWidth: flexes == null,
+              flexes: flexes,
+              children: List.generate(displayItems.length, (index) {
+                const cardDefs = [
+                  (icon: Icons.calendar_today_outlined, title: 'Sep 1, 2026'),
+                  (icon: Icons.access_time_rounded, title: '11:39 AM'),
+                  (icon: Icons.public_rounded, title: 'GMT+5:30'),
+                ];
+                final def = cardDefs[index % cardDefs.length];
+                return KeyedSubtree(
+                  key: ValueKey('row_card_$index'),
+                  child: Row(
+                    children: [
+                      Icon(def.icon, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          def.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right_rounded, size: 18),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
+      );
     }
 
     // ── Normal Mode: Column Architecture ──
