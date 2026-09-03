@@ -89,6 +89,7 @@ class M3ESwipeAction {
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
+          splashFactory: InkSparkle.splashFactory,
           onTap: handlePress,
           child: Center(
             child: IconTheme(

@@ -1244,7 +1244,8 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                       child: InkWell(
                         splashColor: s.splashColor,
                         highlightColor: s.highlightColor,
-                        splashFactory: s.splashFactory,
+                        splashFactory:
+                            s.splashFactory ?? InkSparkle.splashFactory,
                         enableFeedback: s.enableFeedback,
                         onTap: () {
                           if (_dragSlotRef != null && _dragOffset.abs() > 0) {
