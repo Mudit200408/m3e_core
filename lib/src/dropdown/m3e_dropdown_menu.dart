@@ -179,6 +179,12 @@ class M3EDropdownMenu<T> extends StatefulWidget {
   /// Haptic feedback level on tap.
   final M3EHapticFeedback haptic;
 
+  /// Optional scale factor applied when pressed (e.g. 0.98) to the field trigger
+  /// and dropdown items.
+  ///
+  /// Can be overridden individually via [fieldStyle.pressedScale] or [itemStyle.pressedScale].
+  final double? pressedScale;
+
   /// Creates an [M3EDropdownMenu] with a static list of items.
   const M3EDropdownMenu({
     super.key,
@@ -209,6 +215,7 @@ class M3EDropdownMenu<T> extends StatefulWidget {
     this.closeMotion = M3EMotion.expressiveSpatialDefault,
     this.splashFactory = NoSplash.splashFactory,
     this.haptic = M3EHapticFeedback.none,
+    this.pressedScale,
   }) : future = null;
 
   /// Creates an [M3EDropdownMenu] that loads items asynchronously.
@@ -241,6 +248,7 @@ class M3EDropdownMenu<T> extends StatefulWidget {
     this.closeMotion = M3EMotion.expressiveSpatialDefault,
     this.splashFactory = NoSplash.splashFactory,
     this.haptic = M3EHapticFeedback.none,
+    this.pressedScale,
   }) : items = const [];
 
   @override
@@ -255,6 +263,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   // Interaction states for field
   bool _isHoveredField = false;
   bool _isPressedField = false;
+  bool _isInteractingWithChip = false;
 
   // Track selection state for field duration logic
   bool _lastIsOpen = false;
@@ -904,6 +913,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         ],
       );
 
+      final effectiveFieldScale = fd.pressedScale ?? widget.pressedScale;
       final duration = isOpenChanged
           ? const Duration(milliseconds: 20)
           : const Duration(milliseconds: 40);
@@ -941,16 +951,38 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
               mouseCursor: widget.enabled
                   ? (fd.mouseCursor ?? SystemMouseCursors.click)
                   : SystemMouseCursors.forbidden,
-              onTap: widget.enabled ? _toggle : null,
+              onTap: widget.enabled && !_isInteractingWithChip ? _toggle : null,
               onHover: (hover) => setState(() => _isHoveredField = hover),
-              onTapDown: (_) => setState(() => _isPressedField = true),
+              onHighlightChanged: (highlighted) {
+                if (highlighted && _isInteractingWithChip) return;
+                if (mounted && _isPressedField != highlighted) {
+                  setState(() => _isPressedField = highlighted);
+                }
+              },
+              onTapDown: (_) {
+                if (!_isInteractingWithChip) {
+                  setState(() => _isPressedField = true);
+                }
+              },
               onTapUp: (_) => setState(() => _isPressedField = false),
               onTapCancel: () => setState(() => _isPressedField = false),
               child: Padding(padding: fd.padding, child: child),
             ),
           );
         },
-        child: contentRow,
+        child: effectiveFieldScale != null && effectiveFieldScale != 1.0
+            ? SingleMotionBuilder(
+                motion: fd.pressedMotion.toMotion(),
+                value: (_isPressedField && !_isInteractingWithChip)
+                    ? effectiveFieldScale
+                    : 1.0,
+                builder: (context, scale, _) => Transform.scale(
+                  scale: scale,
+                  alignment: Alignment.center,
+                  child: contentRow,
+                ),
+              )
+            : contentRow,
       );
     }
 
@@ -1057,6 +1089,11 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
       slideAnims.add(_chipSlideControllers[optionKey]!);
 
+      final effectiveChipScale =
+          cd.pressedScale ??
+          widget.pressedScale ??
+          widget.fieldStyle.pressedScale;
+
       chipWidgets.add(
         M3ESpringChip<T>(
           key: chipKey,
@@ -1070,6 +1107,12 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
           onRemove: () =>
               _handleChipRemove(option, optionKey, chipKey, displayOptions, i),
           customChild: widget.selectedItemBuilder?.call(option),
+          pressedScale: effectiveChipScale,
+          onInteractionChanged: (interacting) {
+            if (mounted && _isInteractingWithChip != interacting) {
+              setState(() => _isInteractingWithChip = interacting);
+            }
+          },
         ),
       );
     }
@@ -1302,12 +1345,19 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                         );
                       }
 
+                      final effectiveItemStyle =
+                          widget.itemStyle.pressedScale != null
+                          ? widget.itemStyle
+                          : widget.itemStyle.copyWith(
+                              pressedScale: widget.pressedScale,
+                            );
+
                       return M3EDropdownMenuItemWidget<T>(
                         key: ValueKey(item.value),
                         item: item,
                         index: index,
                         total: filtered.length,
-                        style: widget.itemStyle,
+                        style: effectiveItemStyle,
                         splashFactory: widget.splashFactory,
                         onTap: () => _onItemTap(item),
                       );

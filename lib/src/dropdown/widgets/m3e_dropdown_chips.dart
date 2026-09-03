@@ -19,6 +19,12 @@ class M3ESpringChip<T> extends StatefulWidget {
   /// When non-null, replaces the default chip body with this widget.
   final Widget? customChild;
 
+  /// Scale factor applied to the chip when pressed.
+  final double? pressedScale;
+
+  /// Callback dispatched when the user begins or ends interacting with this chip.
+  final ValueChanged<bool>? onInteractionChanged;
+
   const M3ESpringChip({
     required super.key,
     required this.item,
@@ -30,6 +36,8 @@ class M3ESpringChip<T> extends StatefulWidget {
     required this.onRemove,
     this.slideOffset = 0,
     this.customChild,
+    this.pressedScale,
+    this.onInteractionChanged,
   });
 
   @override
@@ -41,6 +49,8 @@ class M3ESpringChipState<T> extends State<M3ESpringChip<T>>
   late SingleMotionController _scaleCtrl;
   late SingleMotionController _slideCtrl;
   late SingleMotionController _squishCtrl;
+  bool _isPressed = false;
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +85,9 @@ class M3ESpringChipState<T> extends State<M3ESpringChip<T>>
 
   @override
   void dispose() {
+    if (_isPressed) {
+      widget.onInteractionChanged?.call(false);
+    }
     _scaleCtrl.dispose();
     _slideCtrl.dispose();
     _squishCtrl.dispose();
@@ -96,6 +109,50 @@ class M3ESpringChipState<T> extends State<M3ESpringChip<T>>
 
   @override
   Widget build(BuildContext context) {
+    final effectiveChipScale = widget.cd.pressedScale ?? widget.pressedScale;
+    final chipContent = widget.customChild ?? _buildChipBody();
+
+    final scaledChild = effectiveChipScale != null && effectiveChipScale != 1.0
+        ? SingleMotionBuilder(
+            motion: widget.cd.pressedMotion.toMotion(),
+            value: _isPressed ? effectiveChipScale : 1.0,
+            builder: (context, scale, _) => Transform.scale(
+              scale: scale,
+              alignment: Alignment.center,
+              child: chipContent,
+            ),
+          )
+        : chipContent;
+
+    final interactiveChild = widget.enabled
+        ? Listener(
+            onPointerDown: (_) {
+              widget.onInteractionChanged?.call(true);
+              if (mounted && !_isPressed) {
+                setState(() => _isPressed = true);
+              }
+            },
+            onPointerUp: (_) {
+              widget.onInteractionChanged?.call(false);
+              if (mounted && _isPressed) {
+                setState(() => _isPressed = false);
+              }
+            },
+            onPointerCancel: (_) {
+              widget.onInteractionChanged?.call(false);
+              if (mounted && _isPressed) {
+                setState(() => _isPressed = false);
+              }
+            },
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap:
+                  () {}, // Absorbs tap so parent field toggle is not triggered
+              child: scaledChild,
+            ),
+          )
+        : scaledChild;
+
     return AnimatedBuilder(
       animation: Listenable.merge([_scaleCtrl, _slideCtrl, _squishCtrl]),
       builder: (context, child) {
@@ -122,7 +179,7 @@ class M3ESpringChipState<T> extends State<M3ESpringChip<T>>
           ),
         );
       },
-      child: widget.customChild ?? _buildChipBody(),
+      child: interactiveChild,
     );
   }
 

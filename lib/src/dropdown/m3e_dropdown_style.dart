@@ -111,6 +111,16 @@ class M3EDropdownFieldStyle with Diagnosticable {
   /// Border radius of the field when pressed.
   final double? pressedRadius;
 
+  /// Scale factor applied to the field content when pressed (e.g. 0.98).
+  ///
+  /// Defaults to null (no scale transformation).
+  final double? pressedScale;
+
+  /// Spring motion used for the pressed scale animation.
+  ///
+  /// Defaults to [M3EMotion.expressiveSpatialFast].
+  final M3EMotion pressedMotion;
+
   /// Splash factory for tap feedback on the field.
   final InteractiveInkFeatureFactory? splashFactory;
 
@@ -145,6 +155,8 @@ class M3EDropdownFieldStyle with Diagnosticable {
     this.selectedBorderRadius,
     this.hoverRadius,
     this.pressedRadius,
+    this.pressedScale,
+    this.pressedMotion = M3EMotion.expressiveSpatialFast,
     this.splashFactory,
     this.splashColor,
     this.highlightColor,
@@ -177,6 +189,8 @@ class M3EDropdownFieldStyle with Diagnosticable {
     double? selectedBorderRadius,
     double? hoverRadius,
     double? pressedRadius,
+    double? pressedScale,
+    M3EMotion? pressedMotion,
     InteractiveInkFeatureFactory? splashFactory,
     Color? splashColor,
     Color? highlightColor,
@@ -205,6 +219,8 @@ class M3EDropdownFieldStyle with Diagnosticable {
       selectedBorderRadius: selectedBorderRadius ?? this.selectedBorderRadius,
       hoverRadius: hoverRadius ?? this.hoverRadius,
       pressedRadius: pressedRadius ?? this.pressedRadius,
+      pressedScale: pressedScale ?? this.pressedScale,
+      pressedMotion: pressedMotion ?? this.pressedMotion,
       splashFactory: splashFactory ?? this.splashFactory,
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
@@ -266,6 +282,10 @@ class M3EDropdownFieldStyle with Diagnosticable {
       ),
       hoverRadius: lerpDouble(a?.hoverRadius, b?.hoverRadius, t),
       pressedRadius: lerpDouble(a?.pressedRadius, b?.pressedRadius, t),
+      pressedScale: lerpDouble(a?.pressedScale, b?.pressedScale, t),
+      pressedMotion: t < 0.5
+          ? (a?.pressedMotion ?? M3EMotion.expressiveSpatialFast)
+          : (b?.pressedMotion ?? M3EMotion.expressiveSpatialFast),
       splashFactory: t < 0.5 ? a?.splashFactory : b?.splashFactory,
       splashColor: Color.lerp(a?.splashColor, b?.splashColor, t),
       highlightColor: Color.lerp(a?.highlightColor, b?.highlightColor, t),
@@ -299,6 +319,8 @@ class M3EDropdownFieldStyle with Diagnosticable {
           selectedBorderRadius == other.selectedBorderRadius &&
           hoverRadius == other.hoverRadius &&
           pressedRadius == other.pressedRadius &&
+          pressedScale == other.pressedScale &&
+          pressedMotion == other.pressedMotion &&
           splashFactory == other.splashFactory &&
           splashColor == other.splashColor &&
           highlightColor == other.highlightColor &&
@@ -328,6 +350,8 @@ class M3EDropdownFieldStyle with Diagnosticable {
     selectedBorderRadius,
     hoverRadius,
     pressedRadius,
+    pressedScale,
+    pressedMotion,
     splashFactory,
     splashColor,
     highlightColor,
@@ -554,6 +578,16 @@ class M3EChipStyle with Diagnosticable {
   /// Mouse cursor when hovering over the chip.
   final MouseCursor? mouseCursor;
 
+  /// Scale factor applied to the chip when pressed (e.g. 0.95).
+  ///
+  /// Defaults to null (no individual scale transformation unless inherited).
+  final double? pressedScale;
+
+  /// Spring motion used for the pressed scale animation.
+  ///
+  /// Defaults to [M3EMotion.expressiveSpatialFast].
+  final M3EMotion pressedMotion;
+
   /// Creates a [M3EChipStyle].
   const M3EChipStyle({
     this.backgroundColor,
@@ -569,6 +603,8 @@ class M3EChipStyle with Diagnosticable {
     this.openMotion = M3EMotion.expressiveSpatialDefault,
     this.closeMotion = M3EMotion.expressiveSpatialDefault,
     this.mouseCursor,
+    this.pressedScale,
+    this.pressedMotion = M3EMotion.expressiveSpatialFast,
   });
 
   /// Creates a copy of this style with the given fields replaced.
@@ -586,6 +622,8 @@ class M3EChipStyle with Diagnosticable {
     M3EMotion? openMotion,
     M3EMotion? closeMotion,
     MouseCursor? mouseCursor,
+    double? pressedScale,
+    M3EMotion? pressedMotion,
   }) {
     return M3EChipStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -601,6 +639,8 @@ class M3EChipStyle with Diagnosticable {
       openMotion: openMotion ?? this.openMotion,
       closeMotion: closeMotion ?? this.closeMotion,
       mouseCursor: mouseCursor ?? this.mouseCursor,
+      pressedScale: pressedScale ?? this.pressedScale,
+      pressedMotion: pressedMotion ?? this.pressedMotion,
     );
   }
 
@@ -633,6 +673,10 @@ class M3EChipStyle with Diagnosticable {
           ? (a?.closeMotion ?? M3EMotion.expressiveSpatialDefault)
           : (b?.closeMotion ?? M3EMotion.expressiveSpatialDefault),
       mouseCursor: t < 0.5 ? a?.mouseCursor : b?.mouseCursor,
+      pressedScale: lerpDouble(a?.pressedScale, b?.pressedScale, t),
+      pressedMotion: t < 0.5
+          ? (a?.pressedMotion ?? M3EMotion.expressiveSpatialFast)
+          : (b?.pressedMotion ?? M3EMotion.expressiveSpatialFast),
     );
   }
 
@@ -652,7 +696,9 @@ class M3EChipStyle with Diagnosticable {
           maxDisplayCount == other.maxDisplayCount &&
           openMotion == other.openMotion &&
           closeMotion == other.closeMotion &&
-          mouseCursor == other.mouseCursor;
+          mouseCursor == other.mouseCursor &&
+          pressedScale == other.pressedScale &&
+          pressedMotion == other.pressedMotion;
 
   @override
   int get hashCode => Object.hash(
@@ -669,6 +715,8 @@ class M3EChipStyle with Diagnosticable {
     openMotion,
     closeMotion,
     mouseCursor,
+    pressedScale,
+    pressedMotion,
   );
 
   @override
@@ -682,6 +730,7 @@ class M3EChipStyle with Diagnosticable {
     );
     properties.add(DoubleProperty('spacing', spacing));
     properties.add(IntProperty('maxDisplayCount', maxDisplayCount));
+    properties.add(DoubleProperty('pressedScale', pressedScale));
   }
 }
 
@@ -936,6 +985,16 @@ class M3EDropdownItemStyle with Diagnosticable {
   /// Defaults to `4.0`.
   final double pressedRadius;
 
+  /// Scale factor applied to the item content when pressed (e.g. 0.98).
+  ///
+  /// Defaults to null (no scale transformation).
+  final double? pressedScale;
+
+  /// Spring motion used for the pressed scale animation.
+  ///
+  /// Defaults to [M3EMotion.expressiveSpatialFast].
+  final M3EMotion pressedMotion;
+
   /// Splash factory for tap feedback on individual items.
   final InteractiveInkFeatureFactory? splashFactory;
 
@@ -966,6 +1025,8 @@ class M3EDropdownItemStyle with Diagnosticable {
     this.selectedBorderRadius,
     this.hoverRadius = 8.0,
     this.pressedRadius = 4.0,
+    this.pressedScale,
+    this.pressedMotion = M3EMotion.expressiveSpatialFast,
     this.splashFactory,
     this.splashColor,
     this.highlightColor,
@@ -990,6 +1051,8 @@ class M3EDropdownItemStyle with Diagnosticable {
     double? selectedBorderRadius,
     double? hoverRadius,
     double? pressedRadius,
+    double? pressedScale,
+    M3EMotion? pressedMotion,
     InteractiveInkFeatureFactory? splashFactory,
     Color? splashColor,
     Color? highlightColor,
@@ -1014,6 +1077,8 @@ class M3EDropdownItemStyle with Diagnosticable {
       selectedBorderRadius: selectedBorderRadius ?? this.selectedBorderRadius,
       hoverRadius: hoverRadius ?? this.hoverRadius,
       pressedRadius: pressedRadius ?? this.pressedRadius,
+      pressedScale: pressedScale ?? this.pressedScale,
+      pressedMotion: pressedMotion ?? this.pressedMotion,
       splashFactory: splashFactory ?? this.splashFactory,
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
@@ -1071,6 +1136,10 @@ class M3EDropdownItemStyle with Diagnosticable {
       ),
       hoverRadius: lerpDouble(a?.hoverRadius, b?.hoverRadius, t) ?? 8.0,
       pressedRadius: lerpDouble(a?.pressedRadius, b?.pressedRadius, t) ?? 4.0,
+      pressedScale: lerpDouble(a?.pressedScale, b?.pressedScale, t),
+      pressedMotion: t < 0.5
+          ? (a?.pressedMotion ?? M3EMotion.expressiveSpatialFast)
+          : (b?.pressedMotion ?? M3EMotion.expressiveSpatialFast),
       splashFactory: t < 0.5 ? a?.splashFactory : b?.splashFactory,
       splashColor: Color.lerp(a?.splashColor, b?.splashColor, t),
       highlightColor: Color.lerp(a?.highlightColor, b?.highlightColor, t),
@@ -1098,6 +1167,8 @@ class M3EDropdownItemStyle with Diagnosticable {
           selectedBorderRadius == other.selectedBorderRadius &&
           hoverRadius == other.hoverRadius &&
           pressedRadius == other.pressedRadius &&
+          pressedScale == other.pressedScale &&
+          pressedMotion == other.pressedMotion &&
           splashFactory == other.splashFactory &&
           splashColor == other.splashColor &&
           highlightColor == other.highlightColor &&
@@ -1121,6 +1192,8 @@ class M3EDropdownItemStyle with Diagnosticable {
     selectedBorderRadius,
     hoverRadius,
     pressedRadius,
+    pressedScale,
+    pressedMotion,
     splashFactory,
     splashColor,
     highlightColor,

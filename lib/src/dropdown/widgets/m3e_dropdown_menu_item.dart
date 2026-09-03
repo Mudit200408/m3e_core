@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:motor/motor.dart';
 import '../m3e_dropdown_item.dart';
 import '../m3e_dropdown_style.dart';
 
@@ -129,6 +130,18 @@ class _M3EDropdownMenuItemWidgetState<T>
       ),
     );
 
+    final scaledContent = id.pressedScale != null && id.pressedScale != 1.0
+        ? SingleMotionBuilder(
+            motion: id.pressedMotion.toMotion(),
+            value: _isPressed ? id.pressedScale! : 1.0,
+            builder: (context, scale, _) => Transform.scale(
+              scale: scale,
+              alignment: Alignment.center,
+              child: content,
+            ),
+          )
+        : content;
+
     final bool selectionChanged = _lastSelected != widget.item.selected;
     _lastSelected = widget.item.selected;
 
@@ -165,6 +178,11 @@ class _M3EDropdownMenuItemWidgetState<T>
             mouseCursor: id.mouseCursor,
             onTap: item.disabled ? null : widget.onTap,
             onHover: (hover) => setState(() => _isHovered = hover),
+            onHighlightChanged: (highlighted) {
+              if (mounted && _isPressed != highlighted) {
+                setState(() => _isPressed = highlighted);
+              }
+            },
             onTapDown: (_) => setState(() => _isPressed = true),
             onTapUp: (_) => setState(() => _isPressed = false),
             onTapCancel: () => setState(() => _isPressed = false),
@@ -172,7 +190,7 @@ class _M3EDropdownMenuItemWidgetState<T>
           ),
         );
       },
-      child: content,
+      child: scaledContent,
     );
   }
 }
