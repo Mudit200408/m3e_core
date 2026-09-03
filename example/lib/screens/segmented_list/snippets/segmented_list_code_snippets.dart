@@ -35,6 +35,7 @@ class SegmentedListCodeSnippets {
     required double outerRadius,
     required double innerRadius,
     required double pressedRadius,
+    double pressedScale = 1.0,
     required double hoveredRadius,
     required double selectedRadius,
     required bool useSelectedBorder,
@@ -244,6 +245,9 @@ class SegmentedListCodeSnippets {
       buf.writeln("    outerRadius: ${outerRadius.toStringAsFixed(1)},");
       buf.writeln("    innerRadius: ${innerRadius.toStringAsFixed(1)},");
       buf.writeln("    pressedRadius: ${pressedRadius.toStringAsFixed(1)},");
+      if (pressedScale != 1.0) {
+        buf.writeln("    pressedScale: ${pressedScale.toStringAsFixed(2)},");
+      }
       buf.writeln("    hoveredRadius: ${hoveredRadius.toStringAsFixed(1)},");
       if (selectionMode != M3ESelectionMode.none) {
         buf.writeln(

@@ -118,6 +118,11 @@ class M3ESegmentedListDecoration {
   /// Custom [BorderRadius] applied when an item is pressed.
   final BorderRadius? pressedBorderRadius;
 
+  /// Scale factor applied to the item inner content when pressed (e.g. 0.98 or 0.96).
+  ///
+  /// Defaults to `null`, meaning content maintains standard `1.0` scale without spring scaling.
+  final double? pressedScale;
+
   /// Corner radius applied to all corners when an item is hovered.
   final double? hoveredRadius;
 
@@ -199,6 +204,7 @@ class M3ESegmentedListDecoration {
     this.selectionCheckmarkAlignment = Alignment.centerRight,
     this.pressedRadius,
     this.pressedBorderRadius,
+    this.pressedScale,
     this.hoveredRadius,
     this.hoveredBorderRadius,
     this.motion = M3EMotion.expressiveSpatialFast,
@@ -247,6 +253,7 @@ class M3ESegmentedListDecoration {
     Alignment? selectionCheckmarkAlignment,
     double? pressedRadius,
     BorderRadius? pressedBorderRadius,
+    double? pressedScale,
     double? hoveredRadius,
     BorderRadius? hoveredBorderRadius,
     M3EMotion? motion,
@@ -296,6 +303,7 @@ class M3ESegmentedListDecoration {
           selectionCheckmarkAlignment ?? this.selectionCheckmarkAlignment,
       pressedRadius: pressedRadius ?? this.pressedRadius,
       pressedBorderRadius: pressedBorderRadius ?? this.pressedBorderRadius,
+      pressedScale: pressedScale ?? this.pressedScale,
       hoveredRadius: hoveredRadius ?? this.hoveredRadius,
       hoveredBorderRadius: hoveredBorderRadius ?? this.hoveredBorderRadius,
       motion: motion ?? this.motion,
@@ -397,6 +405,7 @@ class M3ESegmentedListDecoration {
         b.pressedBorderRadius,
         t,
       ),
+      pressedScale: lerpDouble(a.pressedScale, b.pressedScale, t),
       hoveredRadius: lerpDouble(a.hoveredRadius, b.hoveredRadius, t),
       hoveredBorderRadius: BorderRadius.lerp(
         a.hoveredBorderRadius,
@@ -471,6 +480,7 @@ class M3ESegmentedListDecoration {
         other.selectionCheckmarkAlignment == selectionCheckmarkAlignment &&
         other.pressedRadius == pressedRadius &&
         other.pressedBorderRadius == pressedBorderRadius &&
+        other.pressedScale == pressedScale &&
         other.hoveredRadius == hoveredRadius &&
         other.hoveredBorderRadius == hoveredBorderRadius &&
         other.motion == motion &&
@@ -519,6 +529,7 @@ class M3ESegmentedListDecoration {
     selectionCheckmarkAlignment,
     pressedRadius,
     pressedBorderRadius,
+    pressedScale,
     hoveredRadius,
     hoveredBorderRadius,
     motion,

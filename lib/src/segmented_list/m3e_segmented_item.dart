@@ -230,6 +230,13 @@ class M3ESegmentedItem extends StatefulWidget {
   /// Custom [BorderRadius] applied when the item is pressed.
   final BorderRadius? pressedBorderRadius;
 
+  /// Scale factor applied to the item inner content when pressed (e.g. 0.98 or 0.96).
+  ///
+  /// When specified and not 1.0, the inner content scales down with spring physics
+  /// on touch down and springs back to `1.0` upon release, using [pressedMotion].
+  /// Defaults to `null`.
+  final double? pressedScale;
+
   /// Corner radius applied to all corners when the item is hovered.
   final double? hoveredRadius;
 
@@ -317,6 +324,7 @@ class M3ESegmentedItem extends StatefulWidget {
     this.selectedElevation,
     this.pressedRadius,
     this.pressedBorderRadius,
+    this.pressedScale,
     this.hoveredRadius,
     this.hoveredBorderRadius,
     this.showSelectionCheckmark = false,
@@ -595,9 +603,27 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
                       }
                     : null,
                 onFocusChange: widget.onFocusChange,
+                onHighlightChanged: hasInteraction
+                    ? (highlighted) {
+                        if (mounted && _isPressed != highlighted) {
+                          setState(() => _isPressed = highlighted);
+                        }
+                      }
+                    : null,
                 child: Padding(
                   padding: widget.padding ?? const EdgeInsets.all(12.0),
-                  child: content,
+                  child:
+                      widget.pressedScale != null && widget.pressedScale != 1.0
+                      ? SingleMotionBuilder(
+                          motion: widget.pressedMotion.toMotion(),
+                          value: _isPressed ? widget.pressedScale! : 1.0,
+                          builder: (context, scale, _) => Transform.scale(
+                            scale: scale,
+                            alignment: Alignment.center,
+                            child: content,
+                          ),
+                        )
+                      : content,
                 ),
               ),
             ),

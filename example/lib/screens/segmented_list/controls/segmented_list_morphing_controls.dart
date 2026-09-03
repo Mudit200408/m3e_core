@@ -11,6 +11,8 @@ class SegmentedListMorphingControls extends StatelessWidget {
     super.key,
     required this.pressedRadius,
     required this.onPressedRadiusChanged,
+    required this.pressedScale,
+    required this.onPressedScaleChanged,
     required this.hoveredRadius,
     required this.onHoveredRadiusChanged,
     required this.restingMotionPreset,
@@ -42,6 +44,8 @@ class SegmentedListMorphingControls extends StatelessWidget {
 
   final double pressedRadius;
   final ValueChanged<double> onPressedRadiusChanged;
+  final double pressedScale;
+  final ValueChanged<double> onPressedScaleChanged;
   final double hoveredRadius;
   final ValueChanged<double> onHoveredRadiusChanged;
   final M3EExampleMotionPreset restingMotionPreset;
@@ -91,6 +95,15 @@ class SegmentedListMorphingControls extends StatelessWidget {
               divisions: 32,
               format: (v) => v.toStringAsFixed(0),
               onChanged: onPressedRadiusChanged,
+            ),
+            M3ESliderRow(
+              label: 'Pressed Content Scale',
+              value: pressedScale,
+              min: 0.85,
+              max: 1.0,
+              divisions: 15,
+              format: (v) => v.toStringAsFixed(2),
+              onChanged: onPressedScaleChanged,
             ),
             M3ESliderRow(
               label: 'Hovered Morph Radius',

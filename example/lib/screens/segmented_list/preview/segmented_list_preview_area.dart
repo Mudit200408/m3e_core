@@ -33,6 +33,7 @@ class SegmentedListPreviewArea extends StatelessWidget {
     required this.outerRadius,
     required this.innerRadius,
     required this.pressedRadius,
+    required this.pressedScale,
     required this.hoveredRadius,
     required this.selectedRadius,
     required this.dragRadius,
@@ -101,6 +102,7 @@ class SegmentedListPreviewArea extends StatelessWidget {
   final double outerRadius;
   final double innerRadius;
   final double pressedRadius;
+  final double pressedScale;
   final double hoveredRadius;
   final double selectedRadius;
   final double dragRadius;
@@ -153,6 +155,7 @@ class SegmentedListPreviewArea extends StatelessWidget {
       outerRadius: outerRadius,
       innerRadius: innerRadius,
       pressedRadius: pressedRadius,
+      pressedScale: pressedScale,
       hoveredRadius: hoveredRadius,
       selectedRadius: selectedRadius,
       dragRadius: dragRadius,
@@ -242,6 +245,7 @@ class SegmentedListPreviewArea extends StatelessWidget {
         outerRadius: outerRadius,
         innerRadius: innerRadius,
         pressedRadius: pressedRadius,
+        pressedScale: pressedScale,
         hoveredRadius: hoveredRadius,
         gap: gap,
         padding: paddingInsets,
@@ -365,6 +369,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
             dragElevation: dragElevation,
             dragColor: useCustomDragColor ? dragColor : null,
             dragRadius: dragRadius,
+            pressedRadius: pressedRadius,
+            pressedScale: pressedScale,
+            hoveredRadius: hoveredRadius,
             children: List.generate(items.length, (index) {
               return buildSegmentedListItemTile(
                 context: context,
@@ -412,6 +419,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
         dragElevation: dragElevation,
         dragColor: useCustomDragColor ? dragColor : null,
         dragRadius: dragRadius,
+        pressedRadius: pressedRadius,
+        pressedScale: pressedScale,
+        hoveredRadius: hoveredRadius,
         itemBuilder: (context, index) {
           return buildSegmentedListItemTile(
             context: context,
@@ -469,6 +479,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
               padding: paddingInsets,
               margin: marginInsets,
               elevation: elevation,
+              pressedRadius: pressedRadius,
+              pressedScale: pressedScale,
+              hoveredRadius: hoveredRadius,
               equalWidth: flexes == null,
               flexes: flexes,
               children: List.generate(displayItems.length, (index) {
@@ -526,6 +539,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
           padding: paddingInsets,
           margin: marginInsets,
           elevation: elevation,
+          pressedRadius: pressedRadius,
+          pressedScale: pressedScale,
+          hoveredRadius: hoveredRadius,
           children: List.generate(items.length, (index) {
             final item = items[index];
             return KeyedSubtree(
@@ -569,6 +585,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
                 padding: paddingInsets,
                 margin: marginInsets,
                 elevation: elevation,
+                pressedRadius: pressedRadius,
+                pressedScale: pressedScale,
+                hoveredRadius: hoveredRadius,
                 itemBuilder: (context, index) {
                   if (index >= items.length) {
                     return const KeyedSubtree(
@@ -625,6 +644,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
                     padding: paddingInsets,
                     margin: marginInsets,
                     elevation: elevation,
+                    pressedRadius: pressedRadius,
+                    pressedScale: pressedScale,
+                    hoveredRadius: hoveredRadius,
                     itemBuilder: (context, index) {
                       if (index >= items.length) {
                         return const KeyedSubtree(
@@ -658,6 +680,7 @@ class _ExpandableSegmentedPreview extends StatefulWidget {
   final double outerRadius;
   final double innerRadius;
   final double pressedRadius;
+  final double pressedScale;
   final double hoveredRadius;
   final double gap;
   final EdgeInsetsGeometry? padding;
@@ -686,6 +709,7 @@ class _ExpandableSegmentedPreview extends StatefulWidget {
     required this.outerRadius,
     required this.innerRadius,
     required this.pressedRadius,
+    required this.pressedScale,
     required this.hoveredRadius,
     required this.gap,
     required this.padding,
@@ -898,6 +922,7 @@ class _ExpandableSegmentedPreviewState
             outerRadius: widget.outerRadius,
             innerRadius: widget.innerRadius,
             pressedRadius: widget.pressedRadius,
+            pressedScale: widget.pressedScale,
             hoveredRadius: widget.hoveredRadius,
             gap: widget.gap,
             padding: widget.padding,

@@ -185,6 +185,97 @@ void main() {
     });
 
     testWidgets(
+      '5b. Pressed State: spring content scale animation with pressedScale',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: M3ESegmentedItem(
+                  index: 0,
+                  position: M3ESegmentedItemPosition.single,
+                  outerRadius: 24.0,
+                  innerRadius: 4.0,
+                  pressedScale: 0.90,
+                  onTap: (_) {},
+                  child: const Text('Scale me'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Before press, Transform ancestor is at scale 1.0
+        final childTransformFinder = find.ancestor(
+          of: find.text('Scale me'),
+          matching: find.byType(Transform),
+        );
+        expect(childTransformFinder, findsOneWidget);
+        final initialTransform = tester.widget<Transform>(childTransformFinder);
+        expect(
+          initialTransform.transform.getMaxScaleOnAxis(),
+          closeTo(1.0, 0.01),
+        );
+
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.text('Scale me')),
+        );
+        // Advance past press timeout and pump frames to let spring scale animate
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pump(const Duration(milliseconds: 100));
+
+        final allTransforms = tester
+            .widgetList<Transform>(childTransformFinder)
+            .toList();
+        expect(allTransforms.length, 1);
+        final transform = allTransforms.first;
+        // Matrix4 diagonal for X axis is entry(0, 0)
+        expect(transform.transform.entry(0, 0), lessThan(1.0));
+
+        await gesture.up();
+        await tester.pumpAndSettle();
+
+        // After release, springs back to 1.0
+        final releasedTransform = tester.widget<Transform>(
+          childTransformFinder,
+        );
+        expect(
+          releasedTransform.transform.getMaxScaleOnAxis(),
+          closeTo(1.0, 0.01),
+        );
+      },
+    );
+
+    testWidgets(
+      '5c. Default pressedScale: null does not introduce extra Transform.scale',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: M3ESegmentedItem(
+                  index: 0,
+                  position: M3ESegmentedItemPosition.single,
+                  outerRadius: 24.0,
+                  innerRadius: 4.0,
+                  onTap: (_) {},
+                  child: const Text('No scale'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // When pressedScale is null, no Transform is introduced around the child
+        final childTransformFinder = find.ancestor(
+          of: find.text('No scale'),
+          matching: find.byType(Transform),
+        );
+        expect(childTransformFinder, findsNothing);
+      },
+    );
+
+    testWidgets(
       '6. Dragged State: Reorderable list applies drag proxy styling',
       (tester) async {
         final items = ['Item 0', 'Item 1', 'Item 2'];
@@ -309,7 +400,44 @@ void main() {
         expect(lerped!.dragPlaceholderRadius, equals(12.0));
         expect(lerped.dragPlaceholderColor, isNotNull);
         expect(lerped.dragPlaceholderBorder, isNotNull);
+
+        // Test pressedScale
+        const decScale1 = M3ESegmentedListDecoration(pressedScale: 0.95);
+        const decScale2 = M3ESegmentedListDecoration(pressedScale: 0.95);
+        const decScale3 = M3ESegmentedListDecoration(pressedScale: 0.90);
+        expect(decScale1 == decScale2, isTrue);
+        expect(decScale1.hashCode == decScale2.hashCode, isTrue);
+        expect(decScale1 == decScale3, isFalse);
+
+        final lerpedScale = M3ESegmentedListDecoration.lerp(
+          decScale1,
+          decScale3,
+          0.5,
+        );
+        expect(lerpedScale!.pressedScale, closeTo(0.925, 0.001));
       },
     );
+
+    testWidgets('M3ESegmentedList respects decoration.pressedScale', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: M3ESegmentedList(
+              itemCount: 2,
+              itemBuilder: (context, i) => Text('Item ${i + 1}'),
+              decoration: const M3ESegmentedListDecoration(pressedScale: 0.92),
+            ),
+          ),
+        ),
+      );
+
+      final item1TransformFinder = find.ancestor(
+        of: find.text('Item 1'),
+        matching: find.byType(Transform),
+      );
+      expect(item1TransformFinder, findsOneWidget);
+    });
   });
 }

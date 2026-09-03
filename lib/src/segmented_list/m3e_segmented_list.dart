@@ -140,6 +140,9 @@ class M3ESegmentedList extends StatelessWidget {
   /// Custom [BorderRadius] applied when an item is pressed.
   final BorderRadius? pressedBorderRadius;
 
+  /// Scale factor applied to the item inner content when pressed (e.g. 0.98 or 0.96).
+  final double? pressedScale;
+
   /// Corner radius applied to all corners when an item is hovered.
   final double? hoveredRadius;
 
@@ -259,6 +262,7 @@ class M3ESegmentedList extends StatelessWidget {
     this.selectedElevation,
     this.pressedRadius,
     this.pressedBorderRadius,
+    this.pressedScale,
     this.hoveredRadius,
     this.hoveredBorderRadius,
     this.showSelectionCheckmark = false,
@@ -321,6 +325,7 @@ class M3ESegmentedList extends StatelessWidget {
     this.selectedElevation,
     this.pressedRadius,
     this.pressedBorderRadius,
+    this.pressedScale,
     this.hoveredRadius,
     this.hoveredBorderRadius,
     this.showSelectionCheckmark = false,
@@ -442,6 +447,7 @@ class M3ESegmentedList extends StatelessWidget {
     final effectivePressedRadius = decoration?.pressedRadius ?? pressedRadius;
     final effectivePressedBorderRadius =
         decoration?.pressedBorderRadius ?? pressedBorderRadius;
+    final effectivePressedScale = decoration?.pressedScale ?? pressedScale;
     final effectiveHoveredRadius = decoration?.hoveredRadius ?? hoveredRadius;
     final effectiveHoveredBorderRadius =
         decoration?.hoveredBorderRadius ?? hoveredBorderRadius;
@@ -492,6 +498,7 @@ class M3ESegmentedList extends StatelessWidget {
       selectedElevation: effectiveSelectedElevation,
       pressedRadius: effectivePressedRadius,
       pressedBorderRadius: effectivePressedBorderRadius,
+      pressedScale: effectivePressedScale,
       hoveredRadius: effectiveHoveredRadius,
       hoveredBorderRadius: effectiveHoveredBorderRadius,
       showSelectionCheckmark:

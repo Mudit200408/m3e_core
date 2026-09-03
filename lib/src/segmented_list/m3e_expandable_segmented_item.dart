@@ -159,6 +159,9 @@ class M3EExpandableSegmentedItem extends StatefulWidget {
   /// Custom border radius applied when item is pressed.
   final BorderRadius? pressedBorderRadius;
 
+  /// Scale factor applied to the child card inner content when pressed (e.g. 0.98 or 0.96).
+  final double? pressedScale;
+
   /// Corner radius applied when item is hovered.
   final double? hoveredRadius;
 
@@ -230,6 +233,7 @@ class M3EExpandableSegmentedItem extends StatefulWidget {
     this.selectedElevation,
     this.pressedRadius,
     this.pressedBorderRadius,
+    this.pressedScale,
     this.hoveredRadius,
     this.hoveredBorderRadius,
     this.pressedMotion = M3EMotion.expressiveSpatialFast,
@@ -634,6 +638,7 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
                             ),
                             effectivePressedRadius: effectivePressedRadius,
                             effectiveHoveredRadius: effectiveHoveredRadius,
+                            pressedScale: widget.pressedScale,
                             expandMotion: widget.expandMotion,
                             collapseMotion: widget.collapseMotion,
                             pressedMotion: widget.pressedMotion,
@@ -687,6 +692,7 @@ class _M3EExpandableChildCard extends StatefulWidget {
   final BorderRadius baseRadius;
   final BorderRadius? effectivePressedRadius;
   final BorderRadius? effectiveHoveredRadius;
+  final double? pressedScale;
   final M3EMotion expandMotion;
   final M3EMotion collapseMotion;
   final M3EMotion pressedMotion;
@@ -724,6 +730,7 @@ class _M3EExpandableChildCard extends StatefulWidget {
     required this.baseRadius,
     this.effectivePressedRadius,
     this.effectiveHoveredRadius,
+    this.pressedScale,
     required this.expandMotion,
     required this.collapseMotion,
     required this.pressedMotion,
@@ -885,7 +892,17 @@ class _M3EExpandableChildCardState extends State<_M3EExpandableChildCard> {
               onLongPress: widget.onChildLongPress != null
                   ? () => widget.onChildLongPress!(widget.childIndex)
                   : null,
-              child: cardInner,
+              child: widget.pressedScale != null && widget.pressedScale != 1.0
+                  ? SingleMotionBuilder(
+                      motion: widget.pressedMotion.toMotion(),
+                      value: _isPressed ? widget.pressedScale! : 1.0,
+                      builder: (context, scale, _) => Transform.scale(
+                        scale: scale,
+                        alignment: Alignment.center,
+                        child: cardInner,
+                      ),
+                    )
+                  : cardInner,
             ),
           ),
         );

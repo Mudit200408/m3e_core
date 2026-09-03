@@ -52,6 +52,7 @@ class _SegmentedListPlaygroundViewState
 
   // ── Interactive Morphing ──
   double _pressedRadius = 8.0;
+  double _pressedScale = 0.98;
   double _hoveredRadius = 16.0;
   M3EExampleMotionPreset _restingMotionPreset =
       M3EExampleMotionPreset.expressiveSpatialFast;
@@ -326,6 +327,7 @@ class _SegmentedListPlaygroundViewState
       outerRadius: _outerRadius,
       innerRadius: _innerRadius,
       pressedRadius: _pressedRadius,
+      pressedScale: _pressedScale,
       hoveredRadius: _hoveredRadius,
       selectedRadius: _selectedRadius,
       useSelectedBorder: _useSelectedBorder,
@@ -509,6 +511,8 @@ class _SegmentedListPlaygroundViewState
         isExpandable: _listType == SegmentedListType.expandable,
         pressedRadius: _pressedRadius,
         onPressedRadiusChanged: (val) => setState(() => _pressedRadius = val),
+        pressedScale: _pressedScale,
+        onPressedScaleChanged: (val) => setState(() => _pressedScale = val),
         hoveredRadius: _hoveredRadius,
         onHoveredRadiusChanged: (val) => setState(() => _hoveredRadius = val),
         restingMotionPreset: _restingMotionPreset,
@@ -603,6 +607,7 @@ class _SegmentedListPlaygroundViewState
         outerRadius: _outerRadius,
         innerRadius: _innerRadius,
         pressedRadius: _pressedRadius,
+        pressedScale: _pressedScale,
         hoveredRadius: _hoveredRadius,
         selectedRadius: _selectedRadius,
         dragRadius: _dragRadius,
