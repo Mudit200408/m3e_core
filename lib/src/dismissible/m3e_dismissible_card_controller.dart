@@ -131,6 +131,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   bool _pastThreshold = false;
   bool _pastActionThreshold = false;
   bool _reEngaging = false;
+  Object? _pressedSlotIdentity;
 
   double _neighbourFraction = 0.0;
   double _roundnessFraction = 0.0;
@@ -389,6 +390,10 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         _pastActionThreshold = false;
         _detachPush = 0.0;
         _roundnessFraction = 0.0;
+      }
+      // Clear press scale when drag starts
+      if (style.pressedScale != null && style.pressedScale != 1.0) {
+        setState(() => _pressedSlotIdentity = null);
       }
     });
   }
@@ -1214,43 +1219,71 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                     border: s.border,
                     isDragged: isDragged,
                     hasActiveDrag: _dragSlotRef != null,
-                    child: InkWell(
-                      splashColor: s.splashColor,
-                      highlightColor: s.highlightColor,
-                      splashFactory: s.splashFactory,
-                      enableFeedback: s.enableFeedback,
-                      onTap: () {
-                        if (_dragSlotRef != null && _dragOffset.abs() > 0) {
-                          _springBack(1.0);
-                          return;
+                    child: Listener(
+                      onPointerDown: (_) {
+                        if (s.pressedScale != null && s.pressedScale != 1.0) {
+                          setState(() {
+                            _pressedSlotIdentity = slot.identity;
+                          });
                         }
-                        if (s.actionRevealTrigger ==
-                            M3EActionRevealTrigger.tap) {
-                          final actionList = s.secondaryActions ?? s.actions;
-                          if (actionList != null && actionList.isNotEmpty) {
-                            toggleRevealActions(slot, endToStart: true);
+                      },
+                      onPointerUp: (_) {
+                        if (s.pressedScale != null && s.pressedScale != 1.0) {
+                          setState(() {
+                            _pressedSlotIdentity = null;
+                          });
+                        }
+                      },
+                      onPointerCancel: (_) {
+                        if (s.pressedScale != null && s.pressedScale != 1.0) {
+                          setState(() {
+                            _pressedSlotIdentity = null;
+                          });
+                        }
+                      },
+                      child: InkWell(
+                        splashColor: s.splashColor,
+                        highlightColor: s.highlightColor,
+                        splashFactory: s.splashFactory,
+                        enableFeedback: s.enableFeedback,
+                        onTap: () {
+                          if (_dragSlotRef != null && _dragOffset.abs() > 0) {
+                            _springBack(1.0);
                             return;
                           }
-                        }
-                        if (isInteractionLocked || onTapCallback == null) {
-                          return;
-                        }
-                        onTapCallback!(slotPos);
-                        applyHaptic(s.hapticOnTap);
-                      },
-                      onDoubleTap:
-                          s.actionRevealTrigger ==
-                              M3EActionRevealTrigger.doubleTap
-                          ? () => toggleRevealActions(slot, endToStart: true)
-                          : null,
-                      onLongPress:
-                          s.actionRevealTrigger ==
-                              M3EActionRevealTrigger.longPress
-                          ? () => toggleRevealActions(slot, endToStart: true)
-                          : null,
-                      child: Padding(
-                        padding: s.padding ?? const EdgeInsets.all(16.0),
-                        child: swipeItemBuilder(context, slotPos),
+                          if (s.actionRevealTrigger ==
+                              M3EActionRevealTrigger.tap) {
+                            final actionList = s.secondaryActions ?? s.actions;
+                            if (actionList != null && actionList.isNotEmpty) {
+                              toggleRevealActions(slot, endToStart: true);
+                              return;
+                            }
+                          }
+                          if (isInteractionLocked || onTapCallback == null) {
+                            return;
+                          }
+                          onTapCallback!(slotPos);
+                          applyHaptic(s.hapticOnTap);
+                        },
+                        onDoubleTap:
+                            s.actionRevealTrigger ==
+                                M3EActionRevealTrigger.doubleTap
+                            ? () => toggleRevealActions(slot, endToStart: true)
+                            : null,
+                        onLongPress:
+                            s.actionRevealTrigger ==
+                                M3EActionRevealTrigger.longPress
+                            ? () => toggleRevealActions(slot, endToStart: true)
+                            : null,
+                        child: _buildPressScaledContent(
+                          s,
+                          isDragged: isDragged,
+                          isPressed: _pressedSlotIdentity == slot.identity,
+                          child: Padding(
+                            padding: s.padding ?? const EdgeInsets.all(16.0),
+                            child: swipeItemBuilder(context, slotPos),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -1295,7 +1328,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
         transform: bg.transform,
         transformAlignment: bg.transformAlignment,
         clipBehavior: bg.clipBehavior,
-        child: bg.child != null ? wrapChild(bg.child) : null,
+        child: wrapChild(bg.child),
       );
     }
     if (bg is ColoredBox) {
@@ -1309,6 +1342,28 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       );
     }
     return wrapChild(bg);
+  }
+
+  Widget _buildPressScaledContent(
+    M3EDismissibleCardStyle s, {
+    required bool isDragged,
+    required bool isPressed,
+    required Widget child,
+  }) {
+    if (s.pressedScale == null || s.pressedScale == 1.0) {
+      return child;
+    }
+
+    final motion = s.pressedMotion.toMotion();
+    final targetScale = s.pressedScale!;
+
+    return SingleMotionBuilder(
+      motion: motion,
+      value: (isPressed && !isDragged) ? targetScale : 1.0,
+      builder: (context, animatedScale, _) {
+        return Transform.scale(scale: animatedScale, child: child);
+      },
+    );
   }
 
   Widget _buildActionsRow(

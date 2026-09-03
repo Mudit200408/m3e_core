@@ -117,6 +117,23 @@ class M3EDismissibleCardStyle {
   /// Defaults to `50` for that slower Gmail type collapse
   final double collapseSpeed;
 
+  // ── Press interaction ──
+
+  /// Scale factor applied to the card content when pressed (touch down).
+  ///
+  /// When `null` or `1.0`, no press scale is applied.
+  /// Typical values range from `0.95` to `0.98`.
+  ///
+  /// Combined with [pressedMotion], this creates a tactile "squish" effect
+  /// that provides immediate visual feedback on touch, then springs back
+  /// to `1.0` when the pointer is released or a horizontal drag begins.
+  final double? pressedScale;
+
+  /// Motion used for the press scale animation.
+  ///
+  /// Defaults to `M3EMotion.expressiveSpatialFast`.
+  final M3EMotion pressedMotion;
+
   // ── Interaction ──
 
   final Color? splashColor;
@@ -197,6 +214,8 @@ class M3EDismissibleCardStyle {
     this.backgroundBorderRadius = 100,
     this.secondaryBackgroundBorderRadius = 100,
     this.collapseSpeed = 50,
+    this.pressedScale,
+    this.pressedMotion = M3EMotion.expressiveSpatialFast,
   });
 
   /// Creates a copy with the given fields replaced.
@@ -235,6 +254,8 @@ class M3EDismissibleCardStyle {
     double? backgroundBorderRadius,
     double? secondaryBackgroundBorderRadius,
     double? collapseSpeed,
+    double? pressedScale,
+    M3EMotion? pressedMotion,
   }) {
     return M3EDismissibleCardStyle(
       outerRadius: outerRadius ?? this.outerRadius,
@@ -275,6 +296,8 @@ class M3EDismissibleCardStyle {
           secondaryBackgroundBorderRadius ??
           this.secondaryBackgroundBorderRadius,
       collapseSpeed: collapseSpeed ?? this.collapseSpeed,
+      pressedScale: pressedScale ?? this.pressedScale,
+      pressedMotion: pressedMotion ?? this.pressedMotion,
     );
   }
 }
