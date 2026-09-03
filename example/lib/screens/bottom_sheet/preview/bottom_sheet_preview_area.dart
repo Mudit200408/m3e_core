@@ -115,15 +115,21 @@ class BottomSheetPreviewArea extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Center(
-          child: M3EButton(
+          child: M3EFilledButton(
             size: M3EButtonSize.lg,
             onPressed: () => _openModal(context),
-            child: const Row(
+
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.vertical_align_top_rounded),
-                SizedBox(width: 8),
-                Text('Open Modal Bottom Sheet'),
+                SizedBox(width: 4),
+                Text(
+                  'Open Bottom Sheet',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
               ],
             ),
           ),

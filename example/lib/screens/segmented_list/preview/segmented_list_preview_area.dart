@@ -888,12 +888,14 @@ class _ExpandableSegmentedPreviewState
               color: cs.onSurfaceVariant,
             ),
             const SizedBox(width: 6),
-            Text(
-              triggerText,
-              style: TextStyle(
-                fontSize: 12,
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                triggerText,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: cs.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
