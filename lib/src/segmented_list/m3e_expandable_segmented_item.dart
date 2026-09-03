@@ -569,6 +569,7 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
           child: Material(
             type: MaterialType.transparency,
             child: InkWell(
+              splashFactory: InkSparkle.splashFactory,
               onHighlightChanged: widget.enabled && widget.tapHeaderToToggle
                   ? (highlighted) {
                       if (_isHeaderPressed != highlighted && mounted) {
@@ -867,6 +868,7 @@ class _M3EExpandableChildCardState extends State<_M3EExpandableChildCard> {
           child: Material(
             type: MaterialType.transparency,
             child: InkWell(
+              splashFactory: InkSparkle.splashFactory,
               splashColor: widget.childSplashColor,
               highlightColor: widget.childHighlightColor,
               hoverColor: widget.childHoverColor,

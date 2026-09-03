@@ -581,7 +581,7 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
                 canRequestFocus: widget.enabled,
                 splashColor: widget.splashColor,
                 highlightColor: widget.highlightColor,
-                splashFactory: widget.splashFactory,
+                splashFactory: widget.splashFactory ?? InkSparkle.splashFactory,
                 enableFeedback: widget.enableFeedback,
                 focusColor: widget.focusColor,
                 hoverColor: widget.hoverColor,
