@@ -477,7 +477,7 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       customBorder: isIcon ? const CircleBorder() : null,
       splashColor: d.splashColor,
       highlightColor: d.highlightColor,
-      splashFactory: d.splashFactory,
+      splashFactory: d.splashFactory ?? InkSparkle.splashFactory,
       enableFeedback: d.enableFeedback,
       onTap: onTap,
       onHover: shouldTrackInteractions ? (h) => _handleHoverChanged(h) : null,
