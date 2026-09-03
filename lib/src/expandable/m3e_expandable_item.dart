@@ -222,6 +222,23 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
     );
   }
 
+  Widget _buildPressScaledContent(M3EExpandableStyle d, Widget child) {
+    if (d.pressedScale == null || d.pressedScale == 1.0) {
+      return child;
+    }
+
+    final motion = d.pressedMotion.toMotion();
+    final targetScale = d.pressedScale!;
+
+    return SingleMotionBuilder(
+      motion: motion,
+      value: _isPressed ? targetScale : 1.0,
+      builder: (context, animatedScale, _) {
+        return Transform.scale(scale: animatedScale, child: child);
+      },
+    );
+  }
+
   Widget _buildHeader(
     M3EExpandableStyle d,
     VoidCallback? onTap, {
@@ -412,6 +429,10 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
   }) {
     Widget result = child;
 
+    if (isHeader) {
+      result = _buildPressScaledContent(d, result);
+    }
+
     if (tooltip != null) {
       result = Tooltip(message: tooltip, child: result);
     }
@@ -460,6 +481,9 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       enableFeedback: d.enableFeedback,
       onTap: onTap,
       onHover: shouldTrackInteractions ? (h) => _handleHoverChanged(h) : null,
+      onHighlightChanged: shouldTrackInteractions
+          ? (h) => setState(() => _isPressed = h)
+          : null,
       onTapDown: shouldTrackInteractions ? (_) => _handleTapDown() : null,
       onTapUp: shouldTrackInteractions ? (_) => _handleTapUp() : null,
       onTapCancel: shouldTrackInteractions ? () => _handleTapCancel() : null,
