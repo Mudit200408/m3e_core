@@ -85,6 +85,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
   double _openDamping = .6;
   double _closeStiffness = 500;
   double _closeDamping = .6;
+  double _pressedScale = 0.98;
   Color _fieldColor = Colors.teal;
   Color _panelColor = Colors.teal;
   Color _chipColor = Colors.teal;
@@ -177,6 +178,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
       openDamping: _openDamping,
       closeStiffness: _closeStiffness,
       closeDamping: _closeDamping,
+      pressedScale: _pressedScale,
       fieldColor: _fieldColor,
       panelColor: _panelColor,
       chipColor: _chipColor,
@@ -318,6 +320,8 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
       validationEnabled: _validationEnabled,
       onValidationEnabledChanged: (val) =>
           setState(() => _validationEnabled = val),
+      pressedScale: _pressedScale,
+      onPressedScaleChanged: (val) => setState(() => _pressedScale = val),
     ),
   ];
 
@@ -332,6 +336,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
       showClearIcon: _showClearIcon,
       backgroundColor: _useFieldColor ? _fieldColor : null,
       padding: EdgeInsets.all(_fieldPadding),
+      pressedScale: _pressedScale,
     );
     final dropdownStyle = M3EDropdownStyle(
       containerRadius: _independentRadii ? _panelRadius : null,
@@ -362,6 +367,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
       backgroundColor: _useChipColor ? _chipColor : null,
       openMotion: _openMotion,
       closeMotion: _closeMotion,
+      pressedScale: _pressedScale,
     );
     final itemStyle = M3EDropdownItemStyle(
       outerRadius: _itemOuterRadius,
@@ -370,6 +376,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
       itemPadding: EdgeInsets.all(_itemPadding),
       selectedBackgroundColor: _useItemColor ? _itemColor : null,
       selectedIcon: _showSelectedIcon ? const Icon(Icons.check_rounded) : null,
+      pressedScale: _pressedScale,
     );
     M3EDropdownItemBuilder<String>? itemBuilder;
     if (_customItemBuilder) {

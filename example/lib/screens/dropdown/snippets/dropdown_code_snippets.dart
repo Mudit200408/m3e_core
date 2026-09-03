@@ -67,6 +67,7 @@ class DropdownCodeSnippets {
     required double openDamping,
     required double closeStiffness,
     required double closeDamping,
+    double pressedScale = 1.0,
     required Color fieldColor,
     required Color panelColor,
     required Color chipColor,
@@ -108,6 +109,9 @@ class DropdownCodeSnippets {
     }
     b.writeln('    showClearIcon: $showClearIcon,');
     b.writeln('    padding: EdgeInsets.all(${_number(fieldPadding)}),');
+    if (pressedScale != 1.0) {
+      b.writeln('    pressedScale: ${pressedScale.toStringAsFixed(2)},');
+    }
     if (useFieldColor) {
       b.writeln('    backgroundColor: ${_color(fieldColor)},');
     }
@@ -158,12 +162,18 @@ class DropdownCodeSnippets {
     b.writeln(
       '    closeMotion: M3EMotion.custom(stiffness: ${_number(closeStiffness)}, damping: ${_number(closeDamping)}),',
     );
+    if (pressedScale != 1.0) {
+      b.writeln('    pressedScale: ${pressedScale.toStringAsFixed(2)},');
+    }
     b.writeln('  ),');
     b.writeln('  itemStyle: M3EDropdownItemStyle(');
     b.writeln(
       '    outerRadius: ${_number(itemOuterRadius)}, innerRadius: ${_number(itemInnerRadius)}, itemGap: ${_number(itemGap)},',
     );
     b.writeln('    itemPadding: EdgeInsets.all(${_number(itemPadding)}),');
+    if (pressedScale != 1.0) {
+      b.writeln('    pressedScale: ${pressedScale.toStringAsFixed(2)},');
+    }
     if (showSelectedIcon) {
       b.writeln('    selectedIcon: const Icon(Icons.check_rounded),');
     }

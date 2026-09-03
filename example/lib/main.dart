@@ -244,6 +244,7 @@ class ExampleHomePage extends StatelessWidget {
             innerRadius: 6,
             gap: 4,
             pressedScale: 0.98,
+            splashFactory: InkSparkle.splashFactory,
             color: cs.surfaceContainer,
             onTap: (index) {
               Navigator.of(context).push(

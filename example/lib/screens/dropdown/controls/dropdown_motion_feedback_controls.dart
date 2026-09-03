@@ -26,6 +26,8 @@ class DropdownMotionFeedbackControls extends StatelessWidget {
     required this.onUseSplashChanged,
     required this.validationEnabled,
     required this.onValidationEnabledChanged,
+    required this.pressedScale,
+    required this.onPressedScaleChanged,
   });
 
   final M3EHapticFeedback haptic;
@@ -44,6 +46,8 @@ class DropdownMotionFeedbackControls extends StatelessWidget {
   final ValueChanged<bool> onUseSplashChanged;
   final bool validationEnabled;
   final ValueChanged<bool> onValidationEnabledChanged;
+  final double pressedScale;
+  final ValueChanged<double> onPressedScaleChanged;
 
   String _number(double val) => val.toStringAsFixed(1);
 
@@ -88,6 +92,15 @@ class DropdownMotionFeedbackControls extends StatelessWidget {
               },
             ),
             const SizedBox(height: 8),
+            M3ESliderRow(
+              label: 'Pressed content scale',
+              value: pressedScale,
+              min: 0.85,
+              max: 1.0,
+              divisions: 15,
+              format: (v) => v.toStringAsFixed(2),
+              onChanged: onPressedScaleChanged,
+            ),
             M3ESliderRow(
               label: 'Open stiffness',
               value: openStiffness,
