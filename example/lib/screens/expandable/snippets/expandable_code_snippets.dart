@@ -29,6 +29,7 @@ class ExpandableCodeSnippets {
     required double innerRadius,
     required double hoverRadius,
     required double pressedRadius,
+    required double pressedScale,
     required double gap,
     required bool useExpandedRadius,
     required double expandedRadius,
@@ -117,6 +118,9 @@ class ExpandableCodeSnippets {
     b.writeln(
       '    hoverRadius: ${_number(hoverRadius)}, pressedRadius: ${_number(pressedRadius)}, gap: ${_number(gap)},',
     );
+    if (pressedScale != 1.0) {
+      b.writeln('    pressedScale: ${_number(pressedScale)},');
+    }
     if (useExpandedRadius) {
       b.writeln('    expandedRadius: ${_number(expandedRadius)},');
     }

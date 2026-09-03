@@ -20,6 +20,7 @@ class DismissibleCodeSnippets {
     required bool useCustomCardColor,
     required Color customCardColor,
     required double dismissThreshold,
+    required double pressedScale,
     required M3EHapticFeedback hapticOnTap,
     required M3EHapticFeedback hapticOnThreshold,
     required bool dismissHapticStream,
@@ -102,6 +103,9 @@ class DismissibleCodeSnippets {
     buf.writeln(
       "    dismissThreshold: ${dismissThreshold.toStringAsFixed(2)},",
     );
+    if (pressedScale != 1.0) {
+      buf.writeln("    pressedScale: ${pressedScale.toStringAsFixed(2)},");
+    }
     buf.writeln("    hapticOnTap: M3EHapticFeedback.${hapticOnTap.name},");
     buf.writeln(
       "    hapticOnThreshold: M3EHapticFeedback.${hapticOnThreshold.name},",

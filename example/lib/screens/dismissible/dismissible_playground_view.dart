@@ -80,6 +80,7 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
 
   // ── Interaction & Haptics ──
   double _dismissThreshold = 0.35;
+  double _pressedScale = 0.98;
   M3EHapticFeedback _hapticOnTap = M3EHapticFeedback.none;
   M3EHapticFeedback _hapticOnThreshold = M3EHapticFeedback.light;
   bool _dismissHapticStream = false;
@@ -232,6 +233,7 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
       elevation: _elevation,
       color: _useCustomCardColor ? _customCardColor : null,
       dismissThreshold: _dismissThreshold,
+      pressedScale: _pressedScale,
       hapticOnTap: _hapticOnTap,
       hapticOnThreshold: _hapticOnThreshold,
       dismissHapticStream: _dismissHapticStream,
@@ -339,6 +341,7 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
       useCustomCardColor: _useCustomCardColor,
       customCardColor: _customCardColor,
       dismissThreshold: _dismissThreshold,
+      pressedScale: _pressedScale,
       hapticOnTap: _hapticOnTap,
       hapticOnThreshold: _hapticOnThreshold,
       dismissHapticStream: _dismissHapticStream,
@@ -517,6 +520,8 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
         dismissThreshold: _dismissThreshold,
         onDismissThresholdChanged: (val) =>
             setState(() => _dismissThreshold = val),
+        pressedScale: _pressedScale,
+        onPressedScaleChanged: (val) => setState(() => _pressedScale = val),
         hapticOnTap: _hapticOnTap,
         onHapticOnTapChanged: (val) => setState(() => _hapticOnTap = val),
         hapticOnThreshold: _hapticOnThreshold,

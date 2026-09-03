@@ -243,6 +243,7 @@ class ExampleHomePage extends StatelessWidget {
             outerRadius: 28,
             innerRadius: 6,
             gap: 4,
+            pressedScale: 0.98,
             color: cs.surfaceContainer,
             onTap: (index) {
               Navigator.of(context).push(

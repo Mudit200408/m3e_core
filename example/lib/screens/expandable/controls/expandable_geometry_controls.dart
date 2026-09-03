@@ -17,6 +17,8 @@ class ExpandableGeometryControls extends StatelessWidget {
     required this.onHoverRadiusChanged,
     required this.pressedRadius,
     required this.onPressedRadiusChanged,
+    required this.pressedScale,
+    required this.onPressedScaleChanged,
     required this.gap,
     required this.onGapChanged,
     required this.useExpandedRadius,
@@ -43,6 +45,8 @@ class ExpandableGeometryControls extends StatelessWidget {
   final ValueChanged<double> onHoverRadiusChanged;
   final double pressedRadius;
   final ValueChanged<double> onPressedRadiusChanged;
+  final double pressedScale;
+  final ValueChanged<double> onPressedScaleChanged;
   final double gap;
   final ValueChanged<double> onGapChanged;
   final bool useExpandedRadius;
@@ -108,6 +112,15 @@ class ExpandableGeometryControls extends StatelessWidget {
               divisions: 30,
               format: _number,
               onChanged: onPressedRadiusChanged,
+            ),
+            M3ESliderRow(
+              label: 'Pressed content scale',
+              value: pressedScale,
+              min: 0.85,
+              max: 1.00,
+              divisions: 15,
+              format: _number,
+              onChanged: onPressedScaleChanged,
             ),
             M3ESliderRow(
               label: 'Card gap',

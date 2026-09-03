@@ -12,6 +12,8 @@ class DismissibleInteractionControls extends StatelessWidget {
     super.key,
     required this.dismissThreshold,
     required this.onDismissThresholdChanged,
+    required this.pressedScale,
+    required this.onPressedScaleChanged,
     required this.hapticOnTap,
     required this.onHapticOnTapChanged,
     required this.hapticOnThreshold,
@@ -23,6 +25,8 @@ class DismissibleInteractionControls extends StatelessWidget {
 
   final double dismissThreshold;
   final ValueChanged<double> onDismissThresholdChanged;
+  final double pressedScale;
+  final ValueChanged<double> onPressedScaleChanged;
   final M3EHapticFeedback hapticOnTap;
   final ValueChanged<M3EHapticFeedback> onHapticOnTapChanged;
   final M3EHapticFeedback hapticOnThreshold;
@@ -60,6 +64,17 @@ class DismissibleInteractionControls extends StatelessWidget {
               ),
               const Divider(height: 16),
             ],
+            M3ESliderRow(
+              label: 'Pressed Content Scale',
+              subtitle: 'Scale factor applied to card content while pressed',
+              value: pressedScale,
+              min: 0.85,
+              max: 1.0,
+              divisions: 15,
+              format: (v) => v.toStringAsFixed(2),
+              onChanged: onPressedScaleChanged,
+            ),
+            const Divider(height: 16),
             const Text(
               'Haptic On Tap',
               style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),

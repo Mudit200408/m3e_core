@@ -38,6 +38,7 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
   double _innerRadius = 6;
   double _hoverRadius = 10;
   double _pressedRadius = 4;
+  double _pressedScale = 0.98;
   double _gap = 4;
   bool _useExpandedRadius = false;
   double _expandedRadius = 20;
@@ -105,6 +106,7 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
       innerRadius: _innerRadius,
       hoverRadius: _hoverRadius,
       pressedRadius: _pressedRadius,
+      pressedScale: _pressedScale,
       gap: _gap,
       expandedRadius: _useExpandedRadius ? _expandedRadius : null,
       color: _useCustomColor ? _color : null,
@@ -206,6 +208,7 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
       innerRadius: _innerRadius,
       hoverRadius: _hoverRadius,
       pressedRadius: _pressedRadius,
+      pressedScale: _pressedScale,
       gap: _gap,
       useExpandedRadius: _useExpandedRadius,
       expandedRadius: _expandedRadius,
@@ -289,6 +292,8 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
       onHoverRadiusChanged: (val) => setState(() => _hoverRadius = val),
       pressedRadius: _pressedRadius,
       onPressedRadiusChanged: (val) => setState(() => _pressedRadius = val),
+      pressedScale: _pressedScale,
+      onPressedScaleChanged: (val) => setState(() => _pressedScale = val),
       gap: _gap,
       onGapChanged: (val) => setState(() => _gap = val),
       useExpandedRadius: _useExpandedRadius,
