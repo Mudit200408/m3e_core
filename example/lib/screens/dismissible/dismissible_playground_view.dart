@@ -12,6 +12,7 @@ import 'controls/dismissible_interaction_controls.dart';
 import 'controls/dismissible_layout_controls.dart';
 import 'controls/dismissible_motion_physics_controls.dart';
 import 'controls/dismissible_neighbor_physics_controls.dart';
+import 'controls/dismissible_reorderable_controls.dart';
 import 'controls/dismissible_style_controls.dart';
 import 'models/dismissible_models.dart';
 import 'preview/dismissible_preview_area.dart';
@@ -101,6 +102,11 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
   double _backgroundRadius = 100.0;
   bool _useCustomCardColor = false;
   Color _customCardColor = Colors.teal.shade50;
+
+  // ── Reorderable Controls ──
+  bool _buildDefaultDragHandles = true;
+  double _dragElevation = 8.0;
+  double _dragScale = 1.0;
 
   @override
   void initState() {
@@ -532,6 +538,16 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
             setState(() => _dismissHapticStream = val),
         isActionButtonsMode: isActionButtonsMode,
       ),
+      if (_layoutMode == DismissibleLayoutMode.reorderable)
+        DismissibleReorderableControls(
+          buildDefaultDragHandles: _buildDefaultDragHandles,
+          onBuildDefaultDragHandlesChanged: (val) =>
+              setState(() => _buildDefaultDragHandles = val),
+          dragElevation: _dragElevation,
+          onDragElevationChanged: (val) => setState(() => _dragElevation = val),
+          dragScale: _dragScale,
+          onDragScaleChanged: (val) => setState(() => _dragScale = val),
+        ),
     ];
   }
 
@@ -548,8 +564,18 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
         totalAvailableItems: allItems.length,
         listScrollController: _listScrollController,
         sliverScrollController: _sliverScrollController,
+        buildDefaultDragHandles: _buildDefaultDragHandles,
+        dragScale: _dragScale,
+        dragElevation: _dragElevation,
         onDismiss: _handleDismiss,
         onResetItems: _resetItems,
+        onReorder: (oldIndex, newIndex) {
+          setState(() {
+            if (newIndex > oldIndex) newIndex--;
+            final item = _items.removeAt(oldIndex);
+            _items.insert(newIndex, item);
+          });
+        },
       ),
       codeSnippet: CodeSnippetCard(code: _generateCodeSnippet()),
       controls: _buildControls(),

@@ -51,6 +51,7 @@ class DismissibleCodeSnippets {
     final buf = StringBuffer();
     final isCol = layoutMode == DismissibleLayoutMode.column;
     final isList = layoutMode == DismissibleLayoutMode.listView;
+    final isReorderable = layoutMode == DismissibleLayoutMode.reorderable;
     final bool anyActionButtons = useActionButtons || useSecondaryActionButtons;
 
     if (isCol) {
@@ -61,6 +62,22 @@ class DismissibleCodeSnippets {
       buf.writeln("M3EDismissibleCardList(");
       buf.writeln("  scrollController: _scrollController,");
       buf.writeln("  listPadding: const EdgeInsets.all(16),");
+    } else if (isReorderable) {
+      buf.writeln(
+        "// M3EReorderableDismissibleList (with spring reordering + swipe-to-dismiss)",
+      );
+      buf.writeln("M3EReorderableDismissibleList(");
+      buf.writeln("  scrollController: _scrollController,");
+      buf.writeln("  listPadding: const EdgeInsets.all(16),");
+      buf.writeln("  buildDefaultDragHandles: true,");
+      buf.writeln("  keyBuilder: (index) => ValueKey(items[index].id),");
+      buf.writeln("  onReorder: (oldIndex, newIndex) {");
+      buf.writeln("    setState(() {");
+      buf.writeln("      if (newIndex > oldIndex) newIndex--;");
+      buf.writeln("      final item = items.removeAt(oldIndex);");
+      buf.writeln("      items.insert(newIndex, item);");
+      buf.writeln("    });");
+      buf.writeln("  },");
     } else {
       buf.writeln("// SliverM3EDismissibleCardList (inside CustomScrollView)");
       buf.writeln("SliverM3EDismissibleCardList(");

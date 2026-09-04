@@ -59,6 +59,12 @@ class DismissibleSlot {
   final ValueNotifier<double> flyNotifier = ValueNotifier(0.0);
   bool _flyDisposed = false;
 
+  /// Notifier for local press-state (touch down / press scale).
+  ///
+  /// Isolated per-slot so that pressing an item only updates that item's
+  /// SingleMotionBuilder, avoiding full list-wide rebuilds.
+  final ValueNotifier<bool> isPressedNotifier = ValueNotifier<bool>(false);
+
   /// The child widget to display during the dismiss animation.
   Widget? frozenChild;
 
@@ -77,6 +83,7 @@ class DismissibleSlot {
     collapseCtrl?.dispose();
     flyCtrl?.dispose();
     disposeFlyNotifier();
+    isPressedNotifier.dispose();
   }
 
   /// Disposes of the fly notifier.
@@ -131,7 +138,6 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   bool _pastThreshold = false;
   bool _pastActionThreshold = false;
   bool _reEngaging = false;
-  Object? _pressedSlotIdentity;
 
   double _neighbourFraction = 0.0;
   double _roundnessFraction = 0.0;
@@ -261,14 +267,15 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     int slotIndex,
     int slotPos,
     int dragPos,
-    List<int> visible,
-  ) {
+    List<int> visible, [
+    int? visualIndexOverride,
+  ]) {
     final s = style;
     if (slotPos < 0) return BorderRadius.circular(s.outerRadius);
 
     final total = visible.length;
-    final isFirst = slotPos == 0;
-    final isLast = slotPos == total - 1;
+    final isFirst = (visualIndexOverride ?? slotPos) == 0;
+    final isLast = (visualIndexOverride ?? slotPos) == total - 1;
     final or = s.outerRadius;
     final sr = s.selectedBorderRadius ?? or;
     final ir = s.innerRadius;
@@ -393,7 +400,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       }
       // Clear press scale when drag starts
       if (style.pressedScale != null && style.pressedScale != 1.0) {
-        setState(() => _pressedSlotIdentity = null);
+        slot.isPressedNotifier.value = false;
       }
     });
   }
@@ -986,7 +993,12 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   ///
   /// Pass a pre-computed [visible] list to avoid recomputing
   /// [computeVisibleIndices] once per slot.
-  Widget buildSlot(BuildContext context, int slotIndex, [List<int>? visible]) {
+  Widget buildSlot(
+    BuildContext context,
+    int slotIndex, [
+    List<int>? visible,
+    int? visualIndexOverride,
+  ]) {
     final slot = _slots[slotIndex];
     if (slot.isCollapsing) {
       return _buildCollapsingCard(context, slotIndex);
@@ -995,6 +1007,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       context,
       slotIndex,
       visible ?? computeVisibleIndices(),
+      visualIndexOverride,
     );
   }
 
@@ -1116,8 +1129,9 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   Widget _buildActiveCard(
     BuildContext context,
     int slotIndex,
-    List<int> visible,
-  ) {
+    List<int> visible, [
+    int? visualIndexOverride,
+  ]) {
     final slot = _slots[slotIndex];
     final s = style;
     final slotPos = visible.indexOf(slotIndex);
@@ -1126,10 +1140,16 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     }
 
     final total = visible.length;
-    final isLast = slotPos == total - 1;
+    final isLast = (visualIndexOverride ?? slotPos) == total - 1;
     final isDragged = slotIndex == _dragSlotIndex;
     final dragPos = _dragSlotIndex >= 0 ? visible.indexOf(_dragSlotIndex) : -1;
-    final br = computeRadius(slotIndex, slotPos, dragPos, visible);
+    final br = computeRadius(
+      slotIndex,
+      slotPos,
+      dragPos,
+      visible,
+      visualIndexOverride,
+    );
     final nOff = computeNeighbourOffset(slotPos, dragPos);
 
     // Active background based on swipe direction.
@@ -1222,23 +1242,17 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                     child: Listener(
                       onPointerDown: (_) {
                         if (s.pressedScale != null && s.pressedScale != 1.0) {
-                          setState(() {
-                            _pressedSlotIdentity = slot.identity;
-                          });
+                          slot.isPressedNotifier.value = true;
                         }
                       },
                       onPointerUp: (_) {
                         if (s.pressedScale != null && s.pressedScale != 1.0) {
-                          setState(() {
-                            _pressedSlotIdentity = null;
-                          });
+                          slot.isPressedNotifier.value = false;
                         }
                       },
                       onPointerCancel: (_) {
                         if (s.pressedScale != null && s.pressedScale != 1.0) {
-                          setState(() {
-                            _pressedSlotIdentity = null;
-                          });
+                          slot.isPressedNotifier.value = false;
                         }
                       },
                       child: InkWell(
@@ -1276,14 +1290,20 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
                                 M3EActionRevealTrigger.longPress
                             ? () => toggleRevealActions(slot, endToStart: true)
                             : null,
-                        child: _buildPressScaledContent(
-                          s,
-                          isDragged: isDragged,
-                          isPressed: _pressedSlotIdentity == slot.identity,
-                          child: Padding(
-                            padding: s.padding ?? const EdgeInsets.all(16.0),
-                            child: swipeItemBuilder(context, slotPos),
-                          ),
+                        child: ValueListenableBuilder<bool>(
+                          valueListenable: slot.isPressedNotifier,
+                          builder: (context, isPressed, _) {
+                            return _buildPressScaledContent(
+                              s,
+                              isDragged: isDragged,
+                              isPressed: isPressed,
+                              child: Padding(
+                                padding:
+                                    s.padding ?? const EdgeInsets.all(16.0),
+                                child: swipeItemBuilder(context, slotPos),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),

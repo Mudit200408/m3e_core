@@ -70,6 +70,10 @@ class DismissibleLayoutControls extends StatelessWidget {
                   label: Text('Sliver'),
                   icon: Icon(Icons.layers_rounded),
                 ),
+                M3EToggleButtonGroupAction(
+                  label: Text('Reorderable'),
+                  icon: Icon(Icons.reorder_rounded),
+                ),
               ],
             ),
             if (layoutMode != DismissibleLayoutMode.column) ...[
