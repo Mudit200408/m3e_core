@@ -244,6 +244,7 @@ mixin _ToggleGroupOverflowPresenterMixin on State<M3EToggleButtonGroup> {
       shape: RoundedRectangleBorder(borderRadius: borderRadius),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
+        splashFactory: InkSparkle.splashFactory,
         onTap: action.enabled
             ? () => Navigator.of(context).pop(actionIndex)
             : null,
@@ -331,6 +332,7 @@ mixin _ToggleGroupOverflowPresenterMixin on State<M3EToggleButtonGroup> {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(itemRadius),
+          splashFactory: InkSparkle.splashFactory,
           onTap: action.enabled
               ? () => Navigator.of(context).pop(actionIndex)
               : null,
@@ -513,6 +515,7 @@ mixin _ToggleGroupOverflowPresenterMixin on State<M3EToggleButtonGroup> {
       shape: RoundedRectangleBorder(borderRadius: borderRadius),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
+        splashFactory: InkSparkle.splashFactory,
         onTap: action.enabled
             ? () => Navigator.of(context).pop(actionIndex)
             : null,
@@ -600,6 +603,7 @@ mixin _ToggleGroupOverflowPresenterMixin on State<M3EToggleButtonGroup> {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(itemRadius),
+          splashFactory: InkSparkle.splashFactory,
           onTap: action.enabled
               ? () => Navigator.of(context).pop(actionIndex)
               : null,

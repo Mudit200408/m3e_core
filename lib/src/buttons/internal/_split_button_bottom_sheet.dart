@@ -299,6 +299,7 @@ class _MultiSelectBottomSheetState<T>
 
     return InkWell(
       autofocus: autofocus,
+      splashFactory: InkSparkle.splashFactory,
       onTap: item.enabled ? () => _toggleValue(item.value) : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -444,6 +445,7 @@ Widget _buildBottomSheetItem<T>({
 
   return InkWell(
     autofocus: autofocus,
+    splashFactory: InkSparkle.splashFactory,
     onTap: item.enabled ? () => Navigator.of(context).pop(item.value) : null,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

@@ -19,7 +19,7 @@ const Alignment _kAlignmentCenter = Alignment.center;
 const VisualDensity _kVisualDensityStandard = VisualDensity.standard;
 const Duration _kDurationZero = Duration.zero;
 const InteractiveInkFeatureFactory _kDefaultSplashFactory =
-    InkRipple.splashFactory;
+    InkSparkle.splashFactory;
 const bool _kDefaultEnableFeedback = true;
 const double _kLabelSlideDistance = 10.0;
 final SpringMotion _kPressedRadiusMotion = M3EMotion.expressiveEffectsFast
@@ -660,7 +660,10 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
       animationDuration: _kDurationZero,
       visualDensity: _kVisualDensityStandard,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      splashFactory: widget.splashFactory ?? _kDefaultSplashFactory,
+      splashFactory:
+          widget.decoration?.splashFactory ??
+          widget.splashFactory ??
+          _kDefaultSplashFactory,
       overlayColor: widget.decorationOverlayColor,
       surfaceTintColor: widget.decorationSurfaceTintColor,
       enableFeedback: widget.enableFeedback,

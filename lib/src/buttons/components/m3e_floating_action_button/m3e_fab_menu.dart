@@ -490,6 +490,7 @@ class _M3EFabMenuState extends State<M3EFabMenu> with TickerProviderStateMixin {
               alignment: _menuItemAlign,
               widthFactor: factor,
               child: InkWell(
+                splashFactory: InkSparkle.splashFactory,
                 onTap: () {
                   item.onPressed?.call();
                   _close();

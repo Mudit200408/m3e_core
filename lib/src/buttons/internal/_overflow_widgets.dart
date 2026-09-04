@@ -68,6 +68,7 @@ class OverflowMenuItem extends StatelessWidget {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(radius),
+          splashFactory: InkSparkle.splashFactory,
           onTap: action.enabled ? onTap : null,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

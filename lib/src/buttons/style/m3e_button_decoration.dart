@@ -424,6 +424,9 @@ class M3EToggleButtonDecoration {
   /// Custom alignment.
   final AlignmentGeometry? alignment;
 
+  /// Custom splash factory.
+  final InteractiveInkFeatureFactory? splashFactory;
+
   const M3EToggleButtonDecoration({
     this.backgroundColor,
     this.foregroundColor,
@@ -440,6 +443,7 @@ class M3EToggleButtonDecoration {
     this.hoveredRadius,
     this.connectedInnerRadius,
     this.alignment,
+    this.splashFactory,
   });
 
   /// Factory constructor to seamlessly migrate from Flutter's official `ButtonStyle` / `styleFrom()`.
@@ -466,6 +470,7 @@ class M3EToggleButtonDecoration {
     Color? overlayColor,
     Color? surfaceTintColor,
     AlignmentGeometry? alignment,
+    InteractiveInkFeatureFactory? splashFactory,
   }) {
     final WidgetStateProperty<Color?>? backgroundColorProp =
         (backgroundColor == null &&
@@ -521,6 +526,7 @@ class M3EToggleButtonDecoration {
       overlayColor: overlayColorProp,
       surfaceTintColor: surfaceTintColorProp,
       alignment: alignment,
+      splashFactory: splashFactory,
     );
   }
 
@@ -540,6 +546,7 @@ class M3EToggleButtonDecoration {
     double? pressedRadius,
     double? hoveredRadius,
     double? connectedInnerRadius,
+    InteractiveInkFeatureFactory? splashFactory,
   }) {
     return M3EToggleButtonDecoration(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -556,6 +563,7 @@ class M3EToggleButtonDecoration {
       pressedRadius: pressedRadius ?? this.pressedRadius,
       hoveredRadius: hoveredRadius ?? this.hoveredRadius,
       connectedInnerRadius: connectedInnerRadius ?? this.connectedInnerRadius,
+      splashFactory: splashFactory ?? this.splashFactory,
     );
   }
 
@@ -576,7 +584,8 @@ class M3EToggleButtonDecoration {
           uncheckedRadius == other.uncheckedRadius &&
           pressedRadius == other.pressedRadius &&
           hoveredRadius == other.hoveredRadius &&
-          connectedInnerRadius == other.connectedInnerRadius;
+          connectedInnerRadius == other.connectedInnerRadius &&
+          splashFactory == other.splashFactory;
 
   @override
   int get hashCode => Object.hashAll([
@@ -594,6 +603,7 @@ class M3EToggleButtonDecoration {
     pressedRadius,
     hoveredRadius,
     connectedInnerRadius,
+    splashFactory,
   ]);
 }
 

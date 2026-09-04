@@ -187,6 +187,7 @@ Widget _buildPopupEntry({
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(radius)),
       child: InkWell(
         borderRadius: BorderRadius.circular(radius),
+        splashFactory: InkSparkle.splashFactory,
         onTap: action.enabled ? () => Navigator.of(context).pop(0) : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

@@ -18,7 +18,7 @@ const Alignment _kAlignmentCenter = Alignment.center;
 const VisualDensity _kVisualDensityStandard = VisualDensity.standard;
 const Duration _kDurationZero = Duration.zero;
 const InteractiveInkFeatureFactory _kDefaultSplashFactory =
-    InkRipple.splashFactory;
+    InkSparkle.splashFactory;
 const bool _kDefaultEnableFeedback = true;
 final _kPressedRadiusMotion = M3EMotion.expressiveEffectsFast.toMotion();
 

@@ -12,6 +12,8 @@ import '../../../common/m3e_common.dart';
 import '../../style/m3e_split_button_decoration.dart';
 
 const double _kSplitMinTapTarget = 48.0;
+const InteractiveInkFeatureFactory _kDefaultSplashFactory =
+    InkSparkle.splashFactory;
 const bool _kDefaultEnableFeedback = true;
 
 /// Controls how the trailing (dropdown) button aligns with the leading button.
@@ -620,7 +622,10 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
                 widget.mouseCursor ??
                 SystemMouseCursors.click,
             enableFeedback: widget.enableFeedback,
-            splashFactory: widget.splashFactory ?? InkRipple.splashFactory,
+            splashFactory:
+                widget.decoration?.splashFactory ??
+                widget.splashFactory ??
+                _kDefaultSplashFactory,
             child: _applyDecorationLayers(
               context: context,
               states: segmentStates,
@@ -783,7 +788,10 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
                 : null,
             canRequestFocus: false,
             enableFeedback: widget.enableFeedback,
-            splashFactory: widget.splashFactory ?? InkRipple.splashFactory,
+            splashFactory:
+                widget.decoration?.splashFactory ??
+                widget.splashFactory ??
+                _kDefaultSplashFactory,
             child: _applyDecorationLayers(
               context: context,
               states: segmentStates,

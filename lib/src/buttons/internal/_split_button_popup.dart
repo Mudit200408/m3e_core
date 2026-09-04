@@ -346,6 +346,7 @@ class _PopupOverlayState<T> extends State<_PopupOverlay<T>> {
         child: InkWell(
           borderRadius: borderRadius,
           autofocus: isFirstEnabled,
+          splashFactory: InkSparkle.splashFactory,
           onTap: item.enabled
               ? () {
                   _selected = true;

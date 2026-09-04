@@ -74,4 +74,97 @@ void main() {
       expect(dec.gap, 6.0);
     });
   });
+
+  group('Button Splash Factory Defaults', () {
+    testWidgets('M3EButton defaults to InkSparkle.splashFactory', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: M3EButton(onPressed: () {}, child: const Text('Test')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<ButtonStyleButton>(
+        find.byWidgetPredicate(
+          (w) =>
+              w is ElevatedButton ||
+              w is FilledButton ||
+              w is OutlinedButton ||
+              w is TextButton,
+        ),
+      );
+      expect(button.style?.splashFactory, InkSparkle.splashFactory);
+    });
+
+    testWidgets('M3EToggleButton defaults to InkSparkle.splashFactory', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: M3EToggleButton(
+              onCheckedChange: (_) {},
+              icon: const Icon(Icons.star),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<ButtonStyleButton>(
+        find.byWidgetPredicate(
+          (w) =>
+              w is ElevatedButton ||
+              w is FilledButton ||
+              w is OutlinedButton ||
+              w is TextButton,
+        ),
+      );
+      expect(button.style?.splashFactory, InkSparkle.splashFactory);
+    });
+
+    testWidgets(
+      'M3ESplitButton defaults to InkSparkle.splashFactory on segments',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: M3ESplitButton(
+                onPressed: () {},
+                label: 'Split',
+                items: const [M3ESplitButtonItem(value: 1, child: Text('1'))],
+                onSelected: (_) {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final inkWells = tester.widgetList<InkWell>(find.byType(InkWell));
+        expect(inkWells.isNotEmpty, isTrue);
+        for (final inkWell in inkWells) {
+          expect(inkWell.splashFactory, InkSparkle.splashFactory);
+        }
+      },
+    );
+
+    test('M3EToggleButtonDecoration supports splashFactory', () {
+      const dec = M3EToggleButtonDecoration(
+        splashFactory: InkRipple.splashFactory,
+      );
+      expect(dec.splashFactory, InkRipple.splashFactory);
+
+      final copy = dec.copyWith(splashFactory: InkSparkle.splashFactory);
+      expect(copy.splashFactory, InkSparkle.splashFactory);
+
+      final fromStyle = M3EToggleButtonDecoration.styleFrom(
+        splashFactory: InkRipple.splashFactory,
+      );
+      expect(fromStyle.splashFactory, InkRipple.splashFactory);
+    });
+  });
 }
