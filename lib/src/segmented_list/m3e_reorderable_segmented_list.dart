@@ -391,6 +391,7 @@ class M3EReorderableSegmentedList extends StatefulWidget {
 class _M3EReorderableSegmentedListState
     extends State<M3EReorderableSegmentedList>
     with TickerProviderStateMixin {
+  final GlobalKey _stackKey = GlobalKey();
   final ValueNotifier<int?> _draggedIndexNotifier = ValueNotifier<int?>(null);
   final ValueNotifier<int?> _targetIndexNotifier = ValueNotifier<int?>(null);
   final ValueNotifier<Offset> _pointerOffsetNotifier = ValueNotifier<Offset>(
@@ -554,7 +555,8 @@ class _M3EReorderableSegmentedListState
     if (_isSettlingNotifier.value || _draggedIndexNotifier.value != null) {
       return null;
     }
-    final renderBox = context.findRenderObject() as RenderBox?;
+    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox = (stackBox ?? context.findRenderObject()) as RenderBox?;
     if (renderBox == null) return null;
 
     final itemKey = _itemKeys[index];
@@ -619,7 +621,8 @@ class _M3EReorderableSegmentedListState
     if (_draggedIndexNotifier.value == null || _isSettlingNotifier.value) {
       return;
     }
-    final renderBox = context.findRenderObject() as RenderBox?;
+    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final renderBox = (stackBox ?? context.findRenderObject()) as RenderBox?;
     if (renderBox == null) return;
 
     final localPos = renderBox.globalToLocal(globalPos);
@@ -749,9 +752,15 @@ class _M3EReorderableSegmentedListState
     final effectiveGap = widget.decoration?.gap ?? widget.gap;
     final shiftAmount = _dragItemHeight + effectiveGap;
 
+    final double currentLiftT = _proxyLiftCtrl.value.clamp(0.0, 1.0);
+    const double kLiftShiftX = 12.0;
+    const double kLiftShiftY = 12.0;
+
     _snapStartOffset = Offset(
-      _dragItemOrigin.dx,
-      _pointerOffsetNotifier.value.dy - _grabOffsetY,
+      _dragItemOrigin.dx + (kLiftShiftX * currentLiftT),
+      _pointerOffsetNotifier.value.dy -
+          _grabOffsetY +
+          (kLiftShiftY * currentLiftT),
     );
 
     final renderBox = context.findRenderObject() as RenderBox?;
@@ -1141,14 +1150,20 @@ class _M3EReorderableSegmentedListState
         if (isSettling) {
           final snapT = _snapMotionCtrl.value;
           currentOffset = Offset(
-            _snapStartOffset.dx,
+            lerpDouble(_snapStartOffset.dx, _snapTargetOffset.dx, snapT) ??
+                _snapTargetOffset.dx,
             lerpDouble(_snapStartOffset.dy, _snapTargetOffset.dy, snapT) ??
                 _snapTargetOffset.dy,
           );
         } else {
+          final double liftT = _proxyLiftCtrl.value.clamp(0.0, 1.0);
+          const double kLiftShiftX = 12.0;
+          const double kLiftShiftY = 12.0;
           currentOffset = Offset(
-            _dragItemOrigin.dx,
-            _pointerOffsetNotifier.value.dy - _grabOffsetY,
+            _dragItemOrigin.dx + (kLiftShiftX * liftT),
+            _pointerOffsetNotifier.value.dy -
+                _grabOffsetY +
+                (kLiftShiftY * liftT),
           );
         }
 
@@ -1433,6 +1448,7 @@ class _M3EReorderableSegmentedListState
     final effectivePadding = widget.listPadding;
 
     Widget content = Stack(
+      key: _stackKey,
       clipBehavior: Clip.none,
       children: [
         ListView.builder(
