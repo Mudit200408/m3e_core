@@ -170,7 +170,7 @@ class M3EDropdownMenu<T> extends StatefulWidget {
   /// and dropdown items.
   ///
   /// Defaults to [NoSplash.splashFactory] (no ripple). Pass
-  /// [InkSplash.splashFactory] or [InkRipple.splashFactory] to restore
+  /// [InkSparkle.splashFactory] or [InkSplash.splashFactory] to restore
   /// material splash feedback.
   final InteractiveInkFeatureFactory? splashFactory;
 
