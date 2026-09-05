@@ -31,8 +31,17 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
   ExpandableContentMode _content = ExpandableContentMode.data;
 
   int _itemCount = 4;
+  List<int> _itemIndices = [0, 1, 2, 3];
   bool _allowMultiple = false;
   Set<int> _initiallyExpanded = {0};
+
+  void _handleReorder(int oldIndex, int newIndex) {
+    setState(() {
+      final item = _itemIndices.removeAt(oldIndex);
+      final target = newIndex > oldIndex ? newIndex - 1 : newIndex;
+      _itemIndices.insert(target, item);
+    });
+  }
 
   double _outerRadius = 24;
   double _innerRadius = 6;
@@ -158,9 +167,11 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
     damping: _collapseDamping,
   );
 
-  List<M3EExpandableData> get _data => List.generate(
-    _itemCount,
-    (i) => M3EExpandableData(
+  List<M3EExpandableData> get _data => List.generate(_itemIndices.length, (
+    index,
+  ) {
+    final i = _itemIndices[index];
+    return M3EExpandableData(
       title: 'Expandable section ${i + 1}',
       titleStyle: _useCustomTextStyles
           ? const [
@@ -188,8 +199,8 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
           'Rich body content for section ${i + 1}. This body can contain text, buttons, forms, or any custom widget.',
         ),
       ),
-    ),
-  );
+    );
+  });
 
   String _generateCodeSnippet() {
     return ExpandableCodeSnippets.generate(
@@ -253,6 +264,7 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
       itemCount: _itemCount,
       onItemCountChanged: (val) => setState(() {
         _itemCount = val;
+        _itemIndices = List.generate(_itemCount, (i) => i);
         _initiallyExpanded = _initiallyExpanded
             .where((i) => i < _itemCount)
             .toSet();
@@ -392,6 +404,7 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
         collapseMotion: _collapseMotion,
         listController: _listController,
         sliverController: _sliverController,
+        onReorder: _handleReorder,
       ),
       codeSnippet: CodeSnippetCard(code: _generateCodeSnippet()),
       controls: _buildControls(),

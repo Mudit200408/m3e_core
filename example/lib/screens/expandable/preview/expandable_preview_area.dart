@@ -21,6 +21,7 @@ class ExpandablePreviewArea extends StatelessWidget {
     required this.collapseMotion,
     required this.listController,
     required this.sliverController,
+    this.onReorder,
   });
 
   final ExpandableLayoutMode layout;
@@ -34,6 +35,7 @@ class ExpandablePreviewArea extends StatelessWidget {
   final M3EMotion collapseMotion;
   final ScrollController listController;
   final ScrollController sliverController;
+  final ReorderCallback? onReorder;
 
   M3EExpandableHeaderBuilder get _headerBuilder =>
       (context, index, progress) => Row(
@@ -161,6 +163,41 @@ class ExpandablePreviewArea extends StatelessWidget {
     );
   }
 
+  Widget _buildReorderable() {
+    if (content == ExpandableContentMode.builder) {
+      return M3EReorderableExpandableList.builder(
+        key: const ValueKey('expandable_reorderable_builder'),
+        itemCount: itemCount,
+        keyBuilder: (index) => ValueKey('builder_item_$index'),
+        headerBuilder: _headerBuilder,
+        bodyBuilder: _bodyBuilder,
+        allowMultipleExpanded: allowMultiple,
+        initiallyExpanded: initiallyExpanded,
+        style: style,
+        expandMotion: expandMotion,
+        collapseMotion: collapseMotion,
+        scrollController: listController,
+        shrinkWrap: true,
+        listPadding: const EdgeInsets.all(12),
+        onReorder: onReorder ?? (_, _) {},
+      );
+    }
+    return M3EReorderableExpandableList(
+      key: const ValueKey('expandable_reorderable_data'),
+      data: data,
+      keyBuilder: (index) => ValueKey(data[index].title),
+      allowMultipleExpanded: allowMultiple,
+      initiallyExpanded: initiallyExpanded,
+      style: style,
+      expandMotion: expandMotion,
+      collapseMotion: collapseMotion,
+      scrollController: listController,
+      shrinkWrap: true,
+      listPadding: const EdgeInsets.all(12),
+      onReorder: onReorder ?? (_, _) {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget child;
@@ -177,6 +214,8 @@ class ExpandablePreviewArea extends StatelessWidget {
       );
     } else if (layout == ExpandableLayoutMode.list) {
       child = _buildList();
+    } else if (layout == ExpandableLayoutMode.reorderable) {
+      child = _buildReorderable();
     } else {
       child = _buildColumn();
     }

@@ -79,6 +79,8 @@ class ExpandableCodeSnippets {
         ? 'SliverM3EExpandableCardList'
         : layout == ExpandableLayoutMode.column
         ? 'M3EExpandableCardColumn'
+        : layout == ExpandableLayoutMode.reorderable
+        ? 'M3EReorderableExpandableList'
         : 'M3EExpandableCardList';
     b.writeln('$constructor${builder ? '.builder' : ''}(');
     if (builder) {
@@ -92,8 +94,14 @@ class ExpandableCodeSnippets {
     } else {
       b.writeln('  data: data,');
     }
-    if (layout == ExpandableLayoutMode.list) {
-      b.writeln('  controller: listController,');
+    if (layout == ExpandableLayoutMode.reorderable) {
+      b.writeln('  onReorder: (oldIndex, newIndex) {');
+      b.writeln('    // Handle item reordering');
+      b.writeln('  },');
+    }
+    if (layout == ExpandableLayoutMode.list ||
+        layout == ExpandableLayoutMode.reorderable) {
+      b.writeln('  scrollController: listController,');
     }
     b.writeln('  allowMultipleExpanded: $allowMultiple,');
     b.writeln('  initiallyExpanded: ${initiallyExpanded.toList()} .toSet(),');

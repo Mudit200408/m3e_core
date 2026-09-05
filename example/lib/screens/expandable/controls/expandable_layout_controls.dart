@@ -113,11 +113,12 @@ class ExpandableLayoutControls extends StatelessWidget {
             _group(
               'Layout',
               layout.index,
-              ['Column', 'ListView', 'Sliver'],
+              ['Column', 'ListView', 'Sliver', 'Reorderable'],
               [
                 Icons.view_stream_rounded,
                 Icons.view_list_rounded,
                 Icons.layers_rounded,
+                Icons.reorder_rounded,
               ],
               (i) => onLayoutChanged(ExpandableLayoutMode.values[i]),
             ),
