@@ -31,7 +31,7 @@ class DropdownCodeSnippets {
     required bool customItemBuilder,
     required bool customSelectedBuilder,
     required bool customEmptyBuilder,
-    required bool useSplash,
+    required DropdownSplashFactory splashFactory,
     required bool useFieldColor,
     required bool usePanelColor,
     required bool useChipColor,
@@ -207,8 +207,8 @@ class DropdownCodeSnippets {
         "  validator: (items) => items == null || items.isEmpty ? 'Choose at least one fruit' : null,",
       );
     }
-    if (useSplash) {
-      b.writeln('  splashFactory: InkRipple.splashFactory,');
+    if (splashFactory != DropdownSplashFactory.noSplash) {
+      b.writeln('  splashFactory: ${splashFactory.label}.splashFactory,');
     }
     b.write(');');
     return b.toString();

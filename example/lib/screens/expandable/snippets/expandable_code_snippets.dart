@@ -170,7 +170,7 @@ class ExpandableCodeSnippets {
       '    splashColor: ${useSplash ? _colorLiteral(splashColor) : 'null'}, highlightColor: ${useHighlight ? _colorLiteral(highlightColor) : 'null'},',
     );
     b.writeln(
-      "    splashFactory: ${useSplash ? 'InkRipple.splashFactory' : 'null'}, expandTooltip: 'Expand section', collapseTooltip: 'Collapse section',",
+      "    splashFactory: ${useSplash ? 'InkSparkle.splashFactory' : 'null'}, expandTooltip: 'Expand section', collapseTooltip: 'Collapse section',",
     );
     b.writeln('  ),');
     b.write(');');

@@ -33,7 +33,7 @@ class DropdownPreviewArea extends StatelessWidget {
     required this.closeOnBackButton,
     required this.openMotion,
     required this.closeMotion,
-    required this.useSplash,
+    required this.splashFactory,
     required this.haptic,
     required this.controller,
     required this.onSelectionChanged,
@@ -63,7 +63,7 @@ class DropdownPreviewArea extends StatelessWidget {
   final bool closeOnBackButton;
   final M3EMotion openMotion;
   final M3EMotion closeMotion;
-  final bool useSplash;
+  final DropdownSplashFactory splashFactory;
   final M3EHapticFeedback haptic;
   final M3EDropdownController<String> controller;
   final void Function(List<M3EDropdownItem<String>> items) onSelectionChanged;
@@ -111,9 +111,7 @@ class DropdownPreviewArea extends StatelessWidget {
                 closeOnBackButton: closeOnBackButton,
                 openMotion: openMotion,
                 closeMotion: closeMotion,
-                splashFactory: useSplash
-                    ? InkRipple.splashFactory
-                    : NoSplash.splashFactory,
+                splashFactory: splashFactory.factory,
                 haptic: haptic,
               )
             else
@@ -150,9 +148,7 @@ class DropdownPreviewArea extends StatelessWidget {
                 closeOnBackButton: closeOnBackButton,
                 openMotion: openMotion,
                 closeMotion: closeMotion,
-                splashFactory: useSplash
-                    ? InkRipple.splashFactory
-                    : NoSplash.splashFactory,
+                splashFactory: splashFactory.factory,
                 haptic: haptic,
               ),
             if (validationEnabled) ...[

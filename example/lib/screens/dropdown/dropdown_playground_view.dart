@@ -49,7 +49,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
   bool _customItemBuilder = false;
   bool _customSelectedBuilder = false;
   bool _customEmptyBuilder = false;
-  bool _useSplash = false;
+  DropdownSplashFactory _splashFactory = DropdownSplashFactory.noSplash;
   bool _useFieldColor = false;
   bool _usePanelColor = false;
   bool _useChipColor = false;
@@ -142,7 +142,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
       customItemBuilder: _customItemBuilder,
       customSelectedBuilder: _customSelectedBuilder,
       customEmptyBuilder: _customEmptyBuilder,
-      useSplash: _useSplash,
+      splashFactory: _splashFactory,
       useFieldColor: _useFieldColor,
       usePanelColor: _usePanelColor,
       useChipColor: _useChipColor,
@@ -315,8 +315,8 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
       closeOnBackButton: _closeOnBackButton,
       onCloseOnBackButtonChanged: (val) =>
           setState(() => _closeOnBackButton = val),
-      useSplash: _useSplash,
-      onUseSplashChanged: (val) => setState(() => _useSplash = val),
+      splashFactory: _splashFactory,
+      onSplashFactoryChanged: (val) => setState(() => _splashFactory = val),
       validationEnabled: _validationEnabled,
       onValidationEnabledChanged: (val) =>
           setState(() => _validationEnabled = val),
@@ -426,7 +426,7 @@ class _DropdownPlaygroundViewState extends State<DropdownPlaygroundView> {
         closeOnBackButton: _closeOnBackButton,
         openMotion: _openMotion,
         closeMotion: _closeMotion,
-        useSplash: _useSplash,
+        splashFactory: _splashFactory,
         haptic: _haptic,
         controller: _controller,
         onSelectionChanged: _onSelectionChanged,

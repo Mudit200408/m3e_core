@@ -6,6 +6,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:m3e_core/m3e_core.dart';
 import '../../../shared/shared.dart';
+import '../models/dropdown_models.dart';
 
 class DropdownMotionFeedbackControls extends StatelessWidget {
   const DropdownMotionFeedbackControls({
@@ -22,8 +23,8 @@ class DropdownMotionFeedbackControls extends StatelessWidget {
     required this.onCloseDampingChanged,
     required this.closeOnBackButton,
     required this.onCloseOnBackButtonChanged,
-    required this.useSplash,
-    required this.onUseSplashChanged,
+    required this.splashFactory,
+    required this.onSplashFactoryChanged,
     required this.validationEnabled,
     required this.onValidationEnabledChanged,
     required this.pressedScale,
@@ -42,8 +43,8 @@ class DropdownMotionFeedbackControls extends StatelessWidget {
   final ValueChanged<double> onCloseDampingChanged;
   final bool closeOnBackButton;
   final ValueChanged<bool> onCloseOnBackButtonChanged;
-  final bool useSplash;
-  final ValueChanged<bool> onUseSplashChanged;
+  final DropdownSplashFactory splashFactory;
+  final ValueChanged<DropdownSplashFactory> onSplashFactoryChanged;
   final bool validationEnabled;
   final ValueChanged<bool> onValidationEnabledChanged;
   final double pressedScale;
@@ -88,6 +89,36 @@ class DropdownMotionFeedbackControls extends StatelessWidget {
               onSelectionChanged: (items) {
                 if (items.isNotEmpty && items.first.value != haptic) {
                   onHapticChanged(items.first.value);
+                }
+              },
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                'Splash factory',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+            M3EDropdownMenu<DropdownSplashFactory>(
+              key: ValueKey('control_splash_$splashFactory'),
+              singleSelect: true,
+              searchEnabled: false,
+              items: DropdownSplashFactory.values
+                  .map(
+                    (item) => M3EDropdownItem(
+                      label: item.label,
+                      value: item,
+                      selected: item == splashFactory,
+                    ),
+                  )
+                  .toList(),
+              fieldStyle: const M3EDropdownFieldStyle(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              onSelectionChanged: (items) {
+                if (items.isNotEmpty && items.first.value != splashFactory) {
+                  onSplashFactoryChanged(items.first.value);
                 }
               },
             ),
@@ -144,11 +175,6 @@ class DropdownMotionFeedbackControls extends StatelessWidget {
                   title: 'Close on back button',
                   value: closeOnBackButton,
                   onChanged: onCloseOnBackButtonChanged,
-                ),
-                M3ESwitchItem(
-                  title: 'Enable ink splash',
-                  value: useSplash,
-                  onChanged: onUseSplashChanged,
                 ),
                 M3ESwitchItem(
                   title: 'Enable validation',

@@ -149,7 +149,7 @@ class _ExpandablePlaygroundViewState extends State<ExpandablePlaygroundView> {
       haptic: _haptic,
       splashColor: _useSplash ? _splashColor : null,
       highlightColor: _useHighlight ? _highlightColor : null,
-      splashFactory: _useSplash ? InkRipple.splashFactory : null,
+      splashFactory: _useSplash ? InkSparkle.splashFactory : null,
       enableFeedback: _enableFeedback,
       tapIconToToggle: _tapIcon,
       expandTooltip: 'Expand section',
