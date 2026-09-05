@@ -77,31 +77,38 @@ class M3ESegmentedSwitchGroup extends StatelessWidget {
       innerRadius: innerRadius,
       selectedRadius: selectedRadius,
       pressedRadius: pressedRadius,
+      splashFactory: InkSparkle.splashFactory,
       selectedColor: cs.primaryContainer.withValues(alpha: 0.40),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
       onTap: (index) => items[index].onChanged?.call(!items[index].value),
       isSelected: (index) => items[index].value,
       children: items.map((item) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            splashFactory: NoSplash.splashFactory,
-          ),
-          child: SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            title: Text(
-              item.title,
-              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+        return Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
+                  if (item.subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(item.subtitle!, style: const TextStyle(fontSize: 11)),
+                  ],
+                ],
+              ),
             ),
-            subtitle: item.subtitle != null
-                ? Text(item.subtitle!, style: const TextStyle(fontSize: 11))
-                : null,
-            value: item.value,
-            onChanged: item.onChanged,
-          ),
+            const SizedBox(width: 8),
+            IgnorePointer(
+              child: Switch(value: item.value, onChanged: item.onChanged),
+            ),
+          ],
         );
       }).toList(),
     );
