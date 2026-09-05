@@ -83,7 +83,7 @@ mixin M3EExpandableStateMixin<T extends M3EExpandableListBase> on State<T> {
 
   bool isExpanded(int index) => _expandedIndices.contains(index);
 
-  Widget buildItem(BuildContext context, int index) {
+  Widget buildItem(BuildContext context, int index, {int? visualIndex}) {
     final theme = M3EExpandableTheme.of(context);
     final effectiveStyle = widget.style ?? theme.style;
     final effectiveExpandMotion = widget.expandMotion ?? theme.expandMotion;
@@ -95,6 +95,7 @@ mixin M3EExpandableStateMixin<T extends M3EExpandableListBase> on State<T> {
     return buildM3EExpandableItem(
       key: ValueKey('m3e_expandable_item_$index'),
       index: index,
+      visualIndex: visualIndex,
       totalCount: widget.itemCount,
       isExpanded: isExpanded(index),
       headerBuilder: widget.headerBuilder,

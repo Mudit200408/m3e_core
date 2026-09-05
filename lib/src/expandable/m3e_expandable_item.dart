@@ -14,8 +14,13 @@ typedef M3EExpandableBodyBuilder =
 
 class M3EExpandableItem extends StatefulWidget {
   final int index;
+  final int? visualIndex;
   final int totalCount;
   final bool isExpanded;
+  final bool animateInitially;
+  final bool animateCollapse;
+  final bool? isLast;
+  final Key? headerKey;
   final M3EExpandableHeaderBuilder headerBuilder;
   final M3EExpandableBodyBuilder bodyBuilder;
   final M3EExpandableStyle decoration;
@@ -26,8 +31,13 @@ class M3EExpandableItem extends StatefulWidget {
   const M3EExpandableItem({
     super.key,
     required this.index,
+    this.visualIndex,
     required this.totalCount,
     required this.isExpanded,
+    this.animateInitially = false,
+    this.animateCollapse = true,
+    this.isLast,
+    this.headerKey,
     required this.headerBuilder,
     required this.bodyBuilder,
     required this.decoration,
@@ -41,7 +51,7 @@ class M3EExpandableItem extends StatefulWidget {
 }
 
 class _M3EExpandableItemState extends State<M3EExpandableItem>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final SingleMotionController _expandCtrl;
 
   bool _isHovered = false;
@@ -49,23 +59,58 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
   bool _isPointerInsideBounds = false;
 
   @override
+  bool get wantKeepAlive => widget.isExpanded || _expandCtrl.isAnimating;
+
+  @override
   void initState() {
-    super.initState();
     final motion = widget.isExpanded
         ? widget.expandMotion.toMotion()
         : widget.collapseMotion.toMotion();
 
+    final shouldAnimateExpand = widget.animateInitially && widget.isExpanded;
+    final shouldAnimateCollapse = widget.animateInitially && !widget.isExpanded;
+    final initialValue = shouldAnimateExpand
+        ? 0.0
+        : (shouldAnimateCollapse ? 1.0 : (widget.isExpanded ? 1.0 : 0.0));
+
     _expandCtrl = SingleMotionController(motion: motion, vsync: this)
-      ..value = widget.isExpanded ? 1.0 : 0.0
+      ..value = initialValue
       ..addListener(_handleMotionTick);
+
+    super.initState();
+
+    if (shouldAnimateExpand) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.isExpanded) {
+          _expandCtrl.animateTo(1.0);
+          updateKeepAlive();
+        }
+      });
+    } else if (shouldAnimateCollapse) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !widget.isExpanded) {
+          _expandCtrl.animateTo(0.0);
+          updateKeepAlive();
+        }
+      });
+    }
   }
 
   void _handleMotionTick() {
-    if (!_expandCtrl.isAnimating &&
-        !_isPointerInsideBounds &&
-        _isHovered &&
+    if (widget.isExpanded &&
+        _expandCtrl.isAnimating &&
+        widget.animateInitially &&
         mounted) {
-      setState(() => _isHovered = false);
+      Scrollable.ensureVisible(
+        context,
+        alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+      );
+    }
+    if (!_expandCtrl.isAnimating) {
+      updateKeepAlive();
+      if (!_isPointerInsideBounds && _isHovered && mounted) {
+        setState(() => _isHovered = false);
+      }
     }
   }
 
@@ -90,14 +135,31 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
 
     if (oldWidget.expandMotion != widget.expandMotion ||
         oldWidget.collapseMotion != widget.collapseMotion ||
-        oldWidget.isExpanded != widget.isExpanded) {
+        oldWidget.isExpanded != widget.isExpanded ||
+        oldWidget.animateInitially != widget.animateInitially) {
       final motion = widget.isExpanded
           ? widget.expandMotion.toMotion()
           : widget.collapseMotion.toMotion();
 
       _expandCtrl.motion = motion;
       if (oldWidget.isExpanded != widget.isExpanded) {
-        _expandCtrl.animateTo(widget.isExpanded ? 1.0 : 0.0);
+        if (!widget.isExpanded) {
+          if (widget.animateCollapse) {
+            _expandCtrl.animateTo(0.0);
+          } else {
+            _expandCtrl.stop();
+            _expandCtrl.value = 0.0;
+          }
+        } else {
+          _expandCtrl.animateTo(1.0);
+        }
+        updateKeepAlive();
+      } else if (widget.animateInitially &&
+          widget.isExpanded &&
+          _expandCtrl.value < 1.0 &&
+          !_expandCtrl.isAnimating) {
+        _expandCtrl.animateTo(1.0);
+        updateKeepAlive();
       }
     }
   }
@@ -110,8 +172,9 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
 
   BorderRadius _buildEffectiveRadius() {
     final d = widget.decoration;
-    final isFirst = widget.index == 0;
-    final isLast = widget.index == widget.totalCount - 1;
+    final pos = widget.visualIndex ?? widget.index;
+    final isFirst = pos == 0;
+    final isLast = pos == widget.totalCount - 1;
     final isSingle = widget.totalCount == 1;
 
     if (widget.isExpanded && d.expandedRadius != null) {
@@ -141,10 +204,12 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final d = widget.decoration;
-    final isLast = widget.index == widget.totalCount - 1;
+    final isPhysicalLast =
+        widget.isLast ?? (widget.index == widget.totalCount - 1);
 
     final canTapHeader = d.tapHeaderToToggle;
     final canTapBody =
@@ -166,7 +231,7 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       child: Padding(
         padding: d.margin ?? EdgeInsets.zero,
         child: Padding(
-          padding: EdgeInsets.only(bottom: isLast ? 0 : d.gap),
+          padding: EdgeInsets.only(bottom: isPhysicalLast ? 0 : d.gap),
           child: _buildAnimatedContainer(
             cs,
             d,
@@ -202,22 +267,16 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       child: content,
     );
 
-    return TweenAnimationBuilder<BorderRadius?>(
-      duration: const Duration(milliseconds: 40),
-      curve: Curves.easeOut,
-      tween: BorderRadiusTween(end: _buildEffectiveRadius()),
-      builder: (context, animatedRadius, child) {
-        return Material(
-          elevation: d.elevation,
-          color: d.color ?? cs.surfaceContainer,
-          shape: RoundedRectangleBorder(
-            borderRadius: animatedRadius ?? _buildEffectiveRadius(),
-            side: d.border ?? BorderSide.none,
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: child,
-        );
-      },
+    final effectiveRadius = _buildEffectiveRadius();
+
+    return Material(
+      elevation: d.elevation,
+      color: d.color ?? cs.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: effectiveRadius,
+        side: d.border ?? BorderSide.none,
+      ),
+      clipBehavior: Clip.antiAlias,
       child: content,
     );
   }
@@ -298,7 +357,7 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       },
     );
 
-    return _buildInteractionWrapper(
+    final headerWidget = _buildInteractionWrapper(
       d,
       onTap: onTap,
       isHeader: true,
@@ -308,6 +367,11 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       tooltip: headerTooltip,
       child: headerBody,
     );
+
+    if (widget.headerKey != null) {
+      return KeyedSubtree(key: widget.headerKey, child: headerWidget);
+    }
+    return headerWidget;
   }
 
   Widget _buildIcon(
@@ -502,8 +566,13 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
 Widget buildM3EExpandableItem({
   Key? key,
   required int index,
+  int? visualIndex,
   required int totalCount,
   required bool isExpanded,
+  bool animateInitially = false,
+  bool animateCollapse = true,
+  bool? isLast,
+  Key? headerKey,
   required M3EExpandableHeaderBuilder headerBuilder,
   required M3EExpandableBodyBuilder bodyBuilder,
   required M3EExpandableStyle decoration,
@@ -514,8 +583,13 @@ Widget buildM3EExpandableItem({
   return M3EExpandableItem(
     key: key,
     index: index,
+    visualIndex: visualIndex,
     totalCount: totalCount,
     isExpanded: isExpanded,
+    animateInitially: animateInitially,
+    animateCollapse: animateCollapse,
+    isLast: isLast,
+    headerKey: headerKey,
     headerBuilder: headerBuilder,
     bodyBuilder: bodyBuilder,
     decoration: decoration,

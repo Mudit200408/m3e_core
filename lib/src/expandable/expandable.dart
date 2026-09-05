@@ -5,4 +5,5 @@ export 'm3e_expandable_style.dart';
 export 'm3e_expandable_item.dart';
 export 'm3e_expandable_theme.dart';
 export 'm3e_expandable_shared.dart';
+export 'm3e_reorderable_expandable_list.dart';
 export 'sliver_m3e_expandable_card_list.dart';
