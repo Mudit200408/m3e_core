@@ -64,7 +64,7 @@ Add `m3e_core` and `material_ui` to your `pubspec.yaml`:
 ```yaml
 dependencies:
   material_ui: ^1.1.0
-  m3e_core: ^1.1.2
+  m3e_core: ^1.1.3
 ```
 
 ```dart
@@ -90,19 +90,19 @@ Detailed documentation for each component is available in their respective packa
 > [!WARNING]
 > `M3ECardList` is deprecated in v1.1.2. Use `M3ESegmentedList` instead.
 
-Interactive segmented lists with expressive corner rounding, spring physics reordering (`M3EReorderableSegmentedList`), selection modes (single/multi), and sliver variants (`SliverM3ESegmentedList`).
+Interactive segmented lists with expressive corner rounding, horizontal segmented row (`M3ESegmentedRow`), spring physics reordering (`M3EReorderableSegmentedList`), keyboard navigation & focus rings, pressed scale micro-interactions, selection modes (single/multi), and sliver variants (`SliverM3ESegmentedList`).
 [Detailed Documentation →](https://pub.dev/packages/m3e_segmented_list)
 
 ### 2. M3E Dismissible Cards
-Swipe-to-dismiss items with a beautiful spring-driven "neighbour pull" effect. Supports multi-action reveal, spring stretch, and custom swipe directions.
+Swipe-to-dismiss items with a beautiful spring-driven "neighbour pull" effect. Supports spring reordering (`M3EReorderableDismissibleList`), keyboard navigation & concentric focus rings, pressed scale micro-interactions, multi-action reveal, threshold haptics, spring stretch, and custom swipe directions.
 [Detailed Documentation →](https://pub.dev/packages/m3e_dismissible)
 
 ### 3. M3E Expandable Cards
-Smoothly expand and collapse individual cards using `motor` spring animations. Supports auto-collapse, bouncy collapse transitions, and multiple expanded items.
+Smoothly expand and collapse individual cards using `motor` spring animations. Supports spring reordering (`M3EReorderableExpandableList`), keyboard navigation & focus rings, pressed scale micro-interactions, auto-collapse, bouncy collapse transitions, and multiple expanded items.
 [Detailed Documentation →](https://pub.dev/packages/m3e_expandable)
 
 ### 4. M3E Dropdown Menu
-A powerful, stylized dropdown with support for single/multi-selection, fuzzy search, async loading, and animated chip tags.
+A powerful, stylized dropdown with support for single/multi-selection, fuzzy search, async loading, keyboard navigation & focus rings, spring pressed scale micro-interactions, and animated chip tags.
 [Detailed Documentation →](https://pub.dev/packages/m3e_dropdown_menu)
 
 ### 5. M3E Buttons

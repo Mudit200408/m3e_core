@@ -1,3 +1,27 @@
+# 1.1.3
+- dropdown: add keyboard navigation and focus ring support
+- segmented-list: add keyboard navigation and focus ring support
+- expandable: add keyboard navigation and focus ring support
+- dismissible: add keyboard navigation and focus ring support
+- dropdown: update splash factory doc comment to reference InkSparkle
+- expandable: introduce M3EReorderableExpandableList component
+- buttons: update default splash factory to InkSparkle and add custom splash factory support to button decorations
+- segmented-list: add 2d lift-off shift and stack coordinate isolation to reorderable list
+- dismissible: add M3EReorderableDismissibleList component
+- dismissible: use InkSparkle as default splash effect
+- expandable: use InkSparkle as default splash effect
+- segmented-list: use InkSparkle as default splash effect
+- dropdown: add spring-driven pressed scale micro-interaction
+- test: fix 2d scale matrix checks in dismissible and expandable tests
+- expandable: add pressed scale micro-interaction support
+- dismissible: add pressed scale micro-interaction support
+- segmented-list: add pressed scale micro-interaction support
+- segmented-list: Add M3ESegmentedRow
+- dismissible: apply border radius clipping to active background and add opacity animation to dismissible buttons
+- dismissible: implement haptic feedback when dismissible action buttons reach full reveal threshold
+- slider: prevent sliders and range sliders from requesting focus on pointer interaction and ensure touch events clear existing focus
+- example: improve the example app
+
 # 1.1.2
 - segmented-list: introduce `M3ESegmentedList`, `M3EReorderableSegmentedList`, and `SliverM3ESegmentedList` with spring physics reordering, selection modes, and dynamic corner morphing
 - card: deprecate legacy `M3ECardList`, `M3ECardColumn`, `SliverM3ECardList`, and related aliases in favor of `M3ESegmentedList`
