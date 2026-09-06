@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:motor/motor.dart';
 
 import '../common/m3e_common.dart';
+import 'internal/_dropdown_focus_ring.dart';
 import 'm3e_dropdown_controller.dart';
 import 'm3e_dropdown_item.dart';
 import 'm3e_dropdown_style.dart';
@@ -283,6 +285,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
   final GlobalKey<M3EMoreChipsIndicatorState> _moreKey = GlobalKey();
   // Focus
   late FocusNode _focusNode;
+  bool _isFocusedField = false;
 
   // Animation direction tracking
   bool? _openingShowOnTop;
@@ -349,6 +352,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
     // Focus
     _focusNode = widget.focusNode ?? FocusNode();
+    _isFocusedField = _focusNode.hasFocus;
 
     // Loading notifier
     _loadingNotifier = ValueNotifier<bool>(false);
@@ -381,6 +385,24 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         })
         ..takePriority();
     }
+  }
+
+  KeyEventResult _handleFieldKeyEvent(FocusNode node, KeyEvent event) {
+    if (!widget.enabled) return KeyEventResult.ignored;
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.enter ||
+          event.logicalKey == LogicalKeyboardKey.space ||
+          event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        _toggle();
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.escape && _controller.isOpen) {
+        _close();
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -420,6 +442,7 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     if (oldWidget.focusNode != widget.focusNode) {
       if (oldWidget.focusNode == null) _focusNode.dispose();
       _focusNode = widget.focusNode ?? FocusNode();
+      _isFocusedField = _focusNode.hasFocus;
     }
 
     // Spring params changed
@@ -556,7 +579,9 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
     if (_controller.isOpen) {
       _close();
     } else {
-      FocusManager.instance.primaryFocus?.unfocus();
+      if (!_focusNode.hasFocus) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      }
       _open();
     }
   }
@@ -663,6 +688,13 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                         child: Focus(
                           focusNode: _focusNode,
                           canRequestFocus: widget.enabled,
+                          onFocusChange: (focused) {
+                            final hasPrimary = _focusNode.hasPrimaryFocus;
+                            if (mounted && _isFocusedField != hasPrimary) {
+                              setState(() => _isFocusedField = hasPrimary);
+                            }
+                          },
+                          onKeyEvent: _handleFieldKeyEvent,
                           child: _buildField(context, formState),
                         ),
                       );
@@ -736,27 +768,43 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
                 : widget.dropdownStyle.marginTop,
           );
 
-    return Stack(
-      children: [
-        // Outside-tap detection layer
-        Positioned.fill(
-          child: Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: _handleOutsideTap,
+    return Shortcuts(
+      shortcuts: <ShortcutActivator, Intent>{
+        const SingleActivator(LogicalKeyboardKey.escape): const DismissIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          DismissIntent: CallbackAction<DismissIntent>(
+            onInvoke: (_) => _close(),
           ),
+        },
+        child: Stack(
+          children: [
+            // Outside-tap detection layer
+            Positioned.fill(
+              child: Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerDown: _handleOutsideTap,
+              ),
+            ),
+            CompositedTransformFollower(
+              link: _layerLink,
+              showWhenUnlinked: false,
+              targetAnchor: showOnTop
+                  ? Alignment.topLeft
+                  : Alignment.bottomLeft,
+              followerAnchor: showOnTop
+                  ? Alignment.bottomLeft
+                  : Alignment.topLeft,
+              offset: marginOffset,
+              child: SizedBox(
+                width: renderBoxSize.width,
+                child: RepaintBoundary(child: _buildDropdownPanel(showOnTop)),
+              ),
+            ),
+          ],
         ),
-        CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-          targetAnchor: showOnTop ? Alignment.topLeft : Alignment.bottomLeft,
-          followerAnchor: showOnTop ? Alignment.bottomLeft : Alignment.topLeft,
-          offset: marginOffset,
-          child: SizedBox(
-            width: renderBoxSize.width,
-            child: RepaintBoundary(child: _buildDropdownPanel(showOnTop)),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -928,45 +976,55 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
         builder: (context, animatedRadius, child) {
           final effectiveRadius =
               animatedRadius ?? _buildEffectiveFieldRadius();
-          return Material(
-            color: bgColor,
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: effectiveRadius,
-              side: borderSide,
-            ),
-            child: InkWell(
-              splashFactory: fd.splashFactory ?? widget.splashFactory,
-              splashColor: fd.splashColor,
-              highlightColor: fd.highlightColor,
-              overlayColor: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.pressed)) {
-                  return fgColor.withValues(alpha: 0.10);
-                }
-                if (states.contains(WidgetState.hovered)) {
-                  return fgColor.withValues(alpha: 0.05);
-                }
-                return Colors.transparent;
-              }),
-              mouseCursor: widget.enabled
-                  ? (fd.mouseCursor ?? SystemMouseCursors.click)
-                  : SystemMouseCursors.forbidden,
-              onTap: widget.enabled && !_isInteractingWithChip ? _toggle : null,
-              onHover: (hover) => setState(() => _isHoveredField = hover),
-              onHighlightChanged: (highlighted) {
-                if (highlighted && _isInteractingWithChip) return;
-                if (mounted && _isPressedField != highlighted) {
-                  setState(() => _isPressedField = highlighted);
-                }
-              },
-              onTapDown: (_) {
-                if (!_isInteractingWithChip) {
-                  setState(() => _isPressedField = true);
-                }
-              },
-              onTapUp: (_) => setState(() => _isPressedField = false),
-              onTapCancel: () => setState(() => _isPressedField = false),
-              child: Padding(padding: fd.padding, child: child),
+          return DropdownFocusRing(
+            radius: effectiveRadius,
+            focused: _isFocusedField,
+            color: fd.focusRingColor,
+            width: fd.focusRingWidth,
+            gap: fd.focusRingGap,
+            child: Material(
+              color: bgColor,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: effectiveRadius,
+                side: borderSide,
+              ),
+              child: InkWell(
+                splashFactory: fd.splashFactory ?? widget.splashFactory,
+                splashColor: fd.splashColor,
+                highlightColor: fd.highlightColor,
+                overlayColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return fgColor.withValues(alpha: 0.10);
+                  }
+                  if (states.contains(WidgetState.hovered)) {
+                    return fgColor.withValues(alpha: 0.05);
+                  }
+                  return Colors.transparent;
+                }),
+                mouseCursor: widget.enabled
+                    ? (fd.mouseCursor ?? SystemMouseCursors.click)
+                    : SystemMouseCursors.forbidden,
+                canRequestFocus: false,
+                onTap: widget.enabled && !_isInteractingWithChip
+                    ? _toggle
+                    : null,
+                onHover: (hover) => setState(() => _isHoveredField = hover),
+                onHighlightChanged: (highlighted) {
+                  if (highlighted && _isInteractingWithChip) return;
+                  if (mounted && _isPressedField != highlighted) {
+                    setState(() => _isPressedField = highlighted);
+                  }
+                },
+                onTapDown: (_) {
+                  if (!_isInteractingWithChip) {
+                    setState(() => _isPressedField = true);
+                  }
+                },
+                onTapUp: (_) => setState(() => _isPressedField = false),
+                onTapCancel: () => setState(() => _isPressedField = false),
+                child: Padding(padding: fd.padding, child: child),
+              ),
             ),
           );
         },
@@ -1284,88 +1342,94 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
           ),
         );
       },
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: dd.maxHeight),
-        child: Material(
-          elevation: dd.elevation,
-          color: dd.backgroundColor ?? cs.surfaceContainer,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              widget.dropdownStyle.containerRadius ?? widget.containerRadius,
-            ),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (dd.header != null) dd.header!,
-              if (widget.searchEnabled) _buildSearch(context),
-              if (_isLoading)
-                const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    _errorMessage!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: cs.error,
-                    ),
-                  ),
-                )
-              else if (filtered.isEmpty)
-                widget.emptyBuilder?.call(context) ??
+      child: FocusScope(
+        child: FocusTraversalGroup(
+          policy: WidgetOrderTraversalPolicy(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: dd.maxHeight),
+            child: Material(
+              elevation: dd.elevation,
+              color: dd.backgroundColor ?? cs.surfaceContainer,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  widget.dropdownStyle.containerRadius ??
+                      widget.containerRadius,
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (dd.header != null) dd.header!,
+                  if (widget.searchEnabled) _buildSearch(context),
+                  if (_isLoading)
+                    const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (_errorMessage != null)
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(
-                        dd.noItemsFoundText,
+                        _errorMessage!,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: cs.onSurface.withValues(alpha: 0.5),
+                          color: cs.error,
                         ),
                       ),
                     )
-              else
-                Flexible(
-                  child: ListView.separated(
-                    padding: dd.contentPadding,
-                    shrinkWrap: true,
-                    itemCount: filtered.length,
-                    separatorBuilder: (_, _) =>
-                        widget.itemSeparator ??
-                        SizedBox(height: widget.itemStyle.itemGap ?? 3.0),
-                    itemBuilder: (context, index) {
-                      final item = filtered[index];
-                      if (widget.itemBuilder != null) {
-                        return widget.itemBuilder!(
-                          item,
-                          item.selected,
-                          () => _onItemTap(item),
-                        );
-                      }
-
-                      final effectiveItemStyle =
-                          widget.itemStyle.pressedScale != null
-                          ? widget.itemStyle
-                          : widget.itemStyle.copyWith(
-                              pressedScale: widget.pressedScale,
+                  else if (filtered.isEmpty)
+                    widget.emptyBuilder?.call(context) ??
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            dd.noItemsFoundText,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: cs.onSurface.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        )
+                  else
+                    Flexible(
+                      child: ListView.separated(
+                        padding: dd.contentPadding,
+                        shrinkWrap: true,
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, _) =>
+                            widget.itemSeparator ??
+                            SizedBox(height: widget.itemStyle.itemGap ?? 3.0),
+                        itemBuilder: (context, index) {
+                          final item = filtered[index];
+                          if (widget.itemBuilder != null) {
+                            return widget.itemBuilder!(
+                              item,
+                              item.selected,
+                              () => _onItemTap(item),
                             );
+                          }
 
-                      return M3EDropdownMenuItemWidget<T>(
-                        key: ValueKey(item.value),
-                        item: item,
-                        index: index,
-                        total: filtered.length,
-                        style: effectiveItemStyle,
-                        splashFactory: widget.splashFactory,
-                        onTap: () => _onItemTap(item),
-                      );
-                    },
-                  ),
-                ),
-              if (dd.footer != null) dd.footer!,
-            ],
+                          final effectiveItemStyle =
+                              widget.itemStyle.pressedScale != null
+                              ? widget.itemStyle
+                              : widget.itemStyle.copyWith(
+                                  pressedScale: widget.pressedScale,
+                                );
+
+                          return M3EDropdownMenuItemWidget<T>(
+                            key: ValueKey(item.value),
+                            item: item,
+                            index: index,
+                            total: filtered.length,
+                            style: effectiveItemStyle,
+                            splashFactory: widget.splashFactory,
+                            onTap: () => _onItemTap(item),
+                          );
+                        },
+                      ),
+                    ),
+                  if (dd.footer != null) dd.footer!,
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -1385,45 +1449,56 @@ class _M3EDropdownMenuState<T> extends State<M3EDropdownMenu<T>>
 
     return Padding(
       padding: sd.margin,
-      child: TextField(
-        controller: _searchTextController,
-        autofocus: sd.autofocus,
-        style: sd.textStyle ?? theme.textTheme.bodyMedium,
-        mouseCursor: sd.mouseCursor,
-        decoration: InputDecoration(
-          hintText: sd.hintText,
-          hintStyle: sd.hintStyle,
-          filled: sd.filled,
-          fillColor: sd.fillColor,
-          prefixIcon: Icon(
-            Icons.search,
-            color: cs.onSurface.withValues(alpha: 0.5),
+      child: Focus(
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent &&
+              event.logicalKey == LogicalKeyboardKey.arrowDown) {
+            node.nextFocus();
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: TextField(
+          controller: _searchTextController,
+          autofocus: sd.autofocus,
+          style: sd.textStyle ?? theme.textTheme.bodyMedium,
+          mouseCursor: sd.mouseCursor,
+          decoration: InputDecoration(
+            hintText: sd.hintText,
+            hintStyle: sd.hintStyle,
+            filled: sd.filled,
+            fillColor: sd.fillColor,
+            prefixIcon: Icon(
+              Icons.search,
+              color: cs.onSurface.withValues(alpha: 0.5),
+            ),
+            suffixIcon:
+                sd.showClearIcon && _searchTextController.text.isNotEmpty
+                ? IconButton(
+                    icon: sd.clearIcon ?? const Icon(Icons.clear, size: 18),
+                    onPressed: () {
+                      _searchTextController.clear();
+                      _searchDebounce?.cancel();
+                      _controller.setSearchQuery('');
+                    },
+                  )
+                : null,
+            contentPadding: sd.contentPadding,
+            border: OutlineInputBorder(
+              borderRadius: searchRadius,
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: searchRadius,
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: searchRadius,
+              borderSide: BorderSide(color: cs.primary, width: 1.5),
+            ),
           ),
-          suffixIcon: sd.showClearIcon && _searchTextController.text.isNotEmpty
-              ? IconButton(
-                  icon: sd.clearIcon ?? const Icon(Icons.clear, size: 18),
-                  onPressed: () {
-                    _searchTextController.clear();
-                    _searchDebounce?.cancel();
-                    _controller.setSearchQuery('');
-                  },
-                )
-              : null,
-          contentPadding: sd.contentPadding,
-          border: OutlineInputBorder(
-            borderRadius: searchRadius,
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: searchRadius,
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: searchRadius,
-            borderSide: BorderSide(color: cs.primary, width: 1.5),
-          ),
+          onChanged: _handleSearchChanged,
         ),
-        onChanged: _handleSearchChanged,
       ),
     );
   }

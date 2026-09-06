@@ -133,6 +133,21 @@ class M3EDropdownFieldStyle with Diagnosticable {
   /// Mouse cursor when hovering over the field.
   final MouseCursor? mouseCursor;
 
+  /// Focus ring color.
+  ///
+  /// When null, falls back to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Width of the focus ring stroke.
+  ///
+  /// Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Gap between the field border and the focus ring.
+  ///
+  /// Defaults to `0.0`.
+  final double focusRingGap;
+
   /// Creates a [M3EDropdownFieldStyle].
   const M3EDropdownFieldStyle({
     this.hintText,
@@ -161,6 +176,9 @@ class M3EDropdownFieldStyle with Diagnosticable {
     this.splashColor,
     this.highlightColor,
     this.mouseCursor,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
     this.showClearIcon = false,
     this.animateSuffixIcon = true,
   });
@@ -195,6 +213,9 @@ class M3EDropdownFieldStyle with Diagnosticable {
     Color? splashColor,
     Color? highlightColor,
     MouseCursor? mouseCursor,
+    Color? focusRingColor,
+    double? focusRingWidth,
+    double? focusRingGap,
   }) {
     return M3EDropdownFieldStyle(
       hintText: hintText ?? this.hintText,
@@ -225,6 +246,9 @@ class M3EDropdownFieldStyle with Diagnosticable {
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
       mouseCursor: mouseCursor ?? this.mouseCursor,
+      focusRingColor: focusRingColor ?? this.focusRingColor,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      focusRingGap: focusRingGap ?? this.focusRingGap,
     );
   }
 
@@ -290,6 +314,10 @@ class M3EDropdownFieldStyle with Diagnosticable {
       splashColor: Color.lerp(a?.splashColor, b?.splashColor, t),
       highlightColor: Color.lerp(a?.highlightColor, b?.highlightColor, t),
       mouseCursor: t < 0.5 ? a?.mouseCursor : b?.mouseCursor,
+      focusRingColor: Color.lerp(a?.focusRingColor, b?.focusRingColor, t),
+      focusRingWidth:
+          lerpDouble(a?.focusRingWidth, b?.focusRingWidth, t) ?? 2.0,
+      focusRingGap: lerpDouble(a?.focusRingGap, b?.focusRingGap, t) ?? 0.0,
     );
   }
 
@@ -324,7 +352,10 @@ class M3EDropdownFieldStyle with Diagnosticable {
           splashFactory == other.splashFactory &&
           splashColor == other.splashColor &&
           highlightColor == other.highlightColor &&
-          mouseCursor == other.mouseCursor;
+          mouseCursor == other.mouseCursor &&
+          focusRingColor == other.focusRingColor &&
+          focusRingWidth == other.focusRingWidth &&
+          focusRingGap == other.focusRingGap;
 
   @override
   int get hashCode => Object.hashAll([
@@ -356,6 +387,9 @@ class M3EDropdownFieldStyle with Diagnosticable {
     splashColor,
     highlightColor,
     mouseCursor,
+    focusRingColor,
+    focusRingWidth,
+    focusRingGap,
   ]);
 
   @override
@@ -375,6 +409,9 @@ class M3EDropdownFieldStyle with Diagnosticable {
     properties.add(
       DoubleProperty('selectedBorderRadius', selectedBorderRadius),
     );
+    properties.add(ColorProperty('focusRingColor', focusRingColor));
+    properties.add(DoubleProperty('focusRingWidth', focusRingWidth));
+    properties.add(DoubleProperty('focusRingGap', focusRingGap));
   }
 }
 
@@ -578,6 +615,21 @@ class M3EChipStyle with Diagnosticable {
   /// Mouse cursor when hovering over the chip.
   final MouseCursor? mouseCursor;
 
+  /// Focus ring color.
+  ///
+  /// When null, falls back to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Width of the focus ring stroke.
+  ///
+  /// Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Gap between the chip border and the focus ring.
+  ///
+  /// Defaults to `0.0`.
+  final double focusRingGap;
+
   /// Scale factor applied to the chip when pressed (e.g. 0.95).
   ///
   /// Defaults to null (no individual scale transformation unless inherited).
@@ -603,6 +655,9 @@ class M3EChipStyle with Diagnosticable {
     this.openMotion = M3EMotion.expressiveSpatialDefault,
     this.closeMotion = M3EMotion.expressiveSpatialDefault,
     this.mouseCursor,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
     this.pressedScale,
     this.pressedMotion = M3EMotion.expressiveSpatialFast,
   });
@@ -622,6 +677,9 @@ class M3EChipStyle with Diagnosticable {
     M3EMotion? openMotion,
     M3EMotion? closeMotion,
     MouseCursor? mouseCursor,
+    Color? focusRingColor,
+    double? focusRingWidth,
+    double? focusRingGap,
     double? pressedScale,
     M3EMotion? pressedMotion,
   }) {
@@ -639,6 +697,9 @@ class M3EChipStyle with Diagnosticable {
       openMotion: openMotion ?? this.openMotion,
       closeMotion: closeMotion ?? this.closeMotion,
       mouseCursor: mouseCursor ?? this.mouseCursor,
+      focusRingColor: focusRingColor ?? this.focusRingColor,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      focusRingGap: focusRingGap ?? this.focusRingGap,
       pressedScale: pressedScale ?? this.pressedScale,
       pressedMotion: pressedMotion ?? this.pressedMotion,
     );
@@ -673,6 +734,10 @@ class M3EChipStyle with Diagnosticable {
           ? (a?.closeMotion ?? M3EMotion.expressiveSpatialDefault)
           : (b?.closeMotion ?? M3EMotion.expressiveSpatialDefault),
       mouseCursor: t < 0.5 ? a?.mouseCursor : b?.mouseCursor,
+      focusRingColor: Color.lerp(a?.focusRingColor, b?.focusRingColor, t),
+      focusRingWidth:
+          lerpDouble(a?.focusRingWidth, b?.focusRingWidth, t) ?? 2.0,
+      focusRingGap: lerpDouble(a?.focusRingGap, b?.focusRingGap, t) ?? 0.0,
       pressedScale: lerpDouble(a?.pressedScale, b?.pressedScale, t),
       pressedMotion: t < 0.5
           ? (a?.pressedMotion ?? M3EMotion.expressiveSpatialFast)
@@ -697,6 +762,9 @@ class M3EChipStyle with Diagnosticable {
           openMotion == other.openMotion &&
           closeMotion == other.closeMotion &&
           mouseCursor == other.mouseCursor &&
+          focusRingColor == other.focusRingColor &&
+          focusRingWidth == other.focusRingWidth &&
+          focusRingGap == other.focusRingGap &&
           pressedScale == other.pressedScale &&
           pressedMotion == other.pressedMotion;
 
@@ -715,6 +783,9 @@ class M3EChipStyle with Diagnosticable {
     openMotion,
     closeMotion,
     mouseCursor,
+    focusRingColor,
+    focusRingWidth,
+    focusRingGap,
     pressedScale,
     pressedMotion,
   );
@@ -730,6 +801,9 @@ class M3EChipStyle with Diagnosticable {
     );
     properties.add(DoubleProperty('spacing', spacing));
     properties.add(IntProperty('maxDisplayCount', maxDisplayCount));
+    properties.add(ColorProperty('focusRingColor', focusRingColor));
+    properties.add(DoubleProperty('focusRingWidth', focusRingWidth));
+    properties.add(DoubleProperty('focusRingGap', focusRingGap));
     properties.add(DoubleProperty('pressedScale', pressedScale));
   }
 }
@@ -1007,6 +1081,21 @@ class M3EDropdownItemStyle with Diagnosticable {
   /// Mouse cursor when hovering over an item.
   final MouseCursor? mouseCursor;
 
+  /// Focus ring color.
+  ///
+  /// When null, falls back to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Width of the focus ring stroke.
+  ///
+  /// Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Gap between the item border and the focus ring.
+  ///
+  /// Defaults to `0.0`.
+  final double focusRingGap;
+
   /// Creates a [M3EDropdownItemStyle].
   const M3EDropdownItemStyle({
     this.backgroundColor,
@@ -1031,6 +1120,9 @@ class M3EDropdownItemStyle with Diagnosticable {
     this.splashColor,
     this.highlightColor,
     this.mouseCursor,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
   });
 
   /// Creates a copy of this style with the given fields replaced.
@@ -1057,6 +1149,9 @@ class M3EDropdownItemStyle with Diagnosticable {
     Color? splashColor,
     Color? highlightColor,
     MouseCursor? mouseCursor,
+    Color? focusRingColor,
+    double? focusRingWidth,
+    double? focusRingGap,
   }) {
     return M3EDropdownItemStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -1083,6 +1178,9 @@ class M3EDropdownItemStyle with Diagnosticable {
       splashColor: splashColor ?? this.splashColor,
       highlightColor: highlightColor ?? this.highlightColor,
       mouseCursor: mouseCursor ?? this.mouseCursor,
+      focusRingColor: focusRingColor ?? this.focusRingColor,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      focusRingGap: focusRingGap ?? this.focusRingGap,
     );
   }
 
@@ -1144,6 +1242,10 @@ class M3EDropdownItemStyle with Diagnosticable {
       splashColor: Color.lerp(a?.splashColor, b?.splashColor, t),
       highlightColor: Color.lerp(a?.highlightColor, b?.highlightColor, t),
       mouseCursor: t < 0.5 ? a?.mouseCursor : b?.mouseCursor,
+      focusRingColor: Color.lerp(a?.focusRingColor, b?.focusRingColor, t),
+      focusRingWidth:
+          lerpDouble(a?.focusRingWidth, b?.focusRingWidth, t) ?? 2.0,
+      focusRingGap: lerpDouble(a?.focusRingGap, b?.focusRingGap, t) ?? 0.0,
     );
   }
 
@@ -1172,7 +1274,10 @@ class M3EDropdownItemStyle with Diagnosticable {
           splashFactory == other.splashFactory &&
           splashColor == other.splashColor &&
           highlightColor == other.highlightColor &&
-          mouseCursor == other.mouseCursor;
+          mouseCursor == other.mouseCursor &&
+          focusRingColor == other.focusRingColor &&
+          focusRingWidth == other.focusRingWidth &&
+          focusRingGap == other.focusRingGap;
 
   @override
   int get hashCode => Object.hashAll([
@@ -1198,6 +1303,9 @@ class M3EDropdownItemStyle with Diagnosticable {
     splashColor,
     highlightColor,
     mouseCursor,
+    focusRingColor,
+    focusRingWidth,
+    focusRingGap,
   ]);
 
   @override
@@ -1212,5 +1320,8 @@ class M3EDropdownItemStyle with Diagnosticable {
     properties.add(
       DiagnosticsProperty<EdgeInsetsGeometry>('itemPadding', itemPadding),
     );
+    properties.add(ColorProperty('focusRingColor', focusRingColor));
+    properties.add(DoubleProperty('focusRingWidth', focusRingWidth));
+    properties.add(DoubleProperty('focusRingGap', focusRingGap));
   }
 }

@@ -1,5 +1,7 @@
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:motor/motor.dart';
+import '../internal/_dropdown_focus_ring.dart';
 import '../m3e_dropdown_item.dart';
 import '../m3e_dropdown_style.dart';
 
@@ -32,6 +34,7 @@ class _M3EDropdownMenuItemWidgetState<T>
     extends State<M3EDropdownMenuItemWidget<T>> {
   bool _isHovered = false;
   bool _isPressed = false;
+  bool _isFocused = false;
   bool _lastSelected = false;
 
   @override
@@ -149,48 +152,75 @@ class _M3EDropdownMenuItemWidgetState<T>
         ? const Duration(milliseconds: 20)
         : const Duration(milliseconds: 40);
 
-    return TweenAnimationBuilder<BorderRadius?>(
-      duration: duration,
-      curve: Curves.easeOut,
-      tween: BorderRadiusTween(
-        begin: _buildEffectiveRadius(),
-        end: _buildEffectiveRadius(),
-      ),
-      builder: (context, animatedRadius, child) {
-        final radius = animatedRadius ?? _buildEffectiveRadius();
-        return Material(
-          color: bgColor,
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(borderRadius: radius),
-          child: InkWell(
-            splashFactory: id.splashFactory ?? widget.splashFactory,
-            splashColor: id.splashColor,
-            highlightColor: id.highlightColor,
-            overlayColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.pressed)) {
-                return textColor.withValues(alpha: 0.10);
-              }
-              if (states.contains(WidgetState.hovered)) {
-                return textColor.withValues(alpha: 0.05);
-              }
-              return Colors.transparent;
-            }),
-            mouseCursor: id.mouseCursor,
-            onTap: item.disabled ? null : widget.onTap,
-            onHover: (hover) => setState(() => _isHovered = hover),
-            onHighlightChanged: (highlighted) {
-              if (mounted && _isPressed != highlighted) {
-                setState(() => _isPressed = highlighted);
-              }
-            },
-            onTapDown: (_) => setState(() => _isPressed = true),
-            onTapUp: (_) => setState(() => _isPressed = false),
-            onTapCancel: () => setState(() => _isPressed = false),
-            child: child,
-          ),
-        );
+    return Focus(
+      canRequestFocus: !item.disabled,
+      onFocusChange: (focused) {
+        if (mounted && _isFocused != focused) {
+          setState(() => _isFocused = focused);
+        }
       },
-      child: scaledContent,
+      onKeyEvent: (node, event) {
+        if (item.disabled) return KeyEventResult.ignored;
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.enter ||
+              event.logicalKey == LogicalKeyboardKey.space) {
+            widget.onTap();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: TweenAnimationBuilder<BorderRadius?>(
+        duration: duration,
+        curve: Curves.easeOut,
+        tween: BorderRadiusTween(
+          begin: _buildEffectiveRadius(),
+          end: _buildEffectiveRadius(),
+        ),
+        builder: (context, animatedRadius, child) {
+          final radius = animatedRadius ?? _buildEffectiveRadius();
+          return DropdownFocusRing(
+            radius: radius,
+            focused: _isFocused,
+            color: id.focusRingColor,
+            width: id.focusRingWidth,
+            gap: id.focusRingGap,
+            child: Material(
+              color: bgColor,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(borderRadius: radius),
+              child: InkWell(
+                splashFactory: id.splashFactory ?? widget.splashFactory,
+                splashColor: id.splashColor,
+                highlightColor: id.highlightColor,
+                overlayColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.pressed)) {
+                    return textColor.withValues(alpha: 0.10);
+                  }
+                  if (states.contains(WidgetState.hovered)) {
+                    return textColor.withValues(alpha: 0.05);
+                  }
+                  return Colors.transparent;
+                }),
+                mouseCursor: id.mouseCursor,
+                canRequestFocus: false,
+                onTap: item.disabled ? null : widget.onTap,
+                onHover: (hover) => setState(() => _isHovered = hover),
+                onHighlightChanged: (highlighted) {
+                  if (mounted && _isPressed != highlighted) {
+                    setState(() => _isPressed = highlighted);
+                  }
+                },
+                onTapDown: (_) => setState(() => _isPressed = true),
+                onTapUp: (_) => setState(() => _isPressed = false),
+                onTapCancel: () => setState(() => _isPressed = false),
+                child: child,
+              ),
+            ),
+          );
+        },
+        child: scaledContent,
+      ),
     );
   }
 }
