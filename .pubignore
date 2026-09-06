@@ -1,2 +1,41 @@
-# Ignore doc for pub publish to reduce package size
+# Ignore files when publishing to pub.dev
+
+# Documentation and assets
 doc/
+analysis_output.txt
+
+# Build artifacts and caches
+build/
+coverage/
+.dart_tool/
+.flutter-plugins-dependencies
+*.dill
+*.track.dill
+*.cache.dill.track.dill
+
+# IDE and OS metadata
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.class
+*.log
+*.swp
+
+# Android / native build artifacts
+android/.gradle/
+android/build/
+android/local.properties
+
+# Example app platform folders and heavy assets not needed on pub.dev
+example/build/
+example/.dart_tool/
+example/.flutter-plugins-dependencies
+example/android/
+example/ios/
+example/web/
+example/macos/
+example/windows/
+example/linux/
+example/assets/
+example/pubspec.lock
