@@ -382,6 +382,25 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
         _useActionButtons || _useSecondaryActionButtons;
 
     return [
+      DismissibleLayoutControls(
+        layoutMode: _layoutMode,
+        onLayoutModeChanged: (val) {
+          setState(() {
+            _layoutMode = val;
+            _resetItems();
+          });
+        },
+        enableLazyLoading: _enableLazyLoading,
+        onEnableLazyLoadingChanged: (val) =>
+            setState(() => _enableLazyLoading = val),
+        itemCount: _items.length,
+        onAddItem: _addItem,
+        onResetItems: _resetItems,
+        confirmWithDialog: _confirmWithDialog,
+        onConfirmWithDialogChanged: (val) =>
+            setState(() => _confirmWithDialog = val),
+        isActionButtonsMode: isActionButtonsMode,
+      ),
       DismissibleStyleControls(
         direction: _direction,
         onDirectionChanged: (val) {
@@ -456,25 +475,7 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
         onCustomCardColorChanged: (color) =>
             setState(() => _customCardColor = color),
       ),
-      DismissibleLayoutControls(
-        layoutMode: _layoutMode,
-        onLayoutModeChanged: (val) {
-          setState(() {
-            _layoutMode = val;
-            _resetItems();
-          });
-        },
-        enableLazyLoading: _enableLazyLoading,
-        onEnableLazyLoadingChanged: (val) =>
-            setState(() => _enableLazyLoading = val),
-        itemCount: _items.length,
-        onAddItem: _addItem,
-        onResetItems: _resetItems,
-        confirmWithDialog: _confirmWithDialog,
-        onConfirmWithDialogChanged: (val) =>
-            setState(() => _confirmWithDialog = val),
-        isActionButtonsMode: isActionButtonsMode,
-      ),
+
       DismissibleGeometryControls(
         outerRadius: _outerRadius,
         onOuterRadiusChanged: (val) => setState(() => _outerRadius = val),
