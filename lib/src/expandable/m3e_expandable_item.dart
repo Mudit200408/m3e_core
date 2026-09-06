@@ -1,10 +1,12 @@
 import 'dart:math' as math;
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:motor/motor.dart';
 
 import 'm3e_expandable_shared.dart';
 import 'm3e_expandable_style.dart';
 import '../common/m3e_common.dart';
+import 'internal/_expandable_focus_ring.dart';
 
 typedef M3EExpandableHeaderBuilder =
     Widget Function(BuildContext context, int index, double progress);
@@ -27,6 +29,8 @@ class M3EExpandableItem extends StatefulWidget {
   final M3EMotion expandMotion;
   final M3EMotion collapseMotion;
   final VoidCallback onToggle;
+  final FocusNode? focusNode;
+  final void Function(int index, bool moveForward)? onReorderKey;
 
   const M3EExpandableItem({
     super.key,
@@ -44,6 +48,8 @@ class M3EExpandableItem extends StatefulWidget {
     required this.expandMotion,
     required this.collapseMotion,
     required this.onToggle,
+    this.focusNode,
+    this.onReorderKey,
   });
 
   @override
@@ -53,10 +59,107 @@ class M3EExpandableItem extends StatefulWidget {
 class _M3EExpandableItemState extends State<M3EExpandableItem>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late final SingleMotionController _expandCtrl;
-
+  FocusNode? _internalFocusNode;
   bool _isHovered = false;
   bool _isPressed = false;
+  bool _isFocused = false;
   bool _isPointerInsideBounds = false;
+
+  FocusNode get _focusNode => widget.focusNode ?? _internalFocusNode!;
+
+  KeyEventResult _handleCardKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    // Alt/Option, Meta (Cmd), or Ctrl + Arrow Up/Left -> move backward (index - 1)
+    // Alt/Option, Meta (Cmd), or Ctrl + Arrow Down/Right -> move forward (index + 1)
+    final isModifier =
+        HardwareKeyboard.instance.isAltPressed ||
+        HardwareKeyboard.instance.isMetaPressed ||
+        HardwareKeyboard.instance.isControlPressed ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.alt) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.altLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.altRight,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.meta,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.metaLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.metaRight,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.control,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlRight,
+        );
+
+    if (isModifier && widget.onReorderKey != null) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+          event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+          event.physicalKey == PhysicalKeyboardKey.arrowUp ||
+          event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
+        widget.onReorderKey!(widget.index, false);
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.arrowRight ||
+          event.physicalKey == PhysicalKeyboardKey.arrowDown ||
+          event.physicalKey == PhysicalKeyboardKey.arrowRight) {
+        widget.onReorderKey!(widget.index, true);
+        return KeyEventResult.handled;
+      }
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      widget.onToggle();
+      return KeyEventResult.handled;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight ||
+        event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      if (!widget.isExpanded) {
+        widget.onToggle();
+        return KeyEventResult.handled;
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        node.nextFocus();
+        return KeyEventResult.handled;
+      }
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+        event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      if (widget.isExpanded) {
+        widget.onToggle();
+        return KeyEventResult.handled;
+      }
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  void _handleFocusNodeChanged() {
+    if (!mounted) return;
+    final focused = _focusNode.hasFocus;
+    if (_isFocused != focused) {
+      setState(() => _isFocused = focused);
+    }
+  }
+
+  void _handleFocusChanged(bool focused) {
+    if (mounted && _isFocused != focused) {
+      setState(() => _isFocused = focused);
+    }
+  }
 
   @override
   bool get wantKeepAlive => widget.isExpanded || _expandCtrl.isAnimating;
@@ -72,6 +175,17 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
     final initialValue = shouldAnimateExpand
         ? 0.0
         : (shouldAnimateCollapse ? 1.0 : (widget.isExpanded ? 1.0 : 0.0));
+
+    if (widget.focusNode == null) {
+      _internalFocusNode = FocusNode(
+        debugLabel: 'M3EExpandableItem_${widget.index}',
+        onKeyEvent: _handleCardKeyEvent,
+      );
+    } else {
+      widget.focusNode!.onKeyEvent = _handleCardKeyEvent;
+    }
+    _focusNode.addListener(_handleFocusNodeChanged);
+    _isFocused = _focusNode.hasFocus;
 
     _expandCtrl = SingleMotionController(motion: motion, vsync: this)
       ..value = initialValue
@@ -159,13 +273,31 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
           _expandCtrl.value < 1.0 &&
           !_expandCtrl.isAnimating) {
         _expandCtrl.animateTo(1.0);
-        updateKeepAlive();
       }
+    }
+
+    if (oldWidget.focusNode != widget.focusNode) {
+      final oldNode = oldWidget.focusNode ?? _internalFocusNode;
+      oldNode?.removeListener(_handleFocusNodeChanged);
+      if (oldWidget.focusNode == null && widget.focusNode != null) {
+        _internalFocusNode?.dispose();
+        _internalFocusNode = null;
+      } else if (oldWidget.focusNode != null && widget.focusNode == null) {
+        _internalFocusNode = FocusNode(
+          debugLabel: 'M3EExpandableItem_${widget.index}',
+          onKeyEvent: _handleCardKeyEvent,
+        );
+      }
+      _focusNode.onKeyEvent = _handleCardKeyEvent;
+      _focusNode.addListener(_handleFocusNodeChanged);
+      _isFocused = _focusNode.hasFocus;
     }
   }
 
   @override
   void dispose() {
+    _focusNode.removeListener(_handleFocusNodeChanged);
+    _internalFocusNode?.dispose();
     _expandCtrl.dispose();
     super.dispose();
   }
@@ -269,7 +401,7 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
 
     final effectiveRadius = _buildEffectiveRadius();
 
-    return Material(
+    final materialCard = Material(
       elevation: d.elevation,
       color: d.color ?? cs.surfaceContainer,
       shape: RoundedRectangleBorder(
@@ -278,6 +410,15 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       ),
       clipBehavior: Clip.antiAlias,
       child: content,
+    );
+
+    return ExpandableFocusRing(
+      focused: _isFocused,
+      radius: effectiveRadius,
+      color: d.focusRingColor,
+      gap: d.focusRingGap,
+      width: d.focusRingWidth,
+      child: materialCard,
     );
   }
 
@@ -436,7 +577,9 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
       animation: _expandCtrl,
       builder: (context, _) {
         final progress = _expandCtrl.value;
-        if (progress <= 0.0 && !widget.isExpanded && !_expandCtrl.isAnimating) {
+        if (progress <= 0.0001 &&
+            !widget.isExpanded &&
+            !_expandCtrl.isAnimating) {
           return const SizedBox.shrink();
         }
 
@@ -465,14 +608,17 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
           child: Align(
             alignment: Alignment.topCenter,
             heightFactor: math.max(0.0, progress),
-            child: _buildInteractionWrapper(
-              d,
-              onTap: tapCallback,
-              semanticLabel:
-                  'Body for item ${widget.index + 1} of ${widget.totalCount}',
-              isExpanded: isExpanded,
-              tooltip: bodyTooltip,
-              child: bodyWidget,
+            child: FocusTraversalGroup(
+              policy: WidgetOrderTraversalPolicy(),
+              child: _buildInteractionWrapper(
+                d,
+                onTap: tapCallback,
+                semanticLabel:
+                    'Body for item ${widget.index + 1} of ${widget.totalCount}',
+                isExpanded: isExpanded,
+                tooltip: bodyTooltip,
+                child: bodyWidget,
+              ),
             ),
           ),
         );
@@ -528,6 +674,11 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
         ),
       );
       if (shouldTrackInteractions) {
+        interactive = Focus(
+          focusNode: _focusNode,
+          onFocusChange: _handleFocusChanged,
+          child: interactive,
+        );
         interactive = MouseRegion(
           onEnter: (_) => _handleHoverChanged(true),
           onExit: (_) => _handleHoverChanged(false),
@@ -538,12 +689,15 @@ class _M3EExpandableItemState extends State<M3EExpandableItem>
     }
 
     return InkWell(
+      focusNode: shouldTrackInteractions ? _focusNode : null,
+      canRequestFocus: shouldTrackInteractions,
       customBorder: isIcon ? const CircleBorder() : null,
       splashColor: d.splashColor,
       highlightColor: d.highlightColor,
       splashFactory: d.splashFactory ?? InkSparkle.splashFactory,
       enableFeedback: d.enableFeedback,
       onTap: onTap,
+      onFocusChange: shouldTrackInteractions ? _handleFocusChanged : null,
       onHover: shouldTrackInteractions ? (h) => _handleHoverChanged(h) : null,
       onHighlightChanged: shouldTrackInteractions
           ? (h) => setState(() => _isPressed = h)
@@ -579,6 +733,8 @@ Widget buildM3EExpandableItem({
   required M3EMotion expandMotion,
   required M3EMotion collapseMotion,
   required VoidCallback onToggle,
+  FocusNode? focusNode,
+  void Function(int index, bool moveForward)? onReorderKey,
 }) {
   return M3EExpandableItem(
     key: key,
@@ -596,5 +752,7 @@ Widget buildM3EExpandableItem({
     expandMotion: expandMotion,
     collapseMotion: collapseMotion,
     onToggle: onToggle,
+    focusNode: focusNode,
+    onReorderKey: onReorderKey,
   );
 }

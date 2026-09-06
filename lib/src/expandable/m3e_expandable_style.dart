@@ -43,6 +43,15 @@ class M3EExpandableStyle {
   /// Elevation of the card.
   final double elevation;
 
+  /// Custom focus ring color applied to focused cards. If null, defaults to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Stroke width of the focus ring. Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Outset gap between the card border and the focus ring. Defaults to `4.0`.
+  final double focusRingGap;
+
   // ── Padding ──
 
   /// Padding applied inside each header.
@@ -156,6 +165,9 @@ class M3EExpandableStyle {
     this.color,
     this.border,
     this.elevation = 0,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
     this.headerPadding,
     this.bodyPadding,
     this.titleSubtitleGap = 4.0,
@@ -194,6 +206,9 @@ class M3EExpandableStyle {
     Color? color,
     BorderSide? border,
     double? elevation,
+    Color? focusRingColor,
+    double? focusRingWidth,
+    double? focusRingGap,
     EdgeInsetsGeometry? headerPadding,
     EdgeInsetsGeometry? bodyPadding,
     double? titleSubtitleGap,
@@ -230,6 +245,9 @@ class M3EExpandableStyle {
       color: color ?? this.color,
       border: border ?? this.border,
       elevation: elevation ?? this.elevation,
+      focusRingColor: focusRingColor ?? this.focusRingColor,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      focusRingGap: focusRingGap ?? this.focusRingGap,
       headerPadding: headerPadding ?? this.headerPadding,
       bodyPadding: bodyPadding ?? this.bodyPadding,
       titleSubtitleGap: titleSubtitleGap ?? this.titleSubtitleGap,
@@ -271,6 +289,9 @@ class M3EExpandableStyle {
           color == other.color &&
           border == other.border &&
           elevation == other.elevation &&
+          focusRingColor == other.focusRingColor &&
+          focusRingWidth == other.focusRingWidth &&
+          focusRingGap == other.focusRingGap &&
           headerPadding == other.headerPadding &&
           bodyPadding == other.bodyPadding &&
           titleSubtitleGap == other.titleSubtitleGap &&
@@ -308,6 +329,9 @@ class M3EExpandableStyle {
     color,
     border,
     elevation,
+    focusRingColor,
+    focusRingWidth,
+    focusRingGap,
     headerPadding,
     bodyPadding,
     titleSubtitleGap,

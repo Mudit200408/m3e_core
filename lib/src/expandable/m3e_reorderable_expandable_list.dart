@@ -216,6 +216,16 @@ class _M3EReorderableExpandableListState
     );
   }
 
+  final Map<int, FocusNode> _focusNodes = {};
+  int? _pendingKeyboardFocusIndex;
+
+  FocusNode _getFocusNode(int index) {
+    return _focusNodes.putIfAbsent(
+      index,
+      () => FocusNode(debugLabel: 'M3EReorderableExpandableItem_$index'),
+    );
+  }
+
   @override
   void didUpdateWidget(M3EReorderableExpandableList old) {
     super.didUpdateWidget(old);
@@ -225,6 +235,14 @@ class _M3EReorderableExpandableListState
     _shiftControllers.removeWhere((idx, ctrl) {
       if (idx >= widget.itemCount) {
         ctrl.dispose();
+        return true;
+      }
+      return false;
+    });
+
+    _focusNodes.removeWhere((idx, node) {
+      if (idx >= widget.itemCount) {
+        node.dispose();
         return true;
       }
       return false;
@@ -245,6 +263,10 @@ class _M3EReorderableExpandableListState
       ctrl.dispose();
     }
     _shiftControllers.clear();
+    for (final node in _focusNodes.values) {
+      node.dispose();
+    }
+    _focusNodes.clear();
     _reorderItemKeys.clear();
     _reorderHeaderKeys.clear();
     _internalScrollController.dispose();
@@ -253,6 +275,90 @@ class _M3EReorderableExpandableListState
     _pointerOffsetNotifier.dispose();
     _isSettlingNotifier.dispose();
     super.dispose();
+  }
+
+  void _scrollToItemIfNeeded(int index) {
+    if (!_effectiveScrollController.hasClients) return;
+    if (!_effectiveScrollController.position.hasContentDimensions) return;
+    if (_effectiveScrollController.position.maxScrollExtent <= 0) return;
+
+    final itemBox =
+        _reorderItemKeys[index]?.currentContext?.findRenderObject()
+            as RenderBox?;
+    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final listRenderBox =
+        (stackBox ?? context.findRenderObject()) as RenderBox?;
+
+    if (itemBox == null || listRenderBox == null) return;
+
+    final itemOffsetInList = listRenderBox.globalToLocal(
+      itemBox.localToGlobal(Offset.zero),
+    );
+    final viewportHeight = listRenderBox.size.height;
+    final itemHeight = itemBox.size.height;
+    final currentScroll = _effectiveScrollController.offset;
+    final maxScroll = _effectiveScrollController.position.maxScrollExtent;
+
+    double? targetScroll;
+    const double margin = 16.0;
+
+    if (itemOffsetInList.dy < margin) {
+      targetScroll = (currentScroll + itemOffsetInList.dy - margin).clamp(
+        0.0,
+        maxScroll,
+      );
+    } else if (itemOffsetInList.dy + itemHeight > viewportHeight - margin) {
+      final overflow =
+          (itemOffsetInList.dy + itemHeight) - (viewportHeight - margin);
+      targetScroll = (currentScroll + overflow).clamp(0.0, maxScroll);
+    }
+
+    if (targetScroll != null && (targetScroll - currentScroll).abs() > 1.0) {
+      _effectiveScrollController.animateTo(
+        targetScroll,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  void _handleKeyboardReorder(int index, bool moveForward) {
+    final targetIndex = moveForward ? index + 1 : index - 1;
+    if (targetIndex >= 0 && targetIndex < widget.itemCount) {
+      _pendingKeyboardFocusIndex = targetIndex;
+
+      final from = index;
+      final to = targetIndex;
+      final newExpanded = <int>{};
+      for (final idx in expandedIndices) {
+        if (idx == from) {
+          newExpanded.add(to);
+        } else if (from < to && idx > from && idx <= to) {
+          newExpanded.add(idx - 1);
+        } else if (from > to && idx >= to && idx < from) {
+          newExpanded.add(idx + 1);
+        } else {
+          newExpanded.add(idx);
+        }
+      }
+
+      setState(() {
+        expandedIndices.clear();
+        expandedIndices.addAll(newExpanded);
+      });
+
+      final reorderTo = targetIndex > index ? targetIndex + 1 : targetIndex;
+      widget.onReorder(index, reorderTo);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pendingKeyboardFocusIndex != null) {
+          final targetIdx = _pendingKeyboardFocusIndex!;
+          _pendingKeyboardFocusIndex = null;
+          final node = _getFocusNode(targetIdx);
+          node.requestFocus();
+          _scrollToItemIfNeeded(targetIdx);
+        }
+      });
+    }
   }
 
   // ── Reorder Controllers & Gestures ──
@@ -1014,6 +1120,8 @@ class _M3EReorderableExpandableListState
               haptic: effectiveStyle.haptic,
               onExpansionChanged: widget.onExpansionChanged,
             ),
+            focusNode: _getFocusNode(slotPos),
+            onReorderKey: _handleKeyboardReorder,
           );
 
           final itemContentWithVisibility = Visibility(
@@ -1070,37 +1178,40 @@ class _M3EReorderableExpandableListState
       return widget.emptyBuilder?.call(context) ?? const SizedBox.shrink();
     }
 
-    Widget content = Stack(
-      key: _stackKey,
-      clipBehavior: Clip.none,
-      children: [
-        ListView.builder(
-          controller: _effectiveScrollController,
-          physics: widget.physics,
-          padding: widget.listPadding,
-          shrinkWrap: widget.shrinkWrap,
-          clipBehavior: widget.clipBehavior,
-          // ignore: deprecated_member_use
-          cacheExtent: 1000.0,
-          findChildIndexCallback: (Key key) {
-            if (widget.keyBuilder != null) {
-              for (int i = 0; i < widget.itemCount; i++) {
-                if (widget.keyBuilder!(i) == key) return i;
+    Widget content = FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: Stack(
+        key: _stackKey,
+        clipBehavior: Clip.none,
+        children: [
+          ListView.builder(
+            controller: _effectiveScrollController,
+            physics: widget.physics,
+            padding: widget.listPadding,
+            shrinkWrap: widget.shrinkWrap,
+            clipBehavior: widget.clipBehavior,
+            // ignore: deprecated_member_use
+            cacheExtent: 1000.0,
+            findChildIndexCallback: (Key key) {
+              if (widget.keyBuilder != null) {
+                for (int i = 0; i < widget.itemCount; i++) {
+                  if (widget.keyBuilder!(i) == key) return i;
+                }
               }
-            }
-            return null;
-          },
-          itemCount: widget.itemCount,
-          itemBuilder: (ctx, i) => _buildReorderableItem(ctx, i),
-        ),
-        ValueListenableBuilder<int?>(
-          valueListenable: _draggedIndexNotifier,
-          builder: (context, draggedIndex, _) {
-            if (draggedIndex == null) return const SizedBox.shrink();
-            return _buildProxyItem(context, draggedIndex);
-          },
-        ),
-      ],
+              return null;
+            },
+            itemCount: widget.itemCount,
+            itemBuilder: (ctx, i) => _buildReorderableItem(ctx, i),
+          ),
+          ValueListenableBuilder<int?>(
+            valueListenable: _draggedIndexNotifier,
+            builder: (context, draggedIndex, _) {
+              if (draggedIndex == null) return const SizedBox.shrink();
+              return _buildProxyItem(context, draggedIndex);
+            },
+          ),
+        ],
+      ),
     );
 
     if (widget.margin != null && widget.margin != EdgeInsets.zero) {

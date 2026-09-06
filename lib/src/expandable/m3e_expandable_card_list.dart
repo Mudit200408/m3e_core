@@ -61,13 +61,16 @@ class _M3EExpandableCardListState extends State<M3EExpandableCardList>
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      controller: widget.controller,
-      physics: widget.physics,
-      shrinkWrap: widget.shrinkWrap,
-      padding: widget.padding,
-      itemCount: widget.itemCount,
-      itemBuilder: (context, index) => buildItem(context, index),
+    return FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: ListView.builder(
+        controller: widget.controller,
+        physics: widget.physics,
+        shrinkWrap: widget.shrinkWrap,
+        padding: widget.padding,
+        itemCount: widget.itemCount,
+        itemBuilder: (context, index) => buildItem(context, index),
+      ),
     );
   }
 }

@@ -49,11 +49,14 @@ class _M3EExpandableCardColumnState extends State<M3EExpandableCardColumn>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        widget.itemCount,
-        (index) => buildItem(context, index),
+    return FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          widget.itemCount,
+          (index) => buildItem(context, index),
+        ),
       ),
     );
   }
