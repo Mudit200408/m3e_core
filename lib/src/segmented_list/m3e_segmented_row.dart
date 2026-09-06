@@ -340,6 +340,9 @@ class M3ESegmentedRow extends StatelessWidget {
     final effectiveFocusedRadius = decoration?.focusedRadius;
     final effectiveFocusedBorderRadius = decoration?.focusedBorderRadius;
     final effectiveFocusedElevation = decoration?.focusedElevation;
+    final effectiveFocusRingColor = decoration?.focusRingColor;
+    final effectiveFocusRingWidth = decoration?.focusRingWidth ?? 2.0;
+    final effectiveFocusRingGap = decoration?.focusRingGap ?? 0.0;
     final effectiveSelectedColor = decoration?.selectedColor ?? selectedColor;
     final effectiveSelectedBorder =
         decoration?.selectedBorder ?? selectedBorder;
@@ -399,6 +402,9 @@ class M3ESegmentedRow extends StatelessWidget {
         focusedRadius: effectiveFocusedRadius,
         focusedBorderRadius: effectiveFocusedBorderRadius,
         focusedElevation: effectiveFocusedElevation,
+        focusRingColor: effectiveFocusRingColor,
+        focusRingWidth: effectiveFocusRingWidth,
+        focusRingGap: effectiveFocusRingGap,
         onTap: hasTap ? _handleItemTap : null,
         onLongPress: hasLongPress ? _handleItemLongPress : null,
         semanticLabel: semanticLabelBuilder?.call(index),
@@ -446,13 +452,16 @@ class M3ESegmentedRow extends StatelessWidget {
       return item;
     });
 
-    Widget row = Row(
-      mainAxisSize: mainAxisSize,
-      mainAxisAlignment: mainAxisAlignment,
-      crossAxisAlignment: equalHeight
-          ? CrossAxisAlignment.stretch
-          : crossAxisAlignment,
-      children: rowChildren,
+    Widget row = FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: Row(
+        mainAxisSize: mainAxisSize,
+        mainAxisAlignment: mainAxisAlignment,
+        crossAxisAlignment: equalHeight
+            ? CrossAxisAlignment.stretch
+            : crossAxisAlignment,
+        children: rowChildren,
+      ),
     );
 
     if (equalHeight) {

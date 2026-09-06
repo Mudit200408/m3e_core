@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:motor/motor.dart';
 
 import '../common/m3e_common.dart';
+import 'internal/_segmented_focus_ring.dart';
 import 'm3e_list_item.dart';
 import 'm3e_segmented_item.dart';
 
@@ -207,8 +209,43 @@ class M3EExpandableSegmentedItem extends StatefulWidget {
   /// Custom color for the trailing toggle icon.
   final Color? trailingIconColor;
 
-  /// Creates a folder-style expandable segmented item.
+  /// Optional focus node controlling keyboard focus on the header.
+  final FocusNode? focusNode;
 
+  /// Whether the header should automatically request focus when mounted.
+  final bool autofocus;
+
+  /// Focus ring color for the header card. Defaults to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Stroke width of the header focus ring. Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Outset gap of the header focus ring. Defaults to `0.0`.
+  final double focusRingGap;
+
+  /// Called when the header focus state changes.
+  final void Function(bool)? onFocusChange;
+
+  /// Optional callback invoked when user requests keyboard reordering (Alt+Arrow keys).
+  final void Function(int index, bool moveForward)? onReorderKey;
+
+  /// Optional list of focus nodes for each child item.
+  final List<FocusNode>? childFocusNodes;
+
+  /// Optional builder to produce a focus node for a child item at given index.
+  final FocusNode Function(int childIndex)? childFocusNodeBuilder;
+
+  /// Focus ring color for child items. Defaults to [ColorScheme.primary].
+  final Color? childFocusRingColor;
+
+  /// Stroke width of child focus rings. Defaults to `2.0`.
+  final double childFocusRingWidth;
+
+  /// Outset gap of child focus rings. Defaults to `0.0`.
+  final double childFocusRingGap;
+
+  /// Creates a folder-style expandable segmented item.
   const M3EExpandableSegmentedItem({
     super.key,
     required this.index,
@@ -246,11 +283,21 @@ class M3EExpandableSegmentedItem extends StatefulWidget {
     this.trailingPillBorderRadius,
     this.trailingPillSize = const Size(32.0, 48.0),
     this.trailingIconColor,
-
+    this.focusNode,
+    this.autofocus = false,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
+    this.onFocusChange,
+    this.onReorderKey,
+    this.childFocusNodes,
+    this.childFocusNodeBuilder,
+    this.childFocusRingColor,
+    this.childFocusRingWidth = 2.0,
+    this.childFocusRingGap = 0.0,
     this.expandMotion = M3EMotion.expressiveSpatialFast,
     this.collapseMotion = M3EMotion.expressiveSpatialFast,
     this.tapHeaderToToggle = true,
-
     this.trailingIcon,
     this.showTrailingIcon = true,
     this.haptic = M3EHapticFeedback.light,
@@ -287,9 +334,13 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
     with TickerProviderStateMixin {
   late final SingleMotionController _expandCtrl;
 
+  FocusNode? _internalFocusNode;
   bool _isHeaderPressed = false;
   bool _isHeaderHovered = false;
+  bool _isHeaderFocused = false;
   bool _isPointerInsideHeaderBounds = false;
+
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode!;
 
   int get _effectiveChildCount =>
       widget.children?.length ?? widget.childCount ?? 0;
@@ -301,9 +352,28 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
         ? widget.expandMotion.toMotion()
         : widget.collapseMotion.toMotion();
 
+    if (widget.focusNode == null) {
+      _internalFocusNode = FocusNode(
+        debugLabel: 'M3EExpandableSegmentedItem_${widget.index}',
+        onKeyEvent: _handleCardKeyEvent,
+      );
+    } else {
+      widget.focusNode!.onKeyEvent = _handleCardKeyEvent;
+    }
+    _effectiveFocusNode.addListener(_handleFocusNodeChanged);
+    _isHeaderFocused = _effectiveFocusNode.hasFocus;
+
     _expandCtrl = SingleMotionController(motion: motion, vsync: this)
       ..value = widget.isExpanded ? 1.0 : 0.0
       ..addListener(_handleMotionTick);
+  }
+
+  void _handleFocusNodeChanged() {
+    if (!mounted) return;
+    final focused = _effectiveFocusNode.hasFocus;
+    if (_isHeaderFocused != focused) {
+      setState(() => _isHeaderFocused = focused);
+    }
   }
 
   void _handleMotionTick() {
@@ -326,6 +396,113 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
     }
   }
 
+  final Map<int, FocusNode> _internalChildFocusNodes = {};
+
+  FocusNode _getChildFocusNode(int childIndex) {
+    if (widget.childFocusNodes != null &&
+        childIndex < widget.childFocusNodes!.length) {
+      return widget.childFocusNodes![childIndex];
+    }
+    if (widget.childFocusNodeBuilder != null) {
+      return widget.childFocusNodeBuilder!(childIndex);
+    }
+    return _internalChildFocusNodes.putIfAbsent(
+      childIndex,
+      () => FocusNode(
+        debugLabel: 'M3EExpandableChild_${widget.index}_$childIndex',
+      ),
+    );
+  }
+
+  KeyEventResult _handleCardKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    final isModifier =
+        HardwareKeyboard.instance.isAltPressed ||
+        HardwareKeyboard.instance.isMetaPressed ||
+        HardwareKeyboard.instance.isControlPressed ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.alt) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.altLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.altRight,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.meta,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.metaLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.metaRight,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.control,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlRight,
+        );
+
+    if (isModifier && widget.onReorderKey != null) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+          event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+          event.physicalKey == PhysicalKeyboardKey.arrowUp ||
+          event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
+        widget.onReorderKey!(widget.index, false);
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.arrowRight ||
+          event.physicalKey == PhysicalKeyboardKey.arrowDown ||
+          event.physicalKey == PhysicalKeyboardKey.arrowRight) {
+        widget.onReorderKey!(widget.index, true);
+        return KeyEventResult.handled;
+      }
+    }
+
+    // Enter / Space -> toggle expansion
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      if (widget.enabled) {
+        _handleToggle();
+        return KeyEventResult.handled;
+      }
+    }
+
+    // Arrow Right / Down -> Expand if collapsed, or move focus into first child if already expanded
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight ||
+        event.logicalKey == LogicalKeyboardKey.arrowDown ||
+        event.physicalKey == PhysicalKeyboardKey.arrowRight ||
+        event.physicalKey == PhysicalKeyboardKey.arrowDown) {
+      if (!widget.isExpanded) {
+        if (widget.enabled) {
+          _handleToggle();
+        }
+        return KeyEventResult.handled;
+      } else if (_effectiveChildCount > 0) {
+        _getChildFocusNode(0).requestFocus();
+        return KeyEventResult.handled;
+      }
+    }
+
+    // Arrow Left / Up -> Collapse if expanded
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+        event.logicalKey == LogicalKeyboardKey.arrowUp ||
+        event.physicalKey == PhysicalKeyboardKey.arrowLeft ||
+        event.physicalKey == PhysicalKeyboardKey.arrowUp) {
+      if (widget.enabled && widget.isExpanded) {
+        _handleToggle();
+        return KeyEventResult.handled;
+      }
+    }
+
+    return KeyEventResult.ignored;
+  }
+
   @override
   void didUpdateWidget(covariant M3EExpandableSegmentedItem oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -342,10 +519,35 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
         _expandCtrl.animateTo(widget.isExpanded ? 1.0 : 0.0);
       }
     }
+
+    if (oldWidget.focusNode != widget.focusNode) {
+      final oldNode = oldWidget.focusNode ?? _internalFocusNode;
+      oldNode?.removeListener(_handleFocusNodeChanged);
+      if (oldWidget.focusNode == null && widget.focusNode != null) {
+        _internalFocusNode?.dispose();
+        _internalFocusNode = null;
+      } else if (oldWidget.focusNode != null && widget.focusNode == null) {
+        _internalFocusNode = FocusNode(
+          debugLabel: 'M3EExpandableSegmentedItem_${widget.index}',
+          onKeyEvent: _handleCardKeyEvent,
+        );
+      }
+      _effectiveFocusNode.onKeyEvent = _handleCardKeyEvent;
+      _effectiveFocusNode.addListener(_handleFocusNodeChanged);
+      _isHeaderFocused = _effectiveFocusNode.hasFocus;
+    } else {
+      _effectiveFocusNode.onKeyEvent = _handleCardKeyEvent;
+    }
   }
 
   @override
   void dispose() {
+    _effectiveFocusNode.removeListener(_handleFocusNodeChanged);
+    _internalFocusNode?.dispose();
+    for (final node in _internalChildFocusNodes.values) {
+      node.dispose();
+    }
+    _internalChildFocusNodes.clear();
     _expandCtrl.dispose();
     super.dispose();
   }
@@ -548,7 +750,7 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
       motion: activeHeaderSpring,
       targetRadius: targetParentRadius,
       builder: (context, animatedRadius) {
-        return Container(
+        final coreContainer = Container(
           decoration: BoxDecoration(
             color: widget.color ?? cs.surfaceContainer,
             borderRadius: animatedRadius,
@@ -568,22 +770,44 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
           clipBehavior: Clip.antiAlias,
           child: Material(
             type: MaterialType.transparency,
-            child: InkWell(
-              splashFactory: InkSparkle.splashFactory,
-              onHighlightChanged: widget.enabled && widget.tapHeaderToToggle
-                  ? (highlighted) {
-                      if (_isHeaderPressed != highlighted && mounted) {
-                        setState(() => _isHeaderPressed = highlighted);
+            child: Focus(
+              focusNode: _effectiveFocusNode,
+              autofocus: widget.autofocus,
+              canRequestFocus: widget.enabled,
+              onFocusChange: (focused) {
+                if (mounted && _isHeaderFocused != focused) {
+                  setState(() => _isHeaderFocused = focused);
+                }
+                widget.onFocusChange?.call(focused);
+              },
+              onKeyEvent: _handleCardKeyEvent,
+              child: InkWell(
+                canRequestFocus: false,
+                splashFactory: InkSparkle.splashFactory,
+                onHighlightChanged: widget.enabled && widget.tapHeaderToToggle
+                    ? (highlighted) {
+                        if (_isHeaderPressed != highlighted && mounted) {
+                          setState(() => _isHeaderPressed = highlighted);
+                        }
                       }
-                    }
-                  : null,
-              onHover: widget.enabled ? _handleHeaderHoverChanged : null,
-              onTap: widget.enabled && widget.tapHeaderToToggle
-                  ? _handleToggle
-                  : null,
-              child: headerBody,
+                    : null,
+                onHover: widget.enabled ? _handleHeaderHoverChanged : null,
+                onTap: widget.enabled && widget.tapHeaderToToggle
+                    ? _handleToggle
+                    : null,
+                child: headerBody,
+              ),
             ),
           ),
+        );
+
+        return SegmentedFocusRing(
+          focused: _isHeaderFocused,
+          radius: animatedRadius,
+          color: widget.focusRingColor,
+          width: widget.focusRingWidth,
+          gap: widget.focusRingGap,
+          child: coreContainer,
         );
       },
     );
@@ -612,64 +836,25 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     heightFactor: math.max(0.0, progress),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (int i = 0; i < childCount; i++) ...[
-                          SizedBox(height: widget.gap),
-                          _M3EExpandableChildCard(
-                            key: ValueKey(
-                              'm3e_expandable_child_${widget.index}_$i',
+                    child: FocusTraversalGroup(
+                      policy: WidgetOrderTraversalPolicy(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (int i = 0; i < childCount; i++) ...[
+                            SizedBox(height: widget.gap),
+                            _buildChildCard(
+                              context: context,
+                              childIndex: i,
+                              totalChildren: childCount,
+                              progress: progress,
+                              effectivePressedRadius: effectivePressedRadius,
+                              effectiveHoveredRadius: effectiveHoveredRadius,
                             ),
-                            childIndex: i,
-                            totalChildren: childCount,
-                            progress: progress,
-                            isSelected:
-                                widget.selectedChildIndices?.contains(i) ??
-                                false,
-                            selectedRadius: widget.selectedRadius,
-                            selectedBorderRadius: widget.selectedBorderRadius,
-                            outerRadius: widget.outerRadius,
-                            innerRadius: widget.innerRadius,
-                            baseRadius: _computeChildRadius(
-                              i,
-                              childCount,
-                              progress,
-                            ),
-                            effectivePressedRadius: effectivePressedRadius,
-                            effectiveHoveredRadius: effectiveHoveredRadius,
-                            pressedScale: widget.pressedScale,
-                            expandMotion: widget.expandMotion,
-                            collapseMotion: widget.collapseMotion,
-                            pressedMotion: widget.pressedMotion,
-                            isExpanded: widget.isExpanded,
-                            selectedColor: widget.selectedColor,
-                            childColor: widget.childColor,
-                            color: widget.color,
-                            border: widget.border,
-                            selectedBorder: widget.selectedBorder,
-                            selectedElevation: widget.selectedElevation,
-                            elevation: widget.elevation,
-                            childContent: widget.children != null
-                                ? widget.children![i]
-                                : widget.childBuilder!(context, i),
-                            childPadding: widget.childPadding,
-                            showSelectionCheckmark:
-                                widget.showSelectionCheckmark,
-                            selectionCheckmarkBuilder:
-                                widget.selectionCheckmarkBuilder,
-                            selectionCheckmarkAlignment:
-                                widget.selectionCheckmarkAlignment,
-                            childSplashColor: widget.childSplashColor,
-                            childHighlightColor: widget.childHighlightColor,
-                            childHoverColor: widget.childHoverColor,
-                            childFocusColor: widget.childFocusColor,
-                            onChildTap: widget.onChildTap,
-                            onChildLongPress: widget.onChildLongPress,
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 );
@@ -677,6 +862,73 @@ class _M3EExpandableSegmentedItemState extends State<M3EExpandableSegmentedItem>
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildChildCard({
+    required BuildContext context,
+    required int childIndex,
+    required int totalChildren,
+    required double progress,
+    required BorderRadius? effectivePressedRadius,
+    required BorderRadius? effectiveHoveredRadius,
+  }) {
+    final childFocusNode = _getChildFocusNode(childIndex);
+
+    return _M3EExpandableChildCard(
+      key: ValueKey('m3e_expandable_child_${widget.index}_$childIndex'),
+      childIndex: childIndex,
+      totalChildren: totalChildren,
+      progress: progress,
+      isSelected: widget.selectedChildIndices?.contains(childIndex) ?? false,
+      selectedRadius: widget.selectedRadius,
+      selectedBorderRadius: widget.selectedBorderRadius,
+      outerRadius: widget.outerRadius,
+      innerRadius: widget.innerRadius,
+      baseRadius: _computeChildRadius(childIndex, totalChildren, progress),
+      effectivePressedRadius: effectivePressedRadius,
+      effectiveHoveredRadius: effectiveHoveredRadius,
+      pressedScale: widget.pressedScale,
+      expandMotion: widget.expandMotion,
+      collapseMotion: widget.collapseMotion,
+      pressedMotion: widget.pressedMotion,
+      isExpanded: widget.isExpanded,
+      selectedColor: widget.selectedColor,
+      childColor: widget.childColor,
+      color: widget.color,
+      border: widget.border,
+      selectedBorder: widget.selectedBorder,
+      selectedElevation: widget.selectedElevation,
+      elevation: widget.elevation,
+      childContent: widget.children != null
+          ? widget.children![childIndex]
+          : widget.childBuilder!(context, childIndex),
+      childPadding: widget.childPadding,
+      showSelectionCheckmark: widget.showSelectionCheckmark,
+      selectionCheckmarkBuilder: widget.selectionCheckmarkBuilder,
+      selectionCheckmarkAlignment: widget.selectionCheckmarkAlignment,
+      childSplashColor: widget.childSplashColor,
+      childHighlightColor: widget.childHighlightColor,
+      childHoverColor: widget.childHoverColor,
+      childFocusColor: widget.childFocusColor,
+      focusNode: childFocusNode,
+      focusRingColor: widget.childFocusRingColor ?? widget.focusRingColor,
+      focusRingWidth: widget.childFocusRingWidth,
+      focusRingGap: widget.childFocusRingGap,
+      onChildTap: widget.onChildTap,
+      onChildLongPress: widget.onChildLongPress,
+      onFocusNext: childIndex + 1 < totalChildren
+          ? () => _getChildFocusNode(childIndex + 1).requestFocus()
+          : null,
+      onFocusPrevious: childIndex > 0
+          ? () => _getChildFocusNode(childIndex - 1).requestFocus()
+          : () => _effectiveFocusNode.requestFocus(),
+      onCollapseAndFocusParent: () {
+        if (widget.enabled && widget.isExpanded) {
+          _handleToggle();
+        }
+        _effectiveFocusNode.requestFocus();
+      },
     );
   }
 }
@@ -715,8 +967,15 @@ class _M3EExpandableChildCard extends StatefulWidget {
   final Color? childHighlightColor;
   final Color? childHoverColor;
   final Color? childFocusColor;
+  final FocusNode? focusNode;
+  final Color? focusRingColor;
+  final double focusRingWidth;
+  final double focusRingGap;
   final void Function(int childIndex)? onChildTap;
   final void Function(int childIndex)? onChildLongPress;
+  final VoidCallback? onFocusNext;
+  final VoidCallback? onFocusPrevious;
+  final VoidCallback? onCollapseAndFocusParent;
 
   const _M3EExpandableChildCard({
     super.key,
@@ -752,8 +1011,15 @@ class _M3EExpandableChildCard extends StatefulWidget {
     this.childHighlightColor,
     this.childHoverColor,
     this.childFocusColor,
+    this.focusNode,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
     this.onChildTap,
     this.onChildLongPress,
+    this.onFocusNext,
+    this.onFocusPrevious,
+    this.onCollapseAndFocusParent,
   });
 
   @override
@@ -762,8 +1028,108 @@ class _M3EExpandableChildCard extends StatefulWidget {
 }
 
 class _M3EExpandableChildCardState extends State<_M3EExpandableChildCard> {
+  FocusNode? _internalFocusNode;
   bool _isPressed = false;
   bool _isHovered = false;
+  bool _isFocused = false;
+
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode!;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.focusNode == null) {
+      _internalFocusNode = FocusNode(
+        debugLabel: 'M3EExpandableChild_${widget.childIndex}',
+        onKeyEvent: _handleChildKeyEvent,
+      );
+    } else {
+      widget.focusNode!.onKeyEvent = _handleChildKeyEvent;
+    }
+    _effectiveFocusNode.addListener(_handleFocusNodeChanged);
+    _isFocused = _effectiveFocusNode.hasFocus;
+  }
+
+  void _handleFocusNodeChanged() {
+    if (!mounted) return;
+    final focused = _effectiveFocusNode.hasFocus;
+    if (_isFocused != focused) {
+      setState(() => _isFocused = focused);
+    }
+  }
+
+  KeyEventResult _handleChildKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    // Arrow Down -> move to next child
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+        event.physicalKey == PhysicalKeyboardKey.arrowDown) {
+      if (widget.onFocusNext != null) {
+        widget.onFocusNext!();
+        return KeyEventResult.handled;
+      }
+    }
+
+    // Arrow Up -> move to previous child or parent header
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+        event.physicalKey == PhysicalKeyboardKey.arrowUp) {
+      if (widget.onFocusPrevious != null) {
+        widget.onFocusPrevious!();
+        return KeyEventResult.handled;
+      }
+    }
+
+    // Arrow Left / Escape -> collapse section and return focus to parent header
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+        event.physicalKey == PhysicalKeyboardKey.arrowLeft ||
+        event.logicalKey == LogicalKeyboardKey.escape) {
+      if (widget.onCollapseAndFocusParent != null) {
+        widget.onCollapseAndFocusParent!();
+        return KeyEventResult.handled;
+      }
+    }
+
+    // Enter / Space -> trigger onChildTap
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      if (widget.onChildTap != null) {
+        widget.onChildTap!(widget.childIndex);
+        M3EHapticFeedback.light.apply();
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  void didUpdateWidget(covariant _M3EExpandableChildCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      final oldNode = oldWidget.focusNode ?? _internalFocusNode;
+      oldNode?.removeListener(_handleFocusNodeChanged);
+      if (oldWidget.focusNode == null && widget.focusNode != null) {
+        _internalFocusNode?.dispose();
+        _internalFocusNode = null;
+      } else if (oldWidget.focusNode != null && widget.focusNode == null) {
+        _internalFocusNode = FocusNode(
+          debugLabel: 'M3EExpandableChild_${widget.childIndex}',
+          onKeyEvent: _handleChildKeyEvent,
+        );
+      }
+      _effectiveFocusNode.onKeyEvent = _handleChildKeyEvent;
+      _effectiveFocusNode.addListener(_handleFocusNodeChanged);
+      _isFocused = _effectiveFocusNode.hasFocus;
+    } else {
+      _effectiveFocusNode.onKeyEvent = _handleChildKeyEvent;
+    }
+  }
+
+  @override
+  void dispose() {
+    _effectiveFocusNode.removeListener(_handleFocusNodeChanged);
+    _internalFocusNode?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -845,7 +1211,7 @@ class _M3EExpandableChildCardState extends State<_M3EExpandableChildCard> {
           );
         }
 
-        return Container(
+        final childContainer = Container(
           decoration: BoxDecoration(
             color: effectiveColor,
             borderRadius: animatedRadius,
@@ -867,46 +1233,66 @@ class _M3EExpandableChildCardState extends State<_M3EExpandableChildCard> {
           clipBehavior: Clip.antiAlias,
           child: Material(
             type: MaterialType.transparency,
-            child: InkWell(
-              splashFactory: InkSparkle.splashFactory,
-              splashColor: widget.childSplashColor,
-              highlightColor: widget.childHighlightColor,
-              hoverColor: widget.childHoverColor,
-              focusColor: widget.childFocusColor,
-              mouseCursor: hasChildInteraction
-                  ? SystemMouseCursors.click
-                  : null,
-              onHighlightChanged: hasChildInteraction
-                  ? (highlighted) {
-                      if (mounted && _isPressed != highlighted) {
-                        setState(() => _isPressed = highlighted);
-                      }
-                    }
-                  : null,
-              onHover: (hovering) {
-                if (mounted && _isHovered != hovering) {
-                  setState(() => _isHovered = hovering);
+            child: Focus(
+              focusNode: _effectiveFocusNode,
+              canRequestFocus: true,
+              onFocusChange: (focused) {
+                if (mounted && _isFocused != focused) {
+                  setState(() => _isFocused = focused);
                 }
               },
-              onTap: widget.onChildTap != null
-                  ? () => widget.onChildTap!(widget.childIndex)
-                  : null,
-              onLongPress: widget.onChildLongPress != null
-                  ? () => widget.onChildLongPress!(widget.childIndex)
-                  : null,
-              child: widget.pressedScale != null && widget.pressedScale != 1.0
-                  ? SingleMotionBuilder(
-                      motion: widget.pressedMotion.toMotion(),
-                      value: _isPressed ? widget.pressedScale! : 1.0,
-                      builder: (context, scale, _) => Transform.scale(
-                        scale: scale,
-                        alignment: Alignment.center,
-                        child: cardInner,
-                      ),
-                    )
-                  : cardInner,
+              onKeyEvent: _handleChildKeyEvent,
+              child: InkWell(
+                canRequestFocus: false,
+                splashFactory: InkSparkle.splashFactory,
+                splashColor: widget.childSplashColor,
+                highlightColor: widget.childHighlightColor,
+                hoverColor: widget.childHoverColor,
+                focusColor: widget.childFocusColor,
+                mouseCursor: hasChildInteraction
+                    ? SystemMouseCursors.click
+                    : null,
+                onHighlightChanged: hasChildInteraction
+                    ? (highlighted) {
+                        if (mounted && _isPressed != highlighted) {
+                          setState(() => _isPressed = highlighted);
+                        }
+                      }
+                    : null,
+                onHover: (hovering) {
+                  if (mounted && _isHovered != hovering) {
+                    setState(() => _isHovered = hovering);
+                  }
+                },
+                onTap: widget.onChildTap != null
+                    ? () => widget.onChildTap!(widget.childIndex)
+                    : null,
+                onLongPress: widget.onChildLongPress != null
+                    ? () => widget.onChildLongPress!(widget.childIndex)
+                    : null,
+                child: widget.pressedScale != null && widget.pressedScale != 1.0
+                    ? SingleMotionBuilder(
+                        motion: widget.pressedMotion.toMotion(),
+                        value: _isPressed ? widget.pressedScale! : 1.0,
+                        builder: (context, scale, _) => Transform.scale(
+                          scale: scale,
+                          alignment: Alignment.center,
+                          child: cardInner,
+                        ),
+                      )
+                    : cardInner,
+              ),
             ),
           ),
+        );
+
+        return SegmentedFocusRing(
+          focused: _isFocused,
+          radius: animatedRadius,
+          color: widget.focusRingColor,
+          width: widget.focusRingWidth,
+          gap: widget.focusRingGap,
+          child: childContainer,
         );
       },
     );

@@ -451,6 +451,16 @@ class _M3EReorderableSegmentedListState
     }());
   }
 
+  final Map<int, FocusNode> _focusNodes = {};
+  int? _pendingKeyboardFocusIndex;
+
+  FocusNode _getFocusNode(int index) {
+    return _focusNodes.putIfAbsent(
+      index,
+      () => FocusNode(debugLabel: 'M3EReorderableSegmentedItem_$index'),
+    );
+  }
+
   @override
   void didUpdateWidget(covariant M3EReorderableSegmentedList oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -460,6 +470,14 @@ class _M3EReorderableSegmentedListState
     _shiftControllers.removeWhere((idx, ctrl) {
       if (idx >= widget.itemCount) {
         ctrl.dispose();
+        return true;
+      }
+      return false;
+    });
+
+    _focusNodes.removeWhere((idx, node) {
+      if (idx >= widget.itemCount) {
+        node.dispose();
         return true;
       }
       return false;
@@ -480,6 +498,10 @@ class _M3EReorderableSegmentedListState
       ctrl.dispose();
     }
     _shiftControllers.clear();
+    for (final node in _focusNodes.values) {
+      node.dispose();
+    }
+    _focusNodes.clear();
     _internalScrollController.dispose();
     _draggedIndexNotifier.dispose();
     _targetIndexNotifier.dispose();
@@ -549,6 +571,68 @@ class _M3EReorderableSegmentedListState
       }
     }
     widget.onSelectionChanged!(current);
+  }
+
+  void _scrollToItemIfNeeded(int index) {
+    if (!_effectiveScrollController.hasClients) return;
+    if (!_effectiveScrollController.position.hasContentDimensions) return;
+    if (_effectiveScrollController.position.maxScrollExtent <= 0) return;
+
+    final itemBox =
+        _itemKeys[index]?.currentContext?.findRenderObject() as RenderBox?;
+    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final listRenderBox =
+        (stackBox ?? context.findRenderObject()) as RenderBox?;
+
+    if (itemBox == null || listRenderBox == null) return;
+
+    final itemOffsetInList = listRenderBox.globalToLocal(
+      itemBox.localToGlobal(Offset.zero),
+    );
+    final viewportHeight = listRenderBox.size.height;
+    final itemHeight = itemBox.size.height;
+    final currentScroll = _effectiveScrollController.offset;
+    final maxScroll = _effectiveScrollController.position.maxScrollExtent;
+
+    double? targetScroll;
+    const double margin = 16.0;
+
+    if (itemOffsetInList.dy < margin) {
+      targetScroll = (currentScroll + itemOffsetInList.dy - margin).clamp(
+        0.0,
+        maxScroll,
+      );
+    } else if (itemOffsetInList.dy + itemHeight > viewportHeight - margin) {
+      final overflow =
+          (itemOffsetInList.dy + itemHeight) - (viewportHeight - margin);
+      targetScroll = (currentScroll + overflow).clamp(0.0, maxScroll);
+    }
+
+    if (targetScroll != null && (targetScroll - currentScroll).abs() > 1.0) {
+      _effectiveScrollController.animateTo(
+        targetScroll,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  void _handleKeyboardReorder(int index, bool moveForward) {
+    final targetIndex = moveForward ? index + 1 : index - 1;
+    if (targetIndex >= 0 && targetIndex < widget.itemCount) {
+      _pendingKeyboardFocusIndex = targetIndex;
+      final reorderTo = targetIndex > index ? targetIndex + 1 : targetIndex;
+      widget.onReorder(index, reorderTo);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pendingKeyboardFocusIndex != null) {
+          final targetIdx = _pendingKeyboardFocusIndex!;
+          _pendingKeyboardFocusIndex = null;
+          final node = _getFocusNode(targetIdx);
+          node.requestFocus();
+          _scrollToItemIfNeeded(targetIdx);
+        }
+      });
+    }
   }
 
   Drag? _handleDragStart(int index, Offset globalPos) {
@@ -1247,6 +1331,9 @@ class _M3EReorderableSegmentedListState
     final effectiveFocusedRadius = widget.decoration?.focusedRadius;
     final effectiveFocusedBorderRadius = widget.decoration?.focusedBorderRadius;
     final effectiveFocusedElevation = widget.decoration?.focusedElevation;
+    final effectiveFocusRingColor = widget.decoration?.focusRingColor;
+    final effectiveFocusRingWidth = widget.decoration?.focusRingWidth ?? 2.0;
+    final effectiveFocusRingGap = widget.decoration?.focusRingGap ?? 0.0;
     final effectiveSelectedColor =
         widget.decoration?.selectedColor ?? widget.selectedColor;
     final effectiveSelectedBorder =
@@ -1332,6 +1419,7 @@ class _M3EReorderableSegmentedListState
 
           final itemWidget = M3ESegmentedItem(
             index: index,
+            focusNode: _getFocusNode(index),
             position: dynamicPosition,
             outerRadius: effectiveOuterRadius,
             innerRadius: effectiveInnerRadius,
@@ -1346,6 +1434,9 @@ class _M3EReorderableSegmentedListState
             focusedRadius: effectiveFocusedRadius,
             focusedBorderRadius: effectiveFocusedBorderRadius,
             focusedElevation: effectiveFocusedElevation,
+            focusRingColor: effectiveFocusRingColor,
+            focusRingWidth: effectiveFocusRingWidth,
+            focusRingGap: effectiveFocusRingGap,
             onTap: hasTap ? _handleItemTap : null,
             onLongPress: hasLongPress ? _handleItemLongPress : null,
             semanticLabel: widget.semanticLabelBuilder?.call(index),
@@ -1389,6 +1480,7 @@ class _M3EReorderableSegmentedListState
             // Decouple the physical bottom gap from dynamic visual position:
             // the layout gap is strictly determined by physical slot index.
             isLast: index == widget.itemCount - 1,
+            onReorderKey: _handleKeyboardReorder,
             child: childContent,
           );
 
@@ -1447,38 +1539,41 @@ class _M3EReorderableSegmentedListState
     final effectiveMargin = widget.decoration?.margin ?? widget.margin;
     final effectivePadding = widget.listPadding;
 
-    Widget content = Stack(
-      key: _stackKey,
-      clipBehavior: Clip.none,
-      children: [
-        ListView.builder(
-          controller: _effectiveScrollController,
-          physics: widget.physics,
-          shrinkWrap: widget.shrinkWrap,
-          padding: effectivePadding,
-          itemCount:
-              widget.itemCount +
-              (widget.header != null ? 1 : 0) +
-              (widget.footer != null ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (widget.header != null) {
-              if (index == 0) return widget.header!;
-              index--;
-            }
-            if (index >= widget.itemCount) {
-              return widget.footer ?? const SizedBox.shrink();
-            }
-            return _buildItem(context, index);
-          },
-        ),
-        ValueListenableBuilder<int?>(
-          valueListenable: _draggedIndexNotifier,
-          builder: (context, draggedIndex, _) {
-            if (draggedIndex == null) return const SizedBox.shrink();
-            return _buildProxyItem(context, draggedIndex);
-          },
-        ),
-      ],
+    Widget content = FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: Stack(
+        key: _stackKey,
+        clipBehavior: Clip.none,
+        children: [
+          ListView.builder(
+            controller: _effectiveScrollController,
+            physics: widget.physics,
+            shrinkWrap: widget.shrinkWrap,
+            padding: effectivePadding,
+            itemCount:
+                widget.itemCount +
+                (widget.header != null ? 1 : 0) +
+                (widget.footer != null ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (widget.header != null) {
+                if (index == 0) return widget.header!;
+                index--;
+              }
+              if (index >= widget.itemCount) {
+                return widget.footer ?? const SizedBox.shrink();
+              }
+              return _buildItem(context, index);
+            },
+          ),
+          ValueListenableBuilder<int?>(
+            valueListenable: _draggedIndexNotifier,
+            builder: (context, draggedIndex, _) {
+              if (draggedIndex == null) return const SizedBox.shrink();
+              return _buildProxyItem(context, draggedIndex);
+            },
+          ),
+        ],
+      ),
     );
 
     if (effectiveMargin != null && effectiveMargin != EdgeInsets.zero) {

@@ -292,6 +292,9 @@ class M3ESegmentedColumn extends StatelessWidget {
     final effectiveFocusedRadius = decoration?.focusedRadius;
     final effectiveFocusedBorderRadius = decoration?.focusedBorderRadius;
     final effectiveFocusedElevation = decoration?.focusedElevation;
+    final effectiveFocusRingColor = decoration?.focusRingColor;
+    final effectiveFocusRingWidth = decoration?.focusRingWidth ?? 2.0;
+    final effectiveFocusRingGap = decoration?.focusRingGap ?? 0.0;
     final effectiveSelectedColor = decoration?.selectedColor ?? selectedColor;
     final effectiveSelectedBorder =
         decoration?.selectedBorder ?? selectedBorder;
@@ -316,82 +319,88 @@ class M3ESegmentedColumn extends StatelessWidget {
     final effectivePressedMotion = decoration?.pressedMotion ?? pressedMotion;
     final effectiveMargin = decoration?.margin ?? margin;
 
-    final column = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: List.generate(count, (index) {
-        final position = calculateSegmentedItemPosition(index, count);
-        final selected = _checkIsSelected(index);
-        final enabled = isEnabled?.call(index) ?? true;
+    final column = FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: List.generate(count, (index) {
+          final position = calculateSegmentedItemPosition(index, count);
+          final selected = _checkIsSelected(index);
+          final enabled = isEnabled?.call(index) ?? true;
 
-        final hasTap =
-            enabled &&
-            (onTap != null ||
-                (selectionMode != M3ESelectionMode.none &&
-                    (selectionTrigger == M3ESelectionTrigger.tap ||
-                        selectionTrigger == M3ESelectionTrigger.both)));
-        final hasLongPress =
-            enabled &&
-            (onLongPress != null ||
-                (selectionMode != M3ESelectionMode.none &&
-                    (selectionTrigger == M3ESelectionTrigger.longPress ||
-                        selectionTrigger == M3ESelectionTrigger.both)));
+          final hasTap =
+              enabled &&
+              (onTap != null ||
+                  (selectionMode != M3ESelectionMode.none &&
+                      (selectionTrigger == M3ESelectionTrigger.tap ||
+                          selectionTrigger == M3ESelectionTrigger.both)));
+          final hasLongPress =
+              enabled &&
+              (onLongPress != null ||
+                  (selectionMode != M3ESelectionMode.none &&
+                      (selectionTrigger == M3ESelectionTrigger.longPress ||
+                          selectionTrigger == M3ESelectionTrigger.both)));
 
-        return M3ESegmentedItem(
-          index: index,
-          position: position,
-          outerRadius: effectiveOuterRadius,
-          innerRadius: effectiveInnerRadius,
-          gap: effectiveGap,
-          color: effectiveColor,
-          padding: effectivePadding,
-          enabled: enabled,
-          disabledColor: effectiveDisabledColor,
-          disabledBorder: effectiveDisabledBorder,
-          focusedColor: effectiveFocusedColor,
-          focusedBorder: effectiveFocusedBorder,
-          focusedRadius: effectiveFocusedRadius,
-          focusedBorderRadius: effectiveFocusedBorderRadius,
-          focusedElevation: effectiveFocusedElevation,
-          onTap: hasTap ? _handleItemTap : null,
-          onLongPress: hasLongPress ? _handleItemLongPress : null,
-          semanticLabel: semanticLabelBuilder?.call(index),
-          mouseCursor: mouseCursor,
-          focusColor: effectiveFocusColor,
-          hoverColor: effectiveHoverColor,
-          onFocusChange: onFocusChange != null
-              ? (focused) => onFocusChange!(index, focused)
-              : null,
-          border: effectiveBorder,
-          elevation: effectiveElevation,
-          splashColor: effectiveSplashColor,
-          highlightColor: effectiveHighlightColor,
-          splashFactory: effectiveSplashFactory,
-          enableFeedback: effectiveEnableFeedback,
-          haptic: effectiveHaptic,
-          isSelected: selected,
-          selectedColor: effectiveSelectedColor,
-          selectedBorder: effectiveSelectedBorder,
-          selectedRadius: effectiveSelectedRadius,
-          selectedBorderRadius: effectiveSelectedBorderRadius,
-          selectedElevation: effectiveSelectedElevation,
-          pressedRadius: effectivePressedRadius,
-          pressedBorderRadius: effectivePressedBorderRadius,
-          pressedScale: effectivePressedScale,
-          hoveredRadius: effectiveHoveredRadius,
-          hoveredBorderRadius: effectiveHoveredBorderRadius,
-          showSelectionCheckmark:
-              selectionMode != M3ESelectionMode.none &&
-              effectiveShowSelectionCheckmark,
-          selectionCheckmarkAlignment: effectiveSelectionCheckmarkAlignment,
-          selectionCheckmarkBuilder: selectionCheckmarkBuilder != null
-              ? (ctx, isSel) => selectionCheckmarkBuilder!(ctx, index, isSel)
-              : null,
-          motion: effectiveMotion,
-          pressedMotion: effectivePressedMotion,
-          child: children[index],
-        );
-      }),
+          return M3ESegmentedItem(
+            index: index,
+            position: position,
+            outerRadius: effectiveOuterRadius,
+            innerRadius: effectiveInnerRadius,
+            gap: effectiveGap,
+            color: effectiveColor,
+            padding: effectivePadding,
+            enabled: enabled,
+            disabledColor: effectiveDisabledColor,
+            disabledBorder: effectiveDisabledBorder,
+            focusedColor: effectiveFocusedColor,
+            focusedBorder: effectiveFocusedBorder,
+            focusedRadius: effectiveFocusedRadius,
+            focusedBorderRadius: effectiveFocusedBorderRadius,
+            focusedElevation: effectiveFocusedElevation,
+            focusRingColor: effectiveFocusRingColor,
+            focusRingWidth: effectiveFocusRingWidth,
+            focusRingGap: effectiveFocusRingGap,
+            onTap: hasTap ? _handleItemTap : null,
+            onLongPress: hasLongPress ? _handleItemLongPress : null,
+            semanticLabel: semanticLabelBuilder?.call(index),
+            mouseCursor: mouseCursor,
+            focusColor: effectiveFocusColor,
+            hoverColor: effectiveHoverColor,
+            onFocusChange: onFocusChange != null
+                ? (focused) => onFocusChange!(index, focused)
+                : null,
+            border: effectiveBorder,
+            elevation: effectiveElevation,
+            splashColor: effectiveSplashColor,
+            highlightColor: effectiveHighlightColor,
+            splashFactory: effectiveSplashFactory,
+            enableFeedback: effectiveEnableFeedback,
+            haptic: effectiveHaptic,
+            isSelected: selected,
+            selectedColor: effectiveSelectedColor,
+            selectedBorder: effectiveSelectedBorder,
+            selectedRadius: effectiveSelectedRadius,
+            selectedBorderRadius: effectiveSelectedBorderRadius,
+            selectedElevation: effectiveSelectedElevation,
+            pressedRadius: effectivePressedRadius,
+            pressedBorderRadius: effectivePressedBorderRadius,
+            pressedScale: effectivePressedScale,
+            hoveredRadius: effectiveHoveredRadius,
+            hoveredBorderRadius: effectiveHoveredBorderRadius,
+            showSelectionCheckmark:
+                selectionMode != M3ESelectionMode.none &&
+                effectiveShowSelectionCheckmark,
+            selectionCheckmarkAlignment: effectiveSelectionCheckmarkAlignment,
+            selectionCheckmarkBuilder: selectionCheckmarkBuilder != null
+                ? (ctx, isSel) => selectionCheckmarkBuilder!(ctx, index, isSel)
+                : null,
+            motion: effectiveMotion,
+            pressedMotion: effectivePressedMotion,
+            child: children[index],
+          );
+        }),
+      ),
     );
 
     if (effectiveMargin != null && effectiveMargin != EdgeInsets.zero) {

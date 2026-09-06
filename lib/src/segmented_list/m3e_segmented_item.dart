@@ -1,7 +1,9 @@
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:motor/motor.dart';
 
 import '../common/m3e_common.dart';
+import 'internal/_segmented_focus_ring.dart';
 
 /// The position of a segmented item within a list, used to determine its corner radii.
 enum M3ESegmentedItemPosition {
@@ -204,6 +206,15 @@ class M3ESegmentedItem extends StatefulWidget {
   /// The elevation of the item when focused.
   final double? focusedElevation;
 
+  /// Custom focus ring color applied to focused items. If null, defaults to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Stroke width of the focus ring. Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Outset gap between the item border and the focus ring. Defaults to `4.0`.
+  final double focusRingGap;
+
   // --- Selection & Morphing API ---
 
   /// Whether this item is currently selected.
@@ -316,6 +327,9 @@ class M3ESegmentedItem extends StatefulWidget {
     this.focusedRadius,
     this.focusedBorderRadius,
     this.focusedElevation,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
     this.isSelected = false,
     this.selectedColor,
     this.selectedBorder,
@@ -334,7 +348,12 @@ class M3ESegmentedItem extends StatefulWidget {
     this.pressedMotion = M3EMotion.expressiveSpatialFast,
     this.suppressAnimation = false,
     this.isLast,
+    this.onReorderKey,
   });
+
+  /// Optional callback invoked when the user requests keyboard-driven reordering
+  /// (e.g. via Alt+ArrowUp/Down/Left/Right).
+  final void Function(int index, bool moveForward)? onReorderKey;
 
   @override
   State<M3ESegmentedItem> createState() => _M3ESegmentedItemState();
@@ -342,6 +361,7 @@ class M3ESegmentedItem extends StatefulWidget {
 
 class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
   late final WidgetStatesController _statesController;
+  FocusNode? _internalFocusNode;
   bool _isPressed = false;
   bool _isHovered = false;
   bool _isFocused = false;
@@ -349,38 +369,132 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
   // selection toggle (needs spring) from a position-only change (should snap).
   bool _wasSelected = false;
 
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode!;
+
   @override
   void initState() {
     super.initState();
     _wasSelected = widget.isSelected;
     _statesController = WidgetStatesController();
     _statesController.addListener(_handleStatesChanged);
+    if (widget.focusNode == null) {
+      _internalFocusNode = FocusNode(
+        debugLabel: 'M3ESegmentedItem_${widget.index}',
+      );
+    }
+    _effectiveFocusNode.addListener(_handleFocusNodeChanged);
+    _isFocused = _effectiveFocusNode.hasFocus;
   }
 
   @override
   void didUpdateWidget(covariant M3ESegmentedItem oldWidget) {
     super.didUpdateWidget(oldWidget);
     _wasSelected = oldWidget.isSelected;
+    if (oldWidget.focusNode != widget.focusNode) {
+      final oldNode = oldWidget.focusNode ?? _internalFocusNode;
+      oldNode?.removeListener(_handleFocusNodeChanged);
+      if (oldWidget.focusNode == null && widget.focusNode != null) {
+        _internalFocusNode?.dispose();
+        _internalFocusNode = null;
+      } else if (oldWidget.focusNode != null && widget.focusNode == null) {
+        _internalFocusNode = FocusNode(
+          debugLabel: 'M3ESegmentedItem_${widget.index}',
+        );
+      }
+      _effectiveFocusNode.addListener(_handleFocusNodeChanged);
+      _isFocused = _effectiveFocusNode.hasFocus;
+    }
+  }
+
+  void _handleFocusNodeChanged() {
+    if (!mounted) return;
+    final focused = _effectiveFocusNode.hasFocus;
+    if (_isFocused != focused) {
+      setState(() => _isFocused = focused);
+    }
+  }
+
+  KeyEventResult _handleCardKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    // Alt/Option, Meta (Cmd), or Ctrl + Arrow Up/Left -> move backward (index - 1)
+    // Alt/Option, Meta (Cmd), or Ctrl + Arrow Down/Right -> move forward (index + 1)
+    final isModifier =
+        HardwareKeyboard.instance.isAltPressed ||
+        HardwareKeyboard.instance.isMetaPressed ||
+        HardwareKeyboard.instance.isControlPressed ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.alt) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.altLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.altRight,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.meta,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.metaLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.metaRight,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.control,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlLeft,
+        ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(
+          LogicalKeyboardKey.controlRight,
+        );
+
+    if (isModifier && widget.onReorderKey != null) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+          event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+          event.physicalKey == PhysicalKeyboardKey.arrowUp ||
+          event.physicalKey == PhysicalKeyboardKey.arrowLeft) {
+        widget.onReorderKey!(widget.index, false);
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.arrowRight ||
+          event.physicalKey == PhysicalKeyboardKey.arrowDown ||
+          event.physicalKey == PhysicalKeyboardKey.arrowRight) {
+        widget.onReorderKey!(widget.index, true);
+        return KeyEventResult.handled;
+      }
+    }
+
+    // Enter / Space -> trigger onTap
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space) {
+      if (widget.enabled && widget.onTap != null) {
+        widget.onTap!(widget.index);
+        widget.haptic.apply();
+        return KeyEventResult.handled;
+      }
+    }
+
+    return KeyEventResult.ignored;
   }
 
   void _handleStatesChanged() {
     if (!mounted) return;
     final pressed = _statesController.value.contains(WidgetState.pressed);
     final hovered = _statesController.value.contains(WidgetState.hovered);
-    final focused = _statesController.value.contains(WidgetState.focused);
-    if (pressed != _isPressed ||
-        hovered != _isHovered ||
-        focused != _isFocused) {
+    if (pressed != _isPressed || hovered != _isHovered) {
       setState(() {
         _isPressed = pressed;
         _isHovered = hovered;
-        _isFocused = focused;
       });
     }
   }
 
   @override
   void dispose() {
+    _effectiveFocusNode.removeListener(_handleFocusNodeChanged);
+    _internalFocusNode?.dispose();
     _statesController.removeListener(_handleStatesChanged);
     _statesController.dispose();
     super.dispose();
@@ -478,7 +592,10 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
             widget.position == M3ESegmentedItemPosition.single);
 
     final hasInteraction =
-        widget.enabled && (widget.onTap != null || widget.onLongPress != null);
+        widget.enabled &&
+        (widget.onTap != null ||
+            widget.onLongPress != null ||
+            widget.onReorderKey != null);
 
     Widget content = widget.child;
 
@@ -556,7 +673,7 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
         targetRadius: targetRadius,
         animate: animateRadius,
         builder: (context, animatedRadius) {
-          return Container(
+          final coreContainer = Container(
             decoration: BoxDecoration(
               color: effectiveColor,
               borderRadius: animatedRadius,
@@ -574,59 +691,79 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
             clipBehavior: Clip.antiAlias,
             child: Material(
               type: MaterialType.transparency,
-              child: InkWell(
-                statesController: _statesController,
-                focusNode: widget.focusNode,
+              child: Focus(
+                focusNode: _effectiveFocusNode,
                 autofocus: widget.autofocus,
                 canRequestFocus: widget.enabled,
-                splashColor: widget.splashColor,
-                highlightColor: widget.highlightColor,
-                splashFactory: widget.splashFactory ?? InkSparkle.splashFactory,
-                enableFeedback: widget.enableFeedback,
-                focusColor: widget.focusColor,
-                hoverColor: widget.hoverColor,
-                mouseCursor:
-                    widget.mouseCursor ??
-                    (hasInteraction
-                        ? SystemMouseCursors.click
-                        : SystemMouseCursors.basic),
-                onTap: widget.enabled && widget.onTap != null
-                    ? () {
-                        widget.onTap!(widget.index);
-                        widget.haptic.apply();
-                      }
-                    : null,
-                onLongPress: widget.enabled && widget.onLongPress != null
-                    ? () {
-                        widget.onLongPress!(widget.index);
-                        widget.haptic.apply();
-                      }
-                    : null,
-                onFocusChange: widget.onFocusChange,
-                onHighlightChanged: hasInteraction
-                    ? (highlighted) {
-                        if (mounted && _isPressed != highlighted) {
-                          setState(() => _isPressed = highlighted);
+                onFocusChange: (focused) {
+                  if (mounted && _isFocused != focused) {
+                    setState(() => _isFocused = focused);
+                  }
+                  widget.onFocusChange?.call(focused);
+                },
+                onKeyEvent: _handleCardKeyEvent,
+                child: InkWell(
+                  statesController: _statesController,
+                  canRequestFocus: false,
+                  splashColor: widget.splashColor,
+                  highlightColor: widget.highlightColor,
+                  splashFactory:
+                      widget.splashFactory ?? InkSparkle.splashFactory,
+                  enableFeedback: widget.enableFeedback,
+                  focusColor: widget.focusColor,
+                  hoverColor: widget.hoverColor,
+                  mouseCursor:
+                      widget.mouseCursor ??
+                      (hasInteraction
+                          ? SystemMouseCursors.click
+                          : SystemMouseCursors.basic),
+                  onTap: widget.enabled && hasInteraction
+                      ? () {
+                          widget.onTap?.call(widget.index);
+                          widget.haptic.apply();
                         }
-                      }
-                    : null,
-                child: Padding(
-                  padding: widget.padding ?? const EdgeInsets.all(12.0),
-                  child:
-                      widget.pressedScale != null && widget.pressedScale != 1.0
-                      ? SingleMotionBuilder(
-                          motion: widget.pressedMotion.toMotion(),
-                          value: _isPressed ? widget.pressedScale! : 1.0,
-                          builder: (context, scale, _) => Transform.scale(
-                            scale: scale,
-                            alignment: Alignment.center,
-                            child: content,
-                          ),
-                        )
-                      : content,
+                      : null,
+                  onLongPress: widget.enabled && widget.onLongPress != null
+                      ? () {
+                          widget.onLongPress!(widget.index);
+                          widget.haptic.apply();
+                        }
+                      : null,
+                  onHighlightChanged: hasInteraction
+                      ? (highlighted) {
+                          if (mounted && _isPressed != highlighted) {
+                            setState(() => _isPressed = highlighted);
+                          }
+                        }
+                      : null,
+                  child: Padding(
+                    padding: widget.padding ?? const EdgeInsets.all(12.0),
+                    child:
+                        widget.pressedScale != null &&
+                            widget.pressedScale != 1.0
+                        ? SingleMotionBuilder(
+                            motion: widget.pressedMotion.toMotion(),
+                            value: _isPressed ? widget.pressedScale! : 1.0,
+                            builder: (context, scale, _) => Transform.scale(
+                              scale: scale,
+                              alignment: Alignment.center,
+                              child: content,
+                            ),
+                          )
+                        : content,
+                  ),
                 ),
               ),
             ),
+          );
+
+          return SegmentedFocusRing(
+            focused: _isFocused,
+            radius: animatedRadius,
+            color: widget.focusRingColor,
+            gap: widget.focusRingGap,
+            width: widget.focusRingWidth,
+            child: coreContainer,
           );
         },
       ),

@@ -87,6 +87,15 @@ class M3ESegmentedListDecoration {
   /// Elevation applied when an item is focused.
   final double? focusedElevation;
 
+  /// Custom focus ring color applied to focused items. If null, defaults to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Stroke width of the focus ring. Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Outset gap between the item border and the focus ring. Defaults to `4.0`.
+  final double focusRingGap;
+
   // --- Selection Styling ---
 
   /// Background color applied to selected items.
@@ -195,6 +204,9 @@ class M3ESegmentedListDecoration {
     this.focusedRadius,
     this.focusedBorderRadius,
     this.focusedElevation,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
     this.selectedColor,
     this.selectedBorder,
     this.selectedRadius,
@@ -244,6 +256,9 @@ class M3ESegmentedListDecoration {
     double? focusedRadius,
     BorderRadius? focusedBorderRadius,
     double? focusedElevation,
+    Color? focusRingColor,
+    double? focusRingWidth,
+    double? focusRingGap,
     Color? selectedColor,
     BorderSide? selectedBorder,
     double? selectedRadius,
@@ -292,6 +307,9 @@ class M3ESegmentedListDecoration {
       focusedRadius: focusedRadius ?? this.focusedRadius,
       focusedBorderRadius: focusedBorderRadius ?? this.focusedBorderRadius,
       focusedElevation: focusedElevation ?? this.focusedElevation,
+      focusRingColor: focusRingColor ?? this.focusRingColor,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      focusRingGap: focusRingGap ?? this.focusRingGap,
       selectedColor: selectedColor ?? this.selectedColor,
       selectedBorder: selectedBorder ?? this.selectedBorder,
       selectedRadius: selectedRadius ?? this.selectedRadius,
@@ -372,6 +390,11 @@ class M3ESegmentedListDecoration {
         t,
       ),
       focusedElevation: lerpDouble(a.focusedElevation, b.focusedElevation, t),
+      focusRingColor: Color.lerp(a.focusRingColor, b.focusRingColor, t),
+      focusRingWidth:
+          lerpDouble(a.focusRingWidth, b.focusRingWidth, t) ?? b.focusRingWidth,
+      focusRingGap:
+          lerpDouble(a.focusRingGap, b.focusRingGap, t) ?? b.focusRingGap,
       selectedColor: Color.lerp(a.selectedColor, b.selectedColor, t),
       selectedBorder: BorderSide.lerp(
         a.selectedBorder ?? BorderSide.none,
@@ -448,6 +471,7 @@ class M3ESegmentedListDecoration {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
+
     return other is M3ESegmentedListDecoration &&
         other.outerRadius == outerRadius &&
         other.innerRadius == innerRadius &&
@@ -471,6 +495,9 @@ class M3ESegmentedListDecoration {
         other.focusedRadius == focusedRadius &&
         other.focusedBorderRadius == focusedBorderRadius &&
         other.focusedElevation == focusedElevation &&
+        other.focusRingColor == focusRingColor &&
+        other.focusRingWidth == focusRingWidth &&
+        other.focusRingGap == focusRingGap &&
         other.selectedColor == selectedColor &&
         other.selectedBorder == selectedBorder &&
         other.selectedRadius == selectedRadius &&
@@ -520,6 +547,9 @@ class M3ESegmentedListDecoration {
     focusedRadius,
     focusedBorderRadius,
     focusedElevation,
+    focusRingColor,
+    focusRingWidth,
+    focusRingGap,
     selectedColor,
     selectedBorder,
     selectedRadius,

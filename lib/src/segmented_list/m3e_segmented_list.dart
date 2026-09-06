@@ -435,6 +435,9 @@ class M3ESegmentedList extends StatelessWidget {
     final effectiveFocusedRadius = decoration?.focusedRadius;
     final effectiveFocusedBorderRadius = decoration?.focusedBorderRadius;
     final effectiveFocusedElevation = decoration?.focusedElevation;
+    final effectiveFocusRingColor = decoration?.focusRingColor;
+    final effectiveFocusRingWidth = decoration?.focusRingWidth ?? 2.0;
+    final effectiveFocusRingGap = decoration?.focusRingGap ?? 0.0;
     final effectiveSelectedColor = decoration?.selectedColor ?? selectedColor;
     final effectiveSelectedBorder =
         decoration?.selectedBorder ?? selectedBorder;
@@ -474,6 +477,9 @@ class M3ESegmentedList extends StatelessWidget {
       focusedRadius: effectiveFocusedRadius,
       focusedBorderRadius: effectiveFocusedBorderRadius,
       focusedElevation: effectiveFocusedElevation,
+      focusRingColor: effectiveFocusRingColor,
+      focusRingWidth: effectiveFocusRingWidth,
+      focusRingGap: effectiveFocusRingGap,
       onTap: hasTap ? _handleItemTap : null,
       onLongPress: hasLongPress ? _handleItemLongPress : null,
       semanticLabel: semanticLabelBuilder?.call(index),
@@ -523,12 +529,15 @@ class M3ESegmentedList extends StatelessWidget {
     final effectiveMargin = decoration?.margin ?? margin;
 
     if (!_isBuilder) {
-      final column = Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: List.generate(
-          itemCount,
-          (index) => _buildItem(context, index),
+      final column = FocusTraversalGroup(
+        policy: WidgetOrderTraversalPolicy(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: List.generate(
+            itemCount,
+            (index) => _buildItem(context, index),
+          ),
         ),
       );
 
@@ -538,22 +547,25 @@ class M3ESegmentedList extends StatelessWidget {
       return column;
     }
 
-    final listView = ListView.builder(
-      controller: controller,
-      physics: physics,
-      shrinkWrap: shrinkWrap,
-      padding: listPadding,
-      itemCount: itemCount,
-      addAutomaticKeepAlives: addAutomaticKeepAlives,
-      addRepaintBoundaries: addRepaintBoundaries,
-      addSemanticIndexes: addSemanticIndexes,
-      // ignore: deprecated_member_use
-      cacheExtent: cacheExtent,
-      dragStartBehavior: dragStartBehavior,
-      keyboardDismissBehavior: keyboardDismissBehavior,
-      restorationId: restorationId,
-      clipBehavior: clipBehavior,
-      itemBuilder: _buildItem,
+    final listView = FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: ListView.builder(
+        controller: controller,
+        physics: physics,
+        shrinkWrap: shrinkWrap,
+        padding: listPadding,
+        itemCount: itemCount,
+        addAutomaticKeepAlives: addAutomaticKeepAlives,
+        addRepaintBoundaries: addRepaintBoundaries,
+        addSemanticIndexes: addSemanticIndexes,
+        // ignore: deprecated_member_use
+        cacheExtent: cacheExtent,
+        dragStartBehavior: dragStartBehavior,
+        keyboardDismissBehavior: keyboardDismissBehavior,
+        restorationId: restorationId,
+        clipBehavior: clipBehavior,
+        itemBuilder: _buildItem,
+      ),
     );
 
     if (effectiveMargin != null && effectiveMargin != EdgeInsets.zero) {
