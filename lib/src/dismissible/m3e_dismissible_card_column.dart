@@ -120,12 +120,15 @@ class _M3EDismissibleCardColumnState extends State<M3EDismissibleCardColumn>
       return widget.emptyBuilder?.call(context) ?? const SizedBox.shrink();
     }
     final visible = computeVisibleIndices();
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (int i = 0; i < slots.length; i++) buildSlot(context, i, visible),
-      ],
+    return FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (int i = 0; i < slots.length; i++) buildSlot(context, i, visible),
+        ],
+      ),
     );
   }
 }

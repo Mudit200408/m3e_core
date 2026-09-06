@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../common/m3e_common.dart';
+import 'internal/_dismissible_focus_ring.dart';
 
 /// Represents an individual action button revealed when swiping a list item in
 /// an M3E dismissible or swipeable list.
@@ -61,6 +62,8 @@ class M3ESwipeAction {
   Widget buildButton(
     BuildContext context, {
     required VoidCallback? onTriggered,
+    FocusNode? focusNode,
+    KeyEventResult Function(FocusNode node, KeyEvent event)? onKeyEvent,
   }) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
@@ -70,7 +73,12 @@ class M3ESwipeAction {
     final effectiveFg =
         foregroundColor ?? (isPrimary ? cs.onPrimary : cs.onSecondaryContainer);
 
-    final effectiveRadius = borderRadius ?? BorderRadius.circular(100);
+    final effectiveRadius =
+        (borderRadius as BorderRadius?) ?? BorderRadius.circular(100);
+
+    if (focusNode != null && onKeyEvent != null) {
+      focusNode.onKeyEvent = onKeyEvent;
+    }
 
     void handlePress() {
       haptic.apply();
@@ -78,7 +86,7 @@ class M3ESwipeAction {
       onTriggered?.call();
     }
 
-    return Container(
+    Widget buttonContent = Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
@@ -89,35 +97,63 @@ class M3ESwipeAction {
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
+          focusNode: focusNode,
           splashFactory: InkSparkle.splashFactory,
           onTap: handlePress,
           child: Center(
             child: IconTheme(
               data: IconThemeData(color: effectiveFg, size: 24.0),
-              child: label != null
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        icon,
-                        const SizedBox(height: 2.0),
-                        DefaultTextStyle(
-                          style:
-                              (theme.textTheme.labelSmall ?? const TextStyle())
-                                  .copyWith(
-                                    color: effectiveFg,
-                                    fontSize: 10.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                          child: label!,
-                        ),
-                      ],
-                    )
-                  : icon,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: label != null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          icon,
+                          const SizedBox(height: 2.0),
+                          DefaultTextStyle(
+                            style:
+                                (theme.textTheme.labelSmall ??
+                                        const TextStyle())
+                                    .copyWith(
+                                      color: effectiveFg,
+                                      fontSize: 10.0,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                            child: label!,
+                          ),
+                        ],
+                      )
+                    : icon,
+              ),
             ),
           ),
         ),
       ),
     );
+
+    if (focusNode != null) {
+      final ringColor = isPrimary
+          ? (cs.outline.a > 0 ? cs.outline : cs.onSurface)
+          : cs.primary;
+
+      return ListenableBuilder(
+        listenable: focusNode,
+        builder: (context, child) {
+          return DismissibleFocusRing(
+            focused: focusNode.hasFocus,
+            radius: effectiveRadius,
+            gap: 0.0,
+            width: 2.0,
+            color: ringColor,
+            child: child!,
+          );
+        },
+        child: buttonContent,
+      );
+    }
+
+    return buttonContent;
   }
 }

@@ -249,6 +249,77 @@ class _M3EReorderableDismissibleListState
     super.dispose();
   }
 
+  // ── Keyboard Reordering & Viewport Scrolling ──
+
+  int? _pendingKeyboardFocusIndex;
+
+  void _scrollToItemIfNeeded(int index) {
+    if (!_effectiveScrollController.hasClients) return;
+    if (!_effectiveScrollController.position.hasContentDimensions) return;
+    if (_effectiveScrollController.position.maxScrollExtent <= 0) return;
+
+    final itemBox =
+        _reorderItemKeys[index]?.currentContext?.findRenderObject()
+            as RenderBox?;
+    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final listRenderBox =
+        (stackBox ?? context.findRenderObject()) as RenderBox?;
+
+    if (itemBox == null || listRenderBox == null) return;
+
+    final itemOffsetInList = listRenderBox.globalToLocal(
+      itemBox.localToGlobal(Offset.zero),
+    );
+    final viewportHeight = listRenderBox.size.height;
+    final itemHeight = itemBox.size.height;
+    final currentScroll = _effectiveScrollController.offset;
+    final maxScroll = _effectiveScrollController.position.maxScrollExtent;
+
+    double? targetScroll;
+    const double margin = 16.0;
+
+    if (itemOffsetInList.dy < margin) {
+      targetScroll = (currentScroll + itemOffsetInList.dy - margin).clamp(
+        0.0,
+        maxScroll,
+      );
+    } else if (itemOffsetInList.dy + itemHeight > viewportHeight - margin) {
+      final overflow =
+          (itemOffsetInList.dy + itemHeight) - (viewportHeight - margin);
+      targetScroll = (currentScroll + overflow).clamp(0.0, maxScroll);
+    }
+
+    if (targetScroll != null && (targetScroll - currentScroll).abs() > 1.0) {
+      _effectiveScrollController.animateTo(
+        targetScroll,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  void _handleKeyboardReorder(int index, bool moveForward) {
+    final visible = computeVisibleIndices();
+    final targetIndex = moveForward ? index + 1 : index - 1;
+    if (targetIndex >= 0 && targetIndex < visible.length) {
+      _pendingKeyboardFocusIndex = targetIndex;
+      final reorderTo = targetIndex > index ? targetIndex + 1 : targetIndex;
+      widget.onReorder(index, reorderTo);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pendingKeyboardFocusIndex != null) {
+          final targetIdx = _pendingKeyboardFocusIndex!;
+          _pendingKeyboardFocusIndex = null;
+          final visibleAfter = computeVisibleIndices();
+          if (targetIdx >= 0 && targetIdx < visibleAfter.length) {
+            final slot = slots[visibleAfter[targetIdx]];
+            slot.focusNode.requestFocus();
+          }
+          _scrollToItemIfNeeded(targetIdx);
+        }
+      });
+    }
+  }
+
   // ── Reorder Controllers & Gestures ──
 
   SingleMotionController _getOrCreateShiftController(int index) {
@@ -781,6 +852,8 @@ class _M3EReorderableDismissibleListState
       return const SizedBox.shrink();
     }
 
+    slot.onReorderKey = _handleKeyboardReorder;
+
     final Key itemKey = widget.keyBuilder != null
         ? widget.keyBuilder!(slotPos)
         : ValueKey('reorder_dismiss_slot_${slot.identity.hashCode}');
@@ -882,27 +955,32 @@ class _M3EReorderableDismissibleListState
 
     final visible = computeVisibleIndices();
 
-    Widget content = Stack(
-      key: _stackKey,
-      clipBehavior: Clip.none,
-      children: [
-        ListView.builder(
-          controller: _effectiveScrollController,
-          physics: widget.physics,
-          padding: widget.listPadding,
-          shrinkWrap: widget.shrinkWrap,
-          clipBehavior: widget.clipBehavior,
-          itemCount: slots.length,
-          itemBuilder: (ctx, i) => _buildReorderableSlot(ctx, i, visible),
-        ),
-        ValueListenableBuilder<int?>(
-          valueListenable: _draggedIndexNotifier,
-          builder: (context, draggedIndex, _) {
-            if (draggedIndex == null) return const SizedBox.shrink();
-            return _buildProxyItem(context, draggedIndex);
-          },
-        ),
-      ],
+    Widget content = FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: Stack(
+        key: _stackKey,
+        clipBehavior: Clip.none,
+        children: [
+          ListView.builder(
+            controller: _effectiveScrollController,
+            physics: widget.physics,
+            padding: widget.listPadding,
+            shrinkWrap: widget.shrinkWrap,
+            clipBehavior: widget.clipBehavior,
+            // ignore: deprecated_member_use
+            cacheExtent: 1000.0,
+            itemCount: slots.length,
+            itemBuilder: (ctx, i) => _buildReorderableSlot(ctx, i, visible),
+          ),
+          ValueListenableBuilder<int?>(
+            valueListenable: _draggedIndexNotifier,
+            builder: (context, draggedIndex, _) {
+              if (draggedIndex == null) return const SizedBox.shrink();
+              return _buildProxyItem(context, draggedIndex);
+            },
+          ),
+        ],
+      ),
     );
 
     if (widget.margin != null && widget.margin != EdgeInsets.zero) {

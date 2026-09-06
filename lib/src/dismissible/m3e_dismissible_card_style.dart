@@ -60,6 +60,15 @@ class M3EDismissibleCardStyle {
   /// Set to empty list `[]` to remove shadow completely.
   final List<BoxShadow>? boxShadow;
 
+  /// Custom focus ring color applied to focused cards. If null, defaults to [ColorScheme.primary].
+  final Color? focusRingColor;
+
+  /// Stroke width of the focus ring. Defaults to `2.0`.
+  final double focusRingWidth;
+
+  /// Outset gap between the card border and the focus ring. Defaults to `4.0`.
+  final double focusRingGap;
+
   // ── Swipe backgrounds & actions ──
 
   /// The direction in which the card can be dismissed or swiped.
@@ -190,6 +199,9 @@ class M3EDismissibleCardStyle {
     this.border,
     this.elevation = 0.0,
     this.boxShadow,
+    this.focusRingColor,
+    this.focusRingWidth = 2.0,
+    this.focusRingGap = 0.0,
     this.direction = DismissDirection.horizontal,
     this.background,
     this.secondaryBackground,
@@ -230,6 +242,9 @@ class M3EDismissibleCardStyle {
     BorderSide? border,
     double? elevation,
     List<BoxShadow>? boxShadow,
+    Color? focusRingColor,
+    double? focusRingWidth,
+    double? focusRingGap,
     DismissDirection? direction,
     Widget? background,
     Widget? secondaryBackground,
@@ -268,6 +283,9 @@ class M3EDismissibleCardStyle {
       border: border ?? this.border,
       elevation: elevation ?? this.elevation,
       boxShadow: boxShadow ?? this.boxShadow,
+      focusRingColor: focusRingColor ?? this.focusRingColor,
+      focusRingWidth: focusRingWidth ?? this.focusRingWidth,
+      focusRingGap: focusRingGap ?? this.focusRingGap,
       direction: direction ?? this.direction,
       background: background ?? this.background,
       secondaryBackground: secondaryBackground ?? this.secondaryBackground,

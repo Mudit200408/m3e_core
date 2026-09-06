@@ -119,14 +119,17 @@ class _M3EDismissibleCardListState extends State<M3EDismissibleCardList>
       return widget.emptyBuilder?.call(context) ?? const SizedBox.shrink();
     }
     final visible = computeVisibleIndices();
-    return ListView.builder(
-      controller: widget.scrollController,
-      physics: widget.physics,
-      padding: widget.listPadding,
-      shrinkWrap: widget.shrinkWrap,
-      clipBehavior: widget.clipBehavior,
-      itemCount: slots.length,
-      itemBuilder: (ctx, i) => buildSlot(ctx, i, visible),
+    return FocusTraversalGroup(
+      policy: WidgetOrderTraversalPolicy(),
+      child: ListView.builder(
+        controller: widget.scrollController,
+        physics: widget.physics,
+        padding: widget.listPadding,
+        shrinkWrap: widget.shrinkWrap,
+        clipBehavior: widget.clipBehavior,
+        itemCount: slots.length,
+        itemBuilder: (ctx, i) => buildSlot(ctx, i, visible),
+      ),
     );
   }
 }
