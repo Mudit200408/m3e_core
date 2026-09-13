@@ -419,7 +419,7 @@ class M3EButtonTokensAdapter {
   static final Map<M3EButtonSize, double> _splitIcon =
       Map<M3EButtonSize, double>.unmodifiable({
         M3EButtonSize.xs: 20.0,
-        M3EButtonSize.sm: 24.0,
+        M3EButtonSize.sm: 20.0,
         M3EButtonSize.md: 24.0,
         M3EButtonSize.lg: 32.0,
         M3EButtonSize.xl: 40.0,
