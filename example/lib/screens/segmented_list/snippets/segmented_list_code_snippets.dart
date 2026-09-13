@@ -62,6 +62,8 @@ class SegmentedListCodeSnippets {
     double collapseStiffness = 800,
     double collapseDamping = 0.6,
     List<int>? flexes,
+    bool hideMiddleItem = false,
+    bool hideLastItem = false,
   }) {
     final buf = StringBuffer();
 
@@ -205,8 +207,26 @@ class SegmentedListCodeSnippets {
         if (flexes != null) {
           buf.writeln("  flexes: const $flexes,");
         }
+        if (hideMiddleItem || hideLastItem) {
+          buf.writeln("  isVisible: (index) {");
+          if (hideMiddleItem) buf.writeln("    if (index == 1) return false;");
+          if (hideLastItem) {
+            buf.writeln("    if (index == items.length - 1) return false;");
+          }
+          buf.writeln("    return true;");
+          buf.writeln("  },");
+        }
       } else if (containerMode == SegmentedContainerMode.column) {
         buf.writeln("M3ESegmentedColumn(");
+        if (hideMiddleItem || hideLastItem) {
+          buf.writeln("  isVisible: (index) {");
+          if (hideMiddleItem) buf.writeln("    if (index == 1) return false;");
+          if (hideLastItem) {
+            buf.writeln("    if (index == items.length - 1) return false;");
+          }
+          buf.writeln("    return true;");
+          buf.writeln("  },");
+        }
       } else if (containerMode == SegmentedContainerMode.listView) {
         buf.writeln("M3ESegmentedList.builder(");
         buf.writeln("  controller: _scrollController,");
@@ -291,8 +311,26 @@ class SegmentedListCodeSnippets {
         }
       } else if (containerMode == SegmentedContainerMode.row) {
         buf.writeln("M3ESegmentedRow(");
+        if (hideMiddleItem || hideLastItem) {
+          buf.writeln("  isVisible: (index) {");
+          if (hideMiddleItem) buf.writeln("    if (index == 1) return false;");
+          if (hideLastItem) {
+            buf.writeln("    if (index == items.length - 1) return false;");
+          }
+          buf.writeln("    return true;");
+          buf.writeln("  },");
+        }
       } else if (containerMode == SegmentedContainerMode.column) {
         buf.writeln("M3ESegmentedColumn(");
+        if (hideMiddleItem || hideLastItem) {
+          buf.writeln("  isVisible: (index) {");
+          if (hideMiddleItem) buf.writeln("    if (index == 1) return false;");
+          if (hideLastItem) {
+            buf.writeln("    if (index == items.length - 1) return false;");
+          }
+          buf.writeln("    return true;");
+          buf.writeln("  },");
+        }
       } else if (containerMode == SegmentedContainerMode.listView) {
         buf.writeln("M3ESegmentedList.builder(");
         buf.writeln("  itemCount: ${showEmpty ? 0 : itemCount},");

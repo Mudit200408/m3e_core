@@ -105,6 +105,8 @@ class _SegmentedListPlaygroundViewState
 
   late List<EmailItem> _items;
   bool _showEmpty = false;
+  bool _hideMiddleItem = false;
+  bool _hideLastItem = false;
 
   // ── Styling, Ink & Feedback Overrides ──
   bool _useCustomColor = false;
@@ -202,6 +204,8 @@ class _SegmentedListPlaygroundViewState
       _rowFlexPreset = RowFlexPreset.none;
       _showEmpty = false;
       _isLoadingMore = false;
+      _hideMiddleItem = false;
+      _hideLastItem = false;
     });
   }
 
@@ -354,6 +358,8 @@ class _SegmentedListPlaygroundViewState
       collapseStiffness: _collapseStiffness,
       collapseDamping: _collapseDamping,
       flexes: _rowFlexPreset.computeFlexes(_items.length),
+      hideMiddleItem: _hideMiddleItem,
+      hideLastItem: _hideLastItem,
     );
   }
 
@@ -419,6 +425,10 @@ class _SegmentedListPlaygroundViewState
         trailingPillHeight: _trailingPillHeight,
         onTrailingPillHeightChanged: (val) =>
             setState(() => _trailingPillHeight = val),
+        hideMiddleItem: _hideMiddleItem,
+        onHideMiddleItemChanged: (val) => setState(() => _hideMiddleItem = val),
+        hideLastItem: _hideLastItem,
+        onHideLastItemChanged: (val) => setState(() => _hideLastItem = val),
       ),
 
       SegmentedListSelectionControls(
@@ -666,6 +676,8 @@ class _SegmentedListPlaygroundViewState
         trailingPillSize: Size(_trailingPillWidth, _trailingPillHeight),
         onReorder: _handleReorder,
         onResetItems: _resetItems,
+        hideMiddleItem: _hideMiddleItem,
+        hideLastItem: _hideLastItem,
       ),
 
       codeSnippet: CodeSnippetCard(code: _generateCodeSnippet()),

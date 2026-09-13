@@ -79,6 +79,8 @@ class SegmentedListPreviewArea extends StatelessWidget {
     this.trailingPillColor,
     this.trailingPillSize = const Size(32.0, 48.0),
     this.flexes,
+    this.hideMiddleItem = false,
+    this.hideLastItem = false,
   });
 
   final SegmentedListType listType;
@@ -149,6 +151,8 @@ class SegmentedListPreviewArea extends StatelessWidget {
   final Color? trailingPillColor;
   final Size trailingPillSize;
   final List<int>? flexes;
+  final bool hideMiddleItem;
+  final bool hideLastItem;
 
   M3ESegmentedListDecoration _buildDecoration(ColorScheme cs) {
     return M3ESegmentedListDecoration(
@@ -451,12 +455,21 @@ class SegmentedListPreviewArea extends StatelessWidget {
     // ── Normal Mode: Row Architecture ──
     if (containerMode == SegmentedContainerMode.row) {
       final displayItems = items;
+      bool isSlotVisible(int index) {
+        if (hideMiddleItem && index == 1) return false;
+        if (hideLastItem && index == displayItems.length - 1) return false;
+        return true;
+      }
+
       return SingleChildScrollView(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             M3ESegmentedRow(
+              isVisible: (hideMiddleItem || hideLastItem)
+                  ? isSlotVisible
+                  : null,
               selectionMode: selectionMode,
               selectionTrigger: selectionTrigger,
               selectedIndices: selectedIndices,
@@ -485,6 +498,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
               equalWidth: flexes == null,
               flexes: flexes,
               children: List.generate(displayItems.length, (index) {
+                if (!isSlotVisible(index)) {
+                  return const SizedBox.shrink();
+                }
                 const cardDefs = [
                   (icon: Icons.calendar_today_outlined, title: 'Sep 1, 2026'),
                   (icon: Icons.access_time_rounded, title: '11:39 AM'),
@@ -521,9 +537,16 @@ class SegmentedListPreviewArea extends StatelessWidget {
 
     // ── Normal Mode: Column Architecture ──
     if (containerMode == SegmentedContainerMode.column) {
+      bool isSlotVisible(int index) {
+        if (hideMiddleItem && index == 1) return false;
+        if (hideLastItem && index == items.length - 1) return false;
+        return true;
+      }
+
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: M3ESegmentedColumn(
+          isVisible: (hideMiddleItem || hideLastItem) ? isSlotVisible : null,
           selectionMode: selectionMode,
           selectionTrigger: selectionTrigger,
           selectedIndices: selectedIndices,
@@ -543,6 +566,9 @@ class SegmentedListPreviewArea extends StatelessWidget {
           pressedScale: pressedScale,
           hoveredRadius: hoveredRadius,
           children: List.generate(items.length, (index) {
+            if (!isSlotVisible(index)) {
+              return const SizedBox.shrink();
+            }
             final item = items[index];
             return KeyedSubtree(
               key: ValueKey('col_${item.id}_${tileLayout.name}'),

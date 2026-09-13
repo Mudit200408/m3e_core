@@ -41,6 +41,10 @@ class SegmentedListLayoutControls extends StatelessWidget {
     this.onTrailingPillHeightChanged,
     this.rowFlexPreset = RowFlexPreset.none,
     this.onRowFlexPresetChanged,
+    this.hideMiddleItem = false,
+    this.onHideMiddleItemChanged,
+    this.hideLastItem = false,
+    this.onHideLastItemChanged,
   });
 
   final SegmentedListType listType;
@@ -74,6 +78,10 @@ class SegmentedListLayoutControls extends StatelessWidget {
   final ValueChanged<double>? onTrailingPillHeightChanged;
   final RowFlexPreset rowFlexPreset;
   final ValueChanged<RowFlexPreset>? onRowFlexPresetChanged;
+  final bool hideMiddleItem;
+  final ValueChanged<bool>? onHideMiddleItemChanged;
+  final bool hideLastItem;
+  final ValueChanged<bool>? onHideLastItemChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -404,6 +412,36 @@ class SegmentedListLayoutControls extends StatelessWidget {
                   ),
                 ],
               ),
+              if (containerMode == SegmentedContainerMode.column ||
+                  containerMode == SegmentedContainerMode.row) ...[
+                const Divider(height: 16),
+                const Text(
+                  'Slot Visibility (isVisible)',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+                const SizedBox(height: 8),
+                M3ESegmentedSwitchGroup(
+                  items: [
+                    M3ESwitchItem(
+                      title: 'Hide Middle Item (index 1)',
+                      subtitle: 'Excludes middle slot from gap and radius math',
+                      value: hideMiddleItem,
+                      onChanged: onHideMiddleItemChanged != null
+                          ? (val) => onHideMiddleItemChanged!(val)
+                          : null,
+                    ),
+                    M3ESwitchItem(
+                      title: 'Hide Trailing Item',
+                      subtitle:
+                          'Preceding item takes .last outer corner radius',
+                      value: hideLastItem,
+                      onChanged: onHideLastItemChanged != null
+                          ? (val) => onHideLastItemChanged!(val)
+                          : null,
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ],
