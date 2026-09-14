@@ -245,6 +245,7 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
 
   Set<T>? _selectedValues;
   final GlobalKey _trailingKey = GlobalKey();
+  OverlayEntry? _popupEntry;
 
   @override
   M3EButtonSize get buttonSize => widget.size;
@@ -300,6 +301,12 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
 
   @override
   void dispose() {
+    if (_popupEntry != null) {
+      if (_popupEntry!.mounted) {
+        _popupEntry!.remove();
+      }
+      _popupEntry = null;
+    }
     _trailingFocusNode.removeListener(_onTrailingFocusChanged);
     _trailingFocusNode.dispose();
     disposeBaseButtonState();
@@ -1035,7 +1042,9 @@ class _M3ESplitButtonState<T> extends State<M3ESplitButton<T>>
       triggerRenderBox: tb,
       selectedValue: widget.selectedValue,
       callerFocusNode: _trailingFocusNode,
+      onEntryCreated: (entry) => _popupEntry = entry,
     );
+    _popupEntry = null;
 
     if (!mounted) return;
     _closeMenu();

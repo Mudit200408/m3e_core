@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -17,10 +18,20 @@ Future<T?> showSplitButtonPopup<T>({
   required RenderBox triggerRenderBox,
   FocusNode? callerFocusNode,
   T? selectedValue,
+  void Function(OverlayEntry entry)? onEntryCreated,
 }) {
   final completer = Completer<T?>();
 
   late OverlayEntry overlayEntry;
+
+  void removeEntry() {
+    if (overlayEntry.mounted) {
+      overlayEntry.remove();
+    }
+    if (!completer.isCompleted) {
+      completer.complete(null);
+    }
+  }
 
   overlayEntry = OverlayEntry(
     builder: (context) => _PopupOverlay<T>(
@@ -32,16 +43,16 @@ Future<T?> showSplitButtonPopup<T>({
       selectedValue: selectedValue,
       callerFocusNode: callerFocusNode,
       onSelected: (value) {
-        completer.complete(value);
+        if (!completer.isCompleted) completer.complete(value);
       },
       onDismiss: () {
-        completer.complete(null);
+        if (!completer.isCompleted) completer.complete(null);
       },
-      onRemove: () {
-        overlayEntry.remove();
-      },
+      onRemove: removeEntry,
     ),
   );
+
+  onEntryCreated?.call(overlayEntry);
 
   Overlay.of(context).insert(overlayEntry);
 
@@ -77,11 +88,14 @@ class _PopupOverlay<T> extends StatefulWidget {
   State<_PopupOverlay<T>> createState() => _PopupOverlayState<T>();
 }
 
-class _PopupOverlayState<T> extends State<_PopupOverlay<T>> {
+class _PopupOverlayState<T> extends State<_PopupOverlay<T>>
+    with WidgetsBindingObserver {
   double _springTarget = 0.0;
   bool _selected = false;
   bool _isDismissing = false;
   double _opacity = 0.0;
+  Size? _lastOverlaySize;
+  Offset? _lastTriggerPosition;
 
   // True when the popup was opened via keyboard (caller had focus at open time).
   // Drives whether focus is trapped into the popup on open and restored on close.
@@ -95,6 +109,7 @@ class _PopupOverlayState<T> extends State<_PopupOverlay<T>> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // callerFocusNode.hasFocus is true only when keyboard navigation had
     // previously focused the trailing button. A mouse click does not set
     // hasFocus on the trailing node before the onTap fires.
@@ -115,8 +130,22 @@ class _PopupOverlayState<T> extends State<_PopupOverlay<T>> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _focusScopeNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    _dismissImmediately();
+  }
+
+  void _dismissImmediately() {
+    if (_isDismissing) return;
+    _isDismissing = true;
+    if (!_selected) widget.onDismiss();
+    widget.onRemove();
   }
 
   void _dismiss({bool restoreFocus = false}) {
@@ -140,146 +169,190 @@ class _PopupOverlayState<T> extends State<_PopupOverlay<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final triggerTopLeft = widget.triggerRenderBox.localToGlobal(Offset.zero);
-    final triggerBottomRight = widget.triggerRenderBox.localToGlobal(
-      widget.triggerRenderBox.size.bottomRight(Offset.zero),
-    );
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    if (!widget.triggerRenderBox.attached) {
+      return const SizedBox.shrink();
+    }
 
-    final menuWidth = (widget.triggerRenderBox.size.width + 176.0).clamp(
-      widget.decoration.minWidth,
-      widget.decoration.maxWidth,
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (!widget.triggerRenderBox.attached) {
+          return const SizedBox.shrink();
+        }
 
-    final spaceBelow =
-        screenSize.height -
-        triggerBottomRight.dy -
-        ButtonConstants.kScreenEdgePadding;
-    final spaceAbove = triggerTopLeft.dy - ButtonConstants.kScreenEdgePadding;
+        final overlayBox =
+            Overlay.of(context).context.findRenderObject() as RenderBox;
+        final overlaySize = overlayBox.size;
+        final triggerTopLeft = widget.triggerRenderBox.localToGlobal(
+          Offset.zero,
+          ancestor: overlayBox,
+        );
 
-    final approxHeight = (widget.items.length * 60.0).clamp(
-      96.0,
-      widget.decoration.maxHeight,
-    );
-    final showAbove = spaceBelow < approxHeight && spaceAbove > spaceBelow;
+        if (!_isDismissing &&
+            _lastOverlaySize != null &&
+            (_lastOverlaySize != overlaySize ||
+                (_lastTriggerPosition != null &&
+                    (triggerTopLeft - _lastTriggerPosition!).distance > 1.0))) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _dismissImmediately();
+          });
+          return const SizedBox.shrink();
+        }
+        _lastOverlaySize = overlaySize;
+        _lastTriggerPosition = triggerTopLeft;
 
-    double left = triggerBottomRight.dx - menuWidth;
-    left += widget.decoration.offset.dx;
-    left = left.clamp(
-      ButtonConstants.kScreenEdgePadding,
-      screenSize.width - menuWidth - ButtonConstants.kScreenEdgePadding,
-    );
+        final triggerBottomRight = widget.triggerRenderBox.localToGlobal(
+          widget.triggerRenderBox.size.bottomRight(Offset.zero),
+          ancestor: overlayBox,
+        );
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
 
-    final bool isClampedToLeft = left <= ButtonConstants.kScreenEdgePadding;
-    final scaleAlignment = Alignment(
-      isClampedToLeft ? -1.0 : 1.0,
-      showAbove ? 1.0 : -1.0,
-    );
+        final menuWidth = (widget.triggerRenderBox.size.width + 176.0).clamp(
+          widget.decoration.minWidth,
+          widget.decoration.maxWidth,
+        );
 
-    final motion = widget.decoration.motion.toMotion();
+        final spaceBelow =
+            overlaySize.height -
+            triggerBottomRight.dy -
+            ButtonConstants.kScreenEdgePadding;
+        final spaceAbove =
+            triggerTopLeft.dy - ButtonConstants.kScreenEdgePadding;
 
-    return FocusScope(
-      node: _focusScopeNode,
-      child: Focus(
-        focusNode: FocusNode(skipTraversal: true),
-        onKeyEvent: (node, event) {
-          if (event.logicalKey == LogicalKeyboardKey.escape) {
-            if (event is KeyDownEvent) {
-              _dismiss(restoreFocus: true);
-            }
-            // Always consume Escape (KeyDown, KeyRepeat, KeyUp) to prevent
-            // the duplicate-keydown assertion that fires on macOS when the OS
-            // swallows the KeyUp for Escape after dismissing the overlay.
-            return KeyEventResult.handled;
-          }
-          return KeyEventResult.ignored;
-        },
-        child: Material(
-          color: Colors.transparent,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: _dismiss,
-                  child: Container(
-                    color: theme.colorScheme.scrim.withValues(alpha: 0.26),
+        final approxHeight = (widget.items.length * 60.0).clamp(
+          96.0,
+          widget.decoration.maxHeight,
+        );
+        final showAbove = spaceBelow < approxHeight && spaceAbove > spaceBelow;
+
+        double left = triggerBottomRight.dx - menuWidth;
+        left += widget.decoration.offset.dx;
+        final maxLeft = math.max(
+          ButtonConstants.kScreenEdgePadding,
+          overlaySize.width - menuWidth - ButtonConstants.kScreenEdgePadding,
+        );
+        left = left.clamp(ButtonConstants.kScreenEdgePadding, maxLeft);
+
+        final bool isClampedToLeft = left <= ButtonConstants.kScreenEdgePadding;
+        final scaleAlignment = Alignment(
+          isClampedToLeft ? -1.0 : 1.0,
+          showAbove ? 1.0 : -1.0,
+        );
+
+        final motion = widget.decoration.motion.toMotion();
+
+        return FocusScope(
+          node: _focusScopeNode,
+          child: Focus(
+            focusNode: FocusNode(skipTraversal: true),
+            onKeyEvent: (node, event) {
+              if (event.logicalKey == LogicalKeyboardKey.escape) {
+                if (event is KeyDownEvent) {
+                  _dismiss(restoreFocus: true);
+                }
+                // Always consume Escape (KeyDown, KeyRepeat, KeyUp) to prevent
+                // the duplicate-keydown assertion that fires on macOS when the OS
+                // swallows the KeyUp for Escape after dismissing the overlay.
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _dismiss,
+                      child: Container(
+                        color: theme.colorScheme.scrim.withValues(alpha: 0.26),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Positioned(
-                left: left,
-                top: showAbove
-                    ? null
-                    : triggerBottomRight.dy + widget.decoration.offset.dy,
-                bottom: showAbove
-                    ? screenSize.height -
-                          triggerTopLeft.dy +
-                          widget.decoration.offset.dy
-                    : null,
-                child: AnimatedOpacity(
-                  opacity: _opacity,
-                  // Entry: 200ms fade-in for a smooth appearance.
-                  // Exit: 80ms so the scrim disappears before onRemove fires.
-                  duration: Duration(milliseconds: _isDismissing ? 80 : 200),
-                  curve: Curves.easeOut,
-                  child: SingleMotionBuilder(
-                    motion: motion,
-                    value: _springTarget,
-                    builder: (context, t, _) {
-                      // t: 0→1 on enter, 1→0 on exit.
-                      // Spring t can overshoot above 1.0 — intentionally NOT
-                      // clamped so the overshoot translates to a visible scale
-                      // pop past 1.0. Range 0.72→1.0 gives enough travel that
-                      // a ~10% spring overshoot produces a clear bounce to ~1.03.
-                      final scale = 0.72 + (t * 0.28);
-                      return Transform.scale(
-                        scale: scale,
-                        alignment: scaleAlignment,
-                        child: SizedBox(
-                          width: menuWidth,
-                          child: Material(
-                            color:
-                                widget.decoration.backgroundColor ??
-                                cs.surfaceContainer,
-                            surfaceTintColor: Colors.transparent,
-                            elevation: widget.decoration.elevation ?? 3,
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  widget.decoration.borderRadius ??
-                                  BorderRadius.circular(18),
-                              side: BorderSide.none,
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: (showAbove ? spaceAbove : spaceBelow)
-                                    .clamp(0.0, widget.decoration.maxHeight),
+                  Positioned(
+                    left: left,
+                    top: showAbove
+                        ? null
+                        : triggerBottomRight.dy + widget.decoration.offset.dy,
+                    bottom: showAbove
+                        ? overlaySize.height -
+                              triggerTopLeft.dy +
+                              widget.decoration.offset.dy
+                        : null,
+                    child: AnimatedOpacity(
+                      opacity: _opacity,
+                      // Entry: 200ms fade-in for a smooth appearance.
+                      // Exit: 80ms so the scrim disappears before onRemove fires.
+                      duration: Duration(
+                        milliseconds: _isDismissing ? 80 : 200,
+                      ),
+                      curve: Curves.easeOut,
+                      child: SingleMotionBuilder(
+                        motion: motion,
+                        value: _springTarget,
+                        builder: (context, t, _) {
+                          // t: 0→1 on enter, 1→0 on exit.
+                          // Spring t can overshoot above 1.0 — intentionally NOT
+                          // clamped so the overshoot translates to a visible scale
+                          // pop past 1.0. Range 0.72→1.0 gives enough travel that
+                          // a ~10% spring overshoot produces a clear bounce to ~1.03.
+                          final scale = 0.72 + (t * 0.28);
+                          return Transform.scale(
+                            scale: scale,
+                            alignment: scaleAlignment,
+                            child: SizedBox(
+                              width: menuWidth,
+                              child: Material(
+                                color:
+                                    widget.decoration.backgroundColor ??
+                                    cs.surfaceContainer,
+                                surfaceTintColor: Colors.transparent,
+                                elevation: widget.decoration.elevation ?? 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      widget.decoration.borderRadius ??
+                                      BorderRadius.circular(18),
+                                  side: BorderSide.none,
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxHeight:
+                                        (showAbove ? spaceAbove : spaceBelow)
+                                            .clamp(
+                                              0.0,
+                                              widget.decoration.maxHeight,
+                                            ),
+                                  ),
+                                  child: ListView(
+                                    padding:
+                                        widget.decoration.padding ??
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    shrinkWrap: true,
+                                    children: [
+                                      for (
+                                        int i = 0;
+                                        i < widget.items.length;
+                                        i++
+                                      )
+                                        _buildPopupItem(widget.items[i], i),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              child: ListView(
-                                padding:
-                                    widget.decoration.padding ??
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                shrinkWrap: true,
-                                children: [
-                                  for (int i = 0; i < widget.items.length; i++)
-                                    _buildPopupItem(widget.items[i], i),
-                                ],
-                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
