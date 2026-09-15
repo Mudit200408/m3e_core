@@ -32,6 +32,12 @@ class M3ESwipeAction {
   /// fired when a full swipe exceeds the dismiss threshold.
   final bool isPrimary;
 
+  /// Whether tapping this action should trigger the full M3E dismiss animation
+  /// (card fly-out and gap collapse) before executing [onTap].
+  ///
+  /// Defaults to `false` (which smoothly springs the card back closed).
+  final bool dismissOnTap;
+
   /// Width of the vertical pill button. Defaults to `52.0`.
   final double width;
 
@@ -52,6 +58,7 @@ class M3ESwipeAction {
     this.foregroundColor,
     this.onTap,
     this.isPrimary = false,
+    this.dismissOnTap = false,
     this.width = 52.0,
     this.height,
     this.borderRadius,
@@ -62,6 +69,7 @@ class M3ESwipeAction {
   Widget buildButton(
     BuildContext context, {
     required VoidCallback? onTriggered,
+    VoidCallback? onDismissTriggered,
     FocusNode? focusNode,
     KeyEventResult Function(FocusNode node, KeyEvent event)? onKeyEvent,
   }) {
@@ -82,8 +90,13 @@ class M3ESwipeAction {
 
     void handlePress() {
       haptic.apply();
-      onTap?.call();
-      onTriggered?.call();
+      if (dismissOnTap && onDismissTriggered != null) {
+        onDismissTriggered();
+        onTap?.call();
+      } else {
+        onTap?.call();
+        onTriggered?.call();
+      }
     }
 
     Widget buttonContent = Container(

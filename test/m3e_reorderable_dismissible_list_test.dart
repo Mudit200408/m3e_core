@@ -347,5 +347,74 @@ void main() {
         expect(find.text('Wallet C'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'M3ESwipeAction with dismissOnTap: true animates dismissal and executes onTap',
+      (tester) async {
+        final items = ['Item 1', 'Item 2', 'Item 3'];
+        int actionItemIndex = 0;
+        bool tapped = false;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: StatefulBuilder(
+                builder: (context, setState) {
+                  return SizedBox(
+                    height: 500,
+                    child: M3EReorderableDismissibleList(
+                      itemCount: items.length,
+                      keyBuilder: (index) => ValueKey(items[index]),
+                      onReorder: (_, _) {},
+                      style: M3EDismissibleCardStyle(
+                        actionRevealTrigger: M3EActionRevealTrigger.tap,
+                        actions: [
+                          M3ESwipeAction(
+                            icon: const Icon(Icons.delete_outline),
+                            dismissOnTap: true,
+                            onTap: () {
+                              tapped = true;
+                              setState(() => items.removeAt(actionItemIndex));
+                            },
+                          ),
+                        ],
+                      ),
+                      itemBuilder: (context, index) {
+                        return Listener(
+                          onPointerDown: (_) => actionItemIndex = index,
+                          child: SizedBox(
+                            height: 60,
+                            child: Text(items[index]),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Tap first item to reveal action
+        await tester.tap(find.text('Item 1'));
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+
+        // Tap the dismissOnTap action
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pump();
+
+        expect(tapped, isTrue);
+
+        // Allow fly-out and collapse spring animation to complete
+        await tester.pumpAndSettle();
+
+        expect(find.text('Item 1'), findsNothing);
+        expect(find.text('Item 2'), findsOneWidget);
+        expect(find.text('Item 3'), findsOneWidget);
+      },
+    );
   });
 }
