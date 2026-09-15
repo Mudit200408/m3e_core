@@ -37,6 +37,8 @@ class DismissibleStyleControls extends StatelessWidget {
     required this.onUseCustomCardColorChanged,
     required this.customCardColor,
     required this.onCustomCardColorChanged,
+    required this.dismissOnTapPrimary,
+    required this.onDismissOnTapPrimaryChanged,
   });
 
   final DismissDirection direction;
@@ -66,6 +68,8 @@ class DismissibleStyleControls extends StatelessWidget {
   final ValueChanged<bool> onUseCustomCardColorChanged;
   final Color customCardColor;
   final ValueChanged<Color> onCustomCardColorChanged;
+  final bool dismissOnTapPrimary;
+  final ValueChanged<bool> onDismissOnTapPrimaryChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -223,6 +227,18 @@ class DismissibleStyleControls extends StatelessWidget {
                 divisions: 3,
                 format: (v) => v.toInt().toString(),
                 onChanged: (v) => onActionCountChanged(v.toInt()),
+              ),
+              const Divider(height: 16),
+              M3ESegmentedSwitchGroup(
+                items: [
+                  M3ESwitchItem(
+                    title: 'Dismiss On Tap',
+                    subtitle:
+                        'Primary action tap triggers the full dismiss fly-out',
+                    value: dismissOnTapPrimary,
+                    onChanged: onDismissOnTapPrimaryChanged,
+                  ),
+                ],
               ),
             ],
 

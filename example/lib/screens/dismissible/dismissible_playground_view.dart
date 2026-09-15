@@ -99,6 +99,7 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
   double _actionButtonHeight = 0.0;
   double _actionSpacing = 2.0;
   bool _gmailUI = false;
+  bool _dismissOnTapPrimary = false;
   double _backgroundRadius = 100.0;
   bool _useCustomCardColor = false;
   Color _customCardColor = Colors.teal.shade50;
@@ -265,6 +266,7 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
                 M3ESwipeAction(
                   icon: const Icon(Icons.archive_outlined),
                   isPrimary: true,
+                  dismissOnTap: _dismissOnTapPrimary,
                   width: _actionButtonWidth,
                   height: _actionButtonHeight > 0 ? _actionButtonHeight : null,
                   onTap: () => showSnack(context, 'Archived item'),
@@ -311,6 +313,7 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
               M3ESwipeAction(
                 icon: const Icon(Icons.edit_outlined),
                 isPrimary: true,
+                dismissOnTap: _dismissOnTapPrimary,
                 width: _actionButtonWidth,
                 height: _actionButtonHeight > 0 ? _actionButtonHeight : null,
                 onTap: () => showSnack(context, 'Edit item'),
@@ -474,6 +477,9 @@ class _DismissiblePlaygroundViewState extends State<DismissiblePlaygroundView> {
         customCardColor: _customCardColor,
         onCustomCardColorChanged: (color) =>
             setState(() => _customCardColor = color),
+        dismissOnTapPrimary: _dismissOnTapPrimary,
+        onDismissOnTapPrimaryChanged: (val) =>
+            setState(() => _dismissOnTapPrimary = val),
       ),
 
       DismissibleGeometryControls(
