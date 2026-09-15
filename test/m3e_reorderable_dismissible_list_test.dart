@@ -277,5 +277,75 @@ void main() {
       await gesture.up();
       await tester.pumpAndSettle();
     });
+
+    testWidgets(
+      'removing an item via swipe action does not throw inactive element error',
+      (tester) async {
+        final items = ['Wallet A', 'Wallet B', 'Wallet C'];
+        int actionItemIndex = 0;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: StatefulBuilder(
+                builder: (context, setState) {
+                  return SizedBox(
+                    height: 500,
+                    child: M3EReorderableDismissibleList(
+                      itemCount: items.length,
+                      keyBuilder: (index) => ValueKey(items[index]),
+                      onReorder: (oldIndex, newIndex) {
+                        setState(() {
+                          if (newIndex > oldIndex) newIndex--;
+                          items.insert(newIndex, items.removeAt(oldIndex));
+                        });
+                      },
+                      style: M3EDismissibleCardStyle(
+                        actionRevealTrigger: M3EActionRevealTrigger.tap,
+                        actions: [
+                          M3ESwipeAction(
+                            icon: const Icon(Icons.archive_outlined),
+                            onTap: () {
+                              setState(() => items.removeAt(actionItemIndex));
+                            },
+                          ),
+                        ],
+                      ),
+                      itemBuilder: (context, index) {
+                        return Listener(
+                          onPointerDown: (_) => actionItemIndex = index,
+                          child: SizedBox(
+                            height: 60,
+                            child: Text(items[index]),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Wallet A'), findsOneWidget);
+        expect(find.text('Wallet B'), findsOneWidget);
+        expect(find.text('Wallet C'), findsOneWidget);
+
+        // Tap first card to reveal the action
+        await tester.tap(find.text('Wallet A'));
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.archive_outlined), findsOneWidget);
+
+        // Tap the archive action to remove the first card
+        await tester.tap(find.byIcon(Icons.archive_outlined));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Wallet A'), findsNothing);
+        expect(find.text('Wallet B'), findsOneWidget);
+        expect(find.text('Wallet C'), findsOneWidget);
+      },
+    );
   });
 }

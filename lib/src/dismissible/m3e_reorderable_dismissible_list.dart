@@ -258,12 +258,17 @@ class _M3EReorderableDismissibleListState
     if (!_effectiveScrollController.position.hasContentDimensions) return;
     if (_effectiveScrollController.position.maxScrollExtent <= 0) return;
 
-    final itemBox =
-        _reorderItemKeys[index]?.currentContext?.findRenderObject()
-            as RenderBox?;
-    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final itemCtx = _reorderItemKeys[index]?.currentContext;
+    final itemBox = (itemCtx != null && itemCtx.mounted)
+        ? itemCtx.findRenderObject() as RenderBox?
+        : null;
+    final stackCtx = _stackKey.currentContext;
+    final stackBox = (stackCtx != null && stackCtx.mounted)
+        ? stackCtx.findRenderObject() as RenderBox?
+        : null;
     final listRenderBox =
-        (stackBox ?? context.findRenderObject()) as RenderBox?;
+        (stackBox ?? (context.mounted ? context.findRenderObject() : null))
+            as RenderBox?;
 
     if (itemBox == null || listRenderBox == null) return;
 
@@ -339,12 +344,20 @@ class _M3EReorderableDismissibleListState
         isInteractionLocked) {
       return null;
     }
-    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
-    final renderBox = (stackBox ?? context.findRenderObject()) as RenderBox?;
+    final stackCtx = _stackKey.currentContext;
+    final stackBox = (stackCtx != null && stackCtx.mounted)
+        ? stackCtx.findRenderObject() as RenderBox?
+        : null;
+    final renderBox =
+        (stackBox ?? (context.mounted ? context.findRenderObject() : null))
+            as RenderBox?;
     if (renderBox == null) return null;
 
     final itemKey = _reorderItemKeys[index];
-    final itemBox = itemKey?.currentContext?.findRenderObject() as RenderBox?;
+    final itemCtx = itemKey?.currentContext;
+    final itemBox = (itemCtx != null && itemCtx.mounted)
+        ? itemCtx.findRenderObject() as RenderBox?
+        : null;
     final itemLocalOrigin = itemBox != null
         ? renderBox.globalToLocal(itemBox.localToGlobal(Offset.zero))
         : Offset.zero;
@@ -441,7 +454,10 @@ class _M3EReorderableDismissibleListState
 
     for (int i = 0; i < widget.itemCount; i++) {
       final key = _reorderItemKeys[i];
-      final box = key?.currentContext?.findRenderObject() as RenderBox?;
+      final keyCtx = key?.currentContext;
+      final box = (keyCtx != null && keyCtx.mounted)
+          ? keyCtx.findRenderObject() as RenderBox?
+          : null;
       if (box != null && box.hasSize) {
         final origin = renderBox.globalToLocal(box.localToGlobal(Offset.zero));
         final centerY = origin.dy + (box.size.height / 2.0);

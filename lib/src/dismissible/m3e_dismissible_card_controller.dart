@@ -233,7 +233,12 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   void initSlots() => _syncSlots();
 
   void syncSlotsIfNeeded(int oldItemCount) {
-    if (swipeItemCount != oldItemCount) _syncSlots();
+    if (swipeItemCount != oldItemCount) {
+      if (_dragSlotRef != null) {
+        _cancelDragState(notify: false);
+      }
+      _syncSlots();
+    }
   }
 
   void disposeSlots() {
@@ -286,11 +291,10 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   void _reindexDragSlot() {
     if (_dragSlotRef != null) {
       _dragSlotIndex = _slots.indexOf(_dragSlotRef!);
-      if (_dragSlotIndex < 0) {
-        // Slot was removed — cancel drag silently.
-        _dragSlotRef = null;
-        _dragOffset = 0.0;
-        _detachPush = 0.0;
+      final context = _measureKeys[_dragSlotRef!]?.currentContext;
+      if (_dragSlotIndex < 0 || (context != null && !context.mounted)) {
+        // Slot was removed or deactivated — cancel drag silently.
+        _cancelDragState(notify: false);
       }
     } else {
       _dragSlotIndex = -1;
@@ -303,14 +307,17 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       _measureKeys.putIfAbsent(slot, () => GlobalKey());
 
   Size _cardSize(DismissibleSlot slot) {
-    final box =
-        _measureKeys[slot]?.currentContext?.findRenderObject() as RenderBox?;
+    final context = _measureKeys[slot]?.currentContext;
+    if (context == null || !context.mounted) return const Size(320, 52);
+    final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) return const Size(320, 52);
     return box.size;
   }
 
   double get _dragProgress {
     if (_dragSlotRef == null) return 0.0;
+    final context = _measureKeys[_dragSlotRef!]?.currentContext;
+    if (context != null && !context.mounted) return 0.0;
     final w = _cardSize(_dragSlotRef!).width;
     return (_dragOffset.abs() / (w * style.dismissThreshold)).clamp(0.0, 1.0);
   }
@@ -684,8 +691,21 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
     }
   }
 
-  void _resetDragState() {
-    setState(() {
+  void _cancelDragState({bool notify = true}) {
+    _springCtrl?.stop(canceled: true);
+    _springCtrl?.dispose();
+    _springCtrl = null;
+    _nbrCtrl?.stop(canceled: true);
+    _nbrCtrl?.dispose();
+    _nbrCtrl = null;
+    _roundnessCtrl?.stop(canceled: true);
+    _roundnessCtrl?.dispose();
+    _roundnessCtrl = null;
+    _pushCtrl?.stop(canceled: true);
+    _pushCtrl?.dispose();
+    _pushCtrl = null;
+
+    void updateFields() {
       _dragSlotRef = null;
       _dragSlotIndex = -1;
       _dragOffset = 0.0;
@@ -695,8 +715,16 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
       _pastActionThreshold = false;
       _reEngaging = false;
       _roundnessFraction = 0.0;
-    });
+    }
+
+    if (notify && mounted) {
+      setState(updateFields);
+    } else {
+      updateFields();
+    }
   }
+
+  void _resetDragState() => _cancelDragState(notify: true);
 
   void _playPullHaptics() {
     if (!style.enableFeedback) return;
@@ -1184,6 +1212,7 @@ mixin M3EDismissibleCardMixin<T extends StatefulWidget>
   // ── Spring-back (below threshold release) ──
 
   void _springBack(double speedMul) {
+    if (_dragSlotRef == null) return;
     _targetOffset = 0.0;
     _pushCtrl?.dispose();
     _pushCtrl = null;
