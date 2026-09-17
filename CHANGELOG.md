@@ -1,3 +1,11 @@
+# 1.1.4
+- segmented-list: let M3ESegmentedItem own isVisible so hidden items keep their surface
+- segmented-list: add isVisible to exclude hidden children from gap and radius math
+dismissible: guard inactive element measurement and reset drag on item removal
+- buttons: dismiss split button popup on layout and metric changes
+- button: use Material 3's 20dp for sm split button leading icon
+- dismissible: support dismissOnTap on swipe actions and programmatic dismiss
+
 # 1.1.3
 - dropdown: add keyboard navigation and focus ring support
 - segmented-list: add keyboard navigation and focus ring support
