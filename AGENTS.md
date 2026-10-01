@@ -12,7 +12,7 @@
 - **Project structure**: `lib/src/` — components are organized by feature (`buttons/`, `card/`, `dismissible/`, `dropdown/`, `expandable/`, `floating_toolbar/`, `shapes/`, `slider/`, `progress_indicator/`, `loading-indicator/`, `haptics/`, `common/`)
 - **Public API surface**: `lib/m3e_core.dart` is the single export barrel — understand what is and isn't exported
 - **Architecture patterns**: Each component follows the pattern below — understand it before adding to it
-- **Example app**: `example/lib/` — run it and trace your component's demo screen before making changes
+- **Example app**: `example/lib/` — run it and trace your component's demo screen before making changes. When creating or modifying screens in the example app, you MUST read and follow [`example/AGENTS.md`](file:///Users/muditpurohit/Projects/Flutter/core/m3e_core/example/AGENTS.md).
 - **Changelog**: `CHANGELOG.md` — understand what has recently changed and why
 - **README**: `README.md` — understand the user-facing surface and links to individual package docs
 
@@ -58,6 +58,20 @@ lib/src/buttons/
 - **Barrel exports**: Each component exposes a single `<component>.dart` barrel. Do not reach into internals from outside the component.
 - **No cross-component coupling**: Components must not import from each other's internals.
 - **Style via data classes**: Customization is exposed via dedicated style/theme data classes (e.g., `M3EDismissibleCardStyle`), not raw widget parameters.
+
+### Mandatory Example Playgrounds for New Features
+
+Whenever implementing a new component or extending the public API in `m3e_core`:
+
+- **Creating an interactive playground in `example/` is mandatory**: Every new feature or component must have a corresponding interactive playground screen under `example/lib/screens/<feature>/`.
+- **Agents MUST consult and adhere to [`example/AGENTS.md`](file:///Users/muditpurohit/Projects/Flutter/core/m3e_core/example/AGENTS.md)**: Follow the mandatory 6-part modular screen pattern (`m3e_<feature>_screen.dart`, `<feature>_playground_view.dart`, `models/`, `controls/`, `preview/`, `snippets/`).
+- **Core Requirements**:
+  - Expose **100% of the public API** via interactive knobs in `controls/`.
+  - Provide a **real-time visual preview** in `preview/`.
+  - Provide a **live synchronized, copy-paste ready Dart code generator** via `snippets/` and `CodeSnippetCard`.
+  - Follow Material 3 Expressive standards (`motor` spring physics, M3 container tokens, `PlaygroundSplitLayout`).
+  - Register the new screen in `_destinations` in `example/lib/main.dart`.
+- **Active Collaboration Exception**: **Do NOT touch `example/lib/screens/menu/`** (actively maintained by another agent).
 
 ---
 
@@ -168,7 +182,7 @@ Before adding anything new, search for how similar things are already done in th
 |---|---|
 | Add a new animation | `lib/src/buttons/core/` or `lib/src/dismissible/m3e_dismissible_card_controller.dart` |
 | Add a new style parameter | Existing `*_style.dart` files (e.g., `m3e_dismissible_card_style.dart`) |
-| Add a new example screen | `example/lib/screens/` — follow existing screen structure |
+| Add a new example screen | [`example/AGENTS.md`](file:///Users/muditpurohit/Projects/Flutter/core/m3e_core/example/AGENTS.md) & `example/lib/screens/` — mandatory 6-part architecture |
 | Export a new symbol | Add to the component's barrel `.dart`, then to `lib/m3e_core.dart` |
 | Add haptics | `lib/src/haptics/` |
 | Add a shape | `lib/src/shapes/` |
@@ -213,6 +227,7 @@ Before opening a PR or declaring a task done, verify:
 - [ ] My commit message follows `<scope>: <message>` format
 - [ ] I did NOT make breaking API changes (or got explicit approval if I did)
 - [ ] I reported what changed, why, and how to test it to the user
+- [ ] For new features/components: I created/updated the mandatory example playground per [`example/AGENTS.md`](file:///Users/muditpurohit/Projects/Flutter/core/m3e_core/example/AGENTS.md)
 - [ ] I did NOT push to GitHub without user confirmation
 - [ ] I did NOT add or remove dependencies without approval
 - [ ] My new code matches existing naming, file layout, and style conventions
