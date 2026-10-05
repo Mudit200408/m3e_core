@@ -19,14 +19,11 @@ typedef OverflowMenuItemBuilder =
 
 List<Widget> _buildVisibleButtons({
   required int count,
-  required bool isRtl,
   required Widget Function(int index, bool isFirst, bool isLast) buildButton,
 }) {
   final children = <Widget>[];
   for (int i = 0; i < count; i++) {
-    final isFirst = isRtl ? (i == count - 1) : (i == 0);
-    final isLast = isRtl ? (i == 0) : (i == count - 1);
-    children.add(buildButton(i, isFirst, isLast));
+    children.add(buildButton(i, i == 0, i == count - 1));
   }
   return children;
 }
@@ -205,7 +202,6 @@ class NoOverflowStrategy extends OverflowStrategy {
   }) {
     final children = _buildVisibleButtons(
       count: actions.length,
-      isRtl: isRtl,
       buildButton: buildButton,
     );
     return _axisFlex(children, direction);
@@ -257,7 +253,6 @@ class ScrollOverflowStrategy extends OverflowStrategy {
   }) {
     final children = _buildVisibleButtons(
       count: actions.length,
-      isRtl: isRtl,
       buildButton: buildButton,
     );
 

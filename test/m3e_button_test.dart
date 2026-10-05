@@ -64,6 +64,66 @@ void main() {
     );
   });
 
+  group('M3EToggleButtonGroup connected corners', () {
+    String outerSide(WidgetTester tester, Finder button) {
+      final material = tester.widget<Material>(
+        find.descendant(of: button, matching: find.byType(Material)).first,
+      );
+      final radius = (material.shape! as RoundedRectangleBorder).borderRadius
+          .resolve(Directionality.of(tester.element(button)));
+      return radius.topLeft.x > radius.topRight.x ? 'left' : 'right';
+    }
+
+    for (final direction in TextDirection.values) {
+      testWidgets('end buttons round their outer edge in ${direction.name}', (
+        WidgetTester tester,
+      ) async {
+        // Arrange
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Directionality(
+              textDirection: direction,
+              child: Scaffold(
+                body: Center(
+                  child: M3EToggleButtonGroup(
+                    type: M3EButtonGroupType.connected,
+                    selectedIndex: 1,
+                    onSelectedIndexChanged: (_) {},
+                    actions: const [
+                      M3EToggleButtonGroupAction(label: Text('A')),
+                      M3EToggleButtonGroupAction(label: Text('B')),
+                      M3EToggleButtonGroupAction(label: Text('C')),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Act
+        // The group also builds hidden, unconnected buttons to measure them.
+        final buttons = find.byWidgetPredicate(
+          (widget) => widget is M3EToggleButton && widget.isGroupConnected,
+        );
+        final byLeftEdge =
+            [for (var i = 0; i < buttons.evaluate().length; i++) buttons.at(i)]
+              ..sort(
+                (a, b) =>
+                    tester.getRect(a).left.compareTo(tester.getRect(b).left),
+              );
+        final sides = [
+          outerSide(tester, byLeftEdge.first),
+          outerSide(tester, byLeftEdge.last),
+        ];
+
+        // Assert
+        expect(sides, ['left', 'right']);
+      });
+    }
+  });
+
   group('M3ESplitButtonDecoration', () {
     test('styleFrom preserves borderRadius', () {
       final dec = M3ESplitButtonDecoration.styleFrom(
