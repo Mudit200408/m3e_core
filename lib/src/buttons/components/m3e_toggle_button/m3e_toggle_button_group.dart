@@ -392,8 +392,8 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
 
   final ValueNotifier<int?> _focusedIndexNotifier = ValueNotifier<int?>(null);
 
-  // P0-8: Directionality read once per build and reused by every
-  // _buildButton call — avoids N InheritedWidget lookups per frame.
+  // P0-8: Directionality read once per build and reused by the keyboard
+  // shortcuts and the overflow strategy.
   bool _isRtl = false;
 
   // Generation counter to ensure asynchronous remeasure callbacks do not
@@ -1015,7 +1015,7 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
     );
     final spacing =
         widget.spacing ?? (widget._connected ? 0.0 : metrics.spacing);
-    // Read directionality once — shared by all _buildButton calls.
+    // Read directionality once per build.
     _isRtl = Directionality.of(context) == TextDirection.rtl;
 
     Widget group = M3EButtonGroupProvider(
@@ -1739,10 +1739,6 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
 
     final bool checked = _isToggleActionSelected(index);
 
-    // Use _isRtl cached once per build() — avoids N Directionality.of() calls.
-    final isVisualFirst = _isRtl ? isLast : isFirst;
-    final isVisualLast = _isRtl ? isFirst : isLast;
-
     Widget button = M3EToggleButton(
       icon: action.icon,
       checkedIcon: action.checkedIcon,
@@ -1753,8 +1749,8 @@ class _M3EToggleButtonGroupState extends State<M3EToggleButtonGroup>
       style: widget.style,
       size: _mapSize(widget.size, actionWidth: action.width),
       isGroupConnected: widget._connected,
-      isFirstInGroup: isVisualFirst,
-      isLastInGroup: isVisualLast,
+      isFirstInGroup: isFirst,
+      isLastInGroup: isLast,
       decoration: _cachedDecorations[index],
       statesController: _controllers[index],
       focusNode: action.focusNode ?? _focusNodes[index],
