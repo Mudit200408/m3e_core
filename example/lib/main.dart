@@ -11,6 +11,7 @@ import 'screens/m3e_bottom_sheet_screen.dart';
 import 'screens/m3e_button_screen.dart';
 import 'screens/m3e_dismissible_screen.dart';
 import 'screens/m3e_dropdown_screen.dart';
+import 'screens/m3e_menu_screen.dart';
 import 'screens/m3e_expandable_screen.dart';
 import 'screens/m3e_floating_toolbar_screen.dart';
 import 'screens/m3e_loading_indicator_screen.dart';
@@ -166,6 +167,13 @@ class ExampleHomePage extends StatelessWidget {
           'Smooth OverlayPortal powered dropdowns with fluid chip morphing',
       icon: Icons.arrow_drop_down_circle_rounded,
       screen: DropdownM3EScreen(),
+    ),
+    _HomeDestination(
+      title: 'M3E Menus',
+      subtitle:
+          'Expressive popup menus, segmented groups, spring animations, and cascading submenus',
+      icon: Icons.menu_open_rounded,
+      screen: MenuM3EScreen(),
     ),
     _HomeDestination(
       title: 'M3E Buttons',
