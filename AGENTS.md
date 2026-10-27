@@ -71,7 +71,6 @@ Whenever implementing a new component or extending the public API in `m3e_core`:
   - Provide a **live synchronized, copy-paste ready Dart code generator** via `snippets/` and `CodeSnippetCard`.
   - Follow Material 3 Expressive standards (`motor` spring physics, M3 container tokens, `PlaygroundSplitLayout`).
   - Register the new screen in `_destinations` in `example/lib/main.dart`.
-- **Active Collaboration Exception**: **Do NOT touch `example/lib/screens/menu/`** (actively maintained by another agent).
 
 ---
 

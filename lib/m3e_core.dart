@@ -51,3 +51,6 @@ export 'src/typography/typography.dart';
 
 // M3E Bottom Sheet
 export 'src/bottom_sheet/bottom_sheet.dart';
+
+// M3E Menus
+export 'src/menu/menu.dart';
