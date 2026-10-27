@@ -148,6 +148,7 @@ class _ButtonPlaygroundViewState extends State<ButtonPlaygroundView> {
   Set<int> _multiSelectedIndices = {0, 2};
   bool _neighborSquish = true;
   double _expandedRatio = 0.15;
+  double _minSquishPadding = 4.0;
   double _spacing = 6.0;
   bool _useCustomHeight = false;
   double _customHeight = 80.0;
@@ -176,6 +177,7 @@ class _ButtonPlaygroundViewState extends State<ButtonPlaygroundView> {
     setState(() {
       _groupPreset = preset;
       _isCustomSize = false;
+      _minSquishPadding = 4.0;
       switch (preset) {
         case GroupPreset.formatting:
           _groupType = M3EButtonGroupType.connected;
@@ -332,6 +334,7 @@ class _ButtonPlaygroundViewState extends State<ButtonPlaygroundView> {
       groupMultiSelect: _groupMultiSelect,
       neighborSquish: _neighborSquish,
       expandedRatio: _expandedRatio,
+      minSquishPadding: _minSquishPadding,
       spacing: _spacing,
       useCustomHeight: _useCustomHeight,
       customHeight: _customHeight,
@@ -625,6 +628,9 @@ class _ButtonPlaygroundViewState extends State<ButtonPlaygroundView> {
               setState(() => _neighborSquish = val),
           expandedRatio: _expandedRatio,
           onExpandedRatioChanged: (val) => setState(() => _expandedRatio = val),
+          minSquishPadding: _minSquishPadding,
+          onMinSquishPaddingChanged: (val) =>
+              setState(() => _minSquishPadding = val),
           density: _density,
           onDensityChanged: (val) => setState(() => _density = val),
           direction: _direction,
@@ -792,6 +798,7 @@ class _ButtonPlaygroundViewState extends State<ButtonPlaygroundView> {
             setState(() => _multiSelectedIndices = set),
         neighborSquish: _neighborSquish,
         expandedRatio: _expandedRatio,
+        minSquishPadding: _minSquishPadding,
         spacing: _spacing,
         useCustomHeight: _useCustomHeight,
         customHeight: _customHeight,

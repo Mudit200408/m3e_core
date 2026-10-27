@@ -43,6 +43,8 @@ class ButtonGroupControls extends StatelessWidget {
     required this.onNeighborSquishChanged,
     required this.expandedRatio,
     required this.onExpandedRatioChanged,
+    required this.minSquishPadding,
+    required this.onMinSquishPaddingChanged,
     required this.density,
     required this.onDensityChanged,
     required this.direction,
@@ -91,6 +93,8 @@ class ButtonGroupControls extends StatelessWidget {
   final ValueChanged<bool> onNeighborSquishChanged;
   final double expandedRatio;
   final ValueChanged<double> onExpandedRatioChanged;
+  final double minSquishPadding;
+  final ValueChanged<double> onMinSquishPaddingChanged;
   final M3EButtonGroupDensity density;
   final ValueChanged<M3EButtonGroupDensity> onDensityChanged;
   final Axis direction;
@@ -345,6 +349,16 @@ class ButtonGroupControls extends StatelessWidget {
                 divisions: 31,
                 format: (v) => '${(v * 100).toInt()}% width',
                 onChanged: onExpandedRatioChanged,
+              ),
+              const SizedBox(height: 6),
+              M3ESliderRow(
+                label: 'Min Squish Padding',
+                value: minSquishPadding,
+                min: 0.0,
+                max: 16.0,
+                divisions: 16,
+                format: (v) => '${v.toInt()} dp',
+                onChanged: onMinSquishPaddingChanged,
               ),
             ],
             const Divider(height: 16),

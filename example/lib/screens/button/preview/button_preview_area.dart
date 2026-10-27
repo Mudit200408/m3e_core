@@ -76,6 +76,7 @@ class ButtonPreviewArea extends StatelessWidget {
     required this.onMultiSelectedIndicesChanged,
     required this.neighborSquish,
     required this.expandedRatio,
+    required this.minSquishPadding,
     required this.spacing,
     required this.useCustomHeight,
     required this.customHeight,
@@ -179,6 +180,7 @@ class ButtonPreviewArea extends StatelessWidget {
   final ValueChanged<Set<int>> onMultiSelectedIndicesChanged;
   final bool neighborSquish;
   final double expandedRatio;
+  final double minSquishPadding;
   final double spacing;
   final bool useCustomHeight;
   final double customHeight;
@@ -599,6 +601,7 @@ class ButtonPreviewArea extends StatelessWidget {
                       groupType == M3EButtonGroupType.standard &&
                       neighborSquish,
                   expandedRatio: expandedRatio,
+                  minSquishPadding: minSquishPadding,
                   overflow: overflow,
                   overflowIcon: Icon(overflowIcon),
                   overflowMenuStyle: overflowMenuStyle,

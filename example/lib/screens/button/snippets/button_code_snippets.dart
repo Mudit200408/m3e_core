@@ -118,6 +118,7 @@ class ButtonCodeSnippets {
     required bool groupMultiSelect,
     required bool neighborSquish,
     required double expandedRatio,
+    required double minSquishPadding,
     required double spacing,
     required bool useCustomHeight,
     required double customHeight,
@@ -617,6 +618,9 @@ class ButtonCodeSnippets {
         buf.writeln("  neighborSquish: $neighborSquish,");
         if (neighborSquish && expandedRatio != 0.15) {
           buf.writeln("  expandedRatio: ${expandedRatio.toStringAsFixed(2)},");
+        }
+        if (neighborSquish && minSquishPadding != 4.0) {
+          buf.writeln("  minSquishPadding: ${minSquishPadding.toStringAsFixed(1)},");
         }
       }
       buf.writeln("  overflow: M3EButtonGroupOverflow.${overflow.name},");
