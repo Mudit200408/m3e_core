@@ -3,6 +3,8 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 
+import 'dart:math' as math;
+import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:motor/motor.dart';
 
@@ -64,6 +66,7 @@ class M3EToggleButton extends StatefulWidget {
     this.enableFeedback = _kDefaultEnableFeedback,
     this.splashFactory,
     this.allowMultilineLabel = false,
+    this.minSquishPadding = ButtonConstants.kDefaultMinSquishPadding,
   });
 
   /// Icon displayed in the unchecked state.
@@ -118,6 +121,11 @@ class M3EToggleButton extends StatefulWidget {
   /// Optional mouse cursor to show when hovering over the button.
   final MouseCursor? mouseCursor;
 
+  /// The minimum horizontal padding retained per side when compressed by neighbor squish.
+  ///
+  /// Defaults to `ButtonConstants.kDefaultMinSquishPadding` (4.0).
+  final double minSquishPadding;
+
   // ── Decoration property helpers ───────────────────────────────────────────
 
   WidgetStateProperty<Color?>? get decorationBackgroundColor =>
@@ -139,6 +147,7 @@ class M3EToggleButton extends StatefulWidget {
       decoration?.overlayColor;
   WidgetStateProperty<Color?>? get decorationSurfaceTintColor =>
       decoration?.surfaceTintColor;
+  double? get decorationMinSquishPadding => decoration?.minSquishPadding;
   AlignmentGeometry? get decorationAlignment => decoration?.alignment;
 
   /// Optional controller for managing widget states externally.
@@ -445,16 +454,30 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
   ) {
     final checked = _isChecked;
 
+    final double minSquish =
+        widget.decorationMinSquishPadding ?? widget.minSquishPadding;
+    final double effectiveMinSquish = math.min(minSquish, internalPadding.left);
+
     final buttonShape = WidgetStateProperty.all<OutlinedBorder>(
       RoundedRectangleBorder(borderRadius: animatedRadius),
     );
     final padding = WidgetStateProperty.all<EdgeInsetsGeometry>(
-      internalPadding,
+      EdgeInsets.only(
+        left: effectiveMinSquish,
+        right: effectiveMinSquish,
+        top: internalPadding.top,
+        bottom: internalPadding.bottom,
+      ),
     );
 
     final style = _buildButtonStyle(checked, buttonShape, padding);
 
-    final Widget content = _buildContent(m, checked);
+    final Widget content = _buildContent(
+      m,
+      checked,
+      targetHorizontalPadding: internalPadding.left,
+      minHorizontalPadding: effectiveMinSquish,
+    );
 
     final VoidCallback? onPressed = widget.enabled ? _handleTap : null;
 
@@ -679,7 +702,12 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
   /// so Flutter measures it at natural width first, then clips it to the
   /// squeezed width without overflow assertions. The same path is used by the
   /// offstage measurer so measured widths match visible output.
-  Widget _buildContent(M3EButtonMeasurements m, bool checked) {
+  Widget _buildContent(
+    M3EButtonMeasurements m,
+    bool checked, {
+    required double targetHorizontalPadding,
+    required double minHorizontalPadding,
+  }) {
     final Widget? effectiveIcon = _effectiveIcon;
     final Widget? uncheckedLabel = widget.label;
     final Widget? checkedLabel = widget.checkedLabel ?? widget.label;
@@ -767,21 +795,13 @@ class _M3EToggleButtonState extends State<M3EToggleButton>
           )
         : buildRow(checked ? 1.0 : 0.0);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (!constraints.hasBoundedWidth || widget.allowMultilineLabel) {
-          return naturalRow;
-        }
-        return SizedBox(
-          height: m.height,
-          child: FittedBox(
-            fit: BoxFit.none,
-            alignment: widget.decorationAlignment ?? _kAlignmentCenter,
-            clipBehavior: Clip.hardEdge,
-            child: naturalRow,
-          ),
-        );
-      },
+    return _M3ESquishContent(
+      height: m.height,
+      targetPadding: targetHorizontalPadding,
+      minPadding: minHorizontalPadding,
+      alignment: widget.decorationAlignment ?? _kAlignmentCenter,
+      allowMultiline: widget.allowMultilineLabel,
+      child: naturalRow,
     );
   }
 
@@ -1067,3 +1087,230 @@ class M3ETextToggleButton extends M3EToggleButton {
          isLastInGroup: true,
        );
 }
+
+// ---------------------------------------------------------------------------
+// Squish padding & content layout
+// ---------------------------------------------------------------------------
+
+class _M3ESquishContent extends SingleChildRenderObjectWidget {
+  const _M3ESquishContent({
+    required this.height,
+    required this.targetPadding,
+    required this.minPadding,
+    required this.alignment,
+    required this.allowMultiline,
+    required super.child,
+  });
+
+  final double height;
+  final double targetPadding;
+  final double minPadding;
+  final AlignmentGeometry alignment;
+  final bool allowMultiline;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return _RenderM3ESquishContent(
+      height: height,
+      targetPadding: targetPadding,
+      minPadding: minPadding,
+      alignment: alignment.resolve(Directionality.of(context)),
+      allowMultiline: allowMultiline,
+    );
+  }
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderM3ESquishContent renderObject,
+  ) {
+    renderObject
+      ..height = height
+      ..targetPadding = targetPadding
+      ..minPadding = minPadding
+      ..alignment = alignment.resolve(Directionality.of(context))
+      ..allowMultiline = allowMultiline;
+  }
+}
+
+class _RenderM3ESquishContent extends RenderShiftedBox {
+  _RenderM3ESquishContent({
+    required double height,
+    required double targetPadding,
+    required double minPadding,
+    required Alignment alignment,
+    required bool allowMultiline,
+    RenderBox? child,
+  })  : _height = height,
+        _targetPadding = targetPadding,
+        _minPadding = minPadding,
+        _alignment = alignment,
+        _allowMultiline = allowMultiline,
+        super(child);
+
+  double _height;
+  double get height => _height;
+  set height(double value) {
+    if (_height == value) return;
+    _height = value;
+    markNeedsLayout();
+  }
+
+  double _targetPadding;
+  double get targetPadding => _targetPadding;
+  set targetPadding(double value) {
+    if (_targetPadding == value) return;
+    _targetPadding = value;
+    markNeedsLayout();
+  }
+
+  double _minPadding;
+  double get minPadding => _minPadding;
+  set minPadding(double value) {
+    if (_minPadding == value) return;
+    _minPadding = value;
+    markNeedsLayout();
+  }
+
+  Alignment _alignment;
+  Alignment get alignment => _alignment;
+  set alignment(Alignment value) {
+    if (_alignment == value) return;
+    _alignment = value;
+    markNeedsLayout();
+  }
+
+  bool _allowMultiline;
+  bool get allowMultiline => _allowMultiline;
+  set allowMultiline(bool value) {
+    if (_allowMultiline == value) return;
+    _allowMultiline = value;
+    markNeedsLayout();
+  }
+
+  double get _extraPaddingPerSide =>
+      math.max(0.0, _targetPadding - _minPadding);
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    final double childWidth = child?.getMinIntrinsicWidth(height) ?? 0.0;
+    return childWidth + 2 * _extraPaddingPerSide;
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    final double childWidth = child?.getMaxIntrinsicWidth(height) ?? 0.0;
+    return childWidth + 2 * _extraPaddingPerSide;
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _height;
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => _height;
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    if (child == null) {
+      return constraints.constrain(Size(2 * _extraPaddingPerSide, _height));
+    }
+    final double childWidth = child!.getMaxIntrinsicWidth(_height);
+    if (!constraints.hasBoundedWidth) {
+      return constraints.constrain(
+        Size(childWidth + 2 * _extraPaddingPerSide, _height),
+      );
+    }
+    return constraints.constrain(Size(constraints.maxWidth, _height));
+  }
+
+  @override
+  void performLayout() {
+    if (child == null) {
+      size = constraints.constrain(Size(2 * _extraPaddingPerSide, _height));
+      return;
+    }
+
+    final double extraPadNeeded = 2 * _extraPaddingPerSide;
+    final double childNaturalWidth = child!.getMaxIntrinsicWidth(_height);
+
+    if (!constraints.hasBoundedWidth) {
+      child!.layout(
+        BoxConstraints(
+          minWidth: 0.0,
+          maxWidth: double.infinity,
+          minHeight: 0.0,
+          maxHeight: _height,
+        ),
+        parentUsesSize: true,
+      );
+      final double width = child!.size.width + extraPadNeeded;
+      size = constraints.constrain(Size(width, _height));
+      final BoxParentData childParentData = child!.parentData! as BoxParentData;
+      final double childX = _extraPaddingPerSide;
+      final double childY = (_height - child!.size.height) / 2.0;
+      childParentData.offset = Offset(childX, childY);
+      return;
+    }
+
+    final double availableWidth = constraints.maxWidth;
+    size = constraints.constrain(Size(availableWidth, _height));
+
+    final double freeSpace = availableWidth - childNaturalWidth;
+    final double padToAdd;
+    if (freeSpace >= extraPadNeeded) {
+      padToAdd = _extraPaddingPerSide;
+    } else if (freeSpace > 0) {
+      padToAdd = freeSpace / 2.0;
+    } else {
+      padToAdd = 0.0;
+    }
+
+    final double maxChildWidth = _allowMultiline
+        ? math.max(0.0, availableWidth - 2 * padToAdd)
+        : double.infinity;
+
+    child!.layout(
+      BoxConstraints(
+        minWidth: 0.0,
+        maxWidth: maxChildWidth,
+        minHeight: 0.0,
+        maxHeight: _height,
+      ),
+      parentUsesSize: true,
+    );
+
+    final BoxParentData childParentData = child!.parentData! as BoxParentData;
+    final double alignX = (_alignment.x + 1.0) / 2.0;
+    final double availForChild = math.max(0.0, availableWidth - 2 * padToAdd);
+    final double leftover = availForChild - child!.size.width;
+    final double childX = padToAdd + (leftover * alignX);
+    final double childY = (_height - child!.size.height) / 2.0;
+    childParentData.offset = Offset(childX, childY);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child == null) return;
+    final BoxParentData childParentData = child!.parentData! as BoxParentData;
+    final Rect bounds = offset & size;
+    final Rect childBounds = (childParentData.offset + offset) & child!.size;
+
+    if (childBounds.left < bounds.left ||
+        childBounds.right > bounds.right ||
+        childBounds.top < bounds.top ||
+        childBounds.bottom > bounds.bottom) {
+      context.pushClipRect(
+        needsCompositing,
+        offset,
+        Offset.zero & size,
+        (context, offset) {
+          context.paintChild(child!, childParentData.offset + offset);
+        },
+        clipBehavior: Clip.hardEdge,
+      );
+    } else {
+      context.paintChild(child!, childParentData.offset + offset);
+    }
+  }
+}
+

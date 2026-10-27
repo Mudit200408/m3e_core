@@ -24,6 +24,9 @@ abstract final class ButtonConstants {
   /// neighbor-squish is considered done.
   static const double kPressReleaseThreshold = 0.75;
 
+  /// Default minimum horizontal padding retained per side when a button is compressed by neighbor squish.
+  static const double kDefaultMinSquishPadding = 4.0;
+
   /// How long to wait for a press-release threshold before forcing a reset.
   static const Duration kReleaseTimeout = Duration(seconds: 1);
 

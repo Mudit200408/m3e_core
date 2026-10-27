@@ -226,5 +226,111 @@ void main() {
       );
       expect(fromStyle.splashFactory, InkRipple.splashFactory);
     });
+
+    test('M3EToggleButtonDecoration supports minSquishPadding', () {
+      const dec = M3EToggleButtonDecoration(
+        minSquishPadding: 6.0,
+      );
+      expect(dec.minSquishPadding, 6.0);
+
+      final copy = dec.copyWith(minSquishPadding: 2.0);
+      expect(copy.minSquishPadding, 2.0);
+
+      final fromStyle = M3EToggleButtonDecoration.styleFrom(
+        minSquishPadding: 8.0,
+      );
+      expect(fromStyle.minSquishPadding, 8.0);
+    });
+  });
+
+  group('M3EToggleButtonGroup MinSquishPadding', () {
+    testWidgets(
+      'group propagates minSquishPadding and allows action override',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: M3EToggleButtonGroup(
+                  minSquishPadding: 2.0,
+                  selectedIndex: 0,
+                  onSelectedIndexChanged: (_) {},
+                  actions: const [
+                    M3EToggleButtonGroupAction(
+                      icon: Icon(Icons.format_bold),
+                      label: Text('Bold'),
+                    ),
+                    M3EToggleButtonGroupAction(
+                      icon: Icon(Icons.format_italic),
+                      label: Text('Italic'),
+                      minSquishPadding: 6.0,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final buttons = tester.widgetList<M3EToggleButton>(
+          find.byType(M3EToggleButton),
+        );
+        expect(buttons.length, 2);
+
+        expect(buttons.elementAt(0).minSquishPadding, 2.0);
+        expect(buttons.elementAt(1).minSquishPadding, 6.0);
+      },
+    );
+
+    testWidgets(
+      'labels remain rendered and visible during neighbor squishing',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: SizedBox(
+                  width: 260,
+                  child: M3EToggleButtonGroup(
+                    neighborSquish: true,
+                    expandedRatio: 0.25,
+                    minSquishPadding: 2.0,
+                    selectedIndex: 0,
+                    onSelectedIndexChanged: (_) {},
+                    actions: const [
+                      M3EToggleButtonGroupAction(
+                        icon: Icon(Icons.format_bold),
+                        label: Text('Bold'),
+                      ),
+                      M3EToggleButtonGroupAction(
+                        icon: Icon(Icons.format_italic),
+                        label: Text('Italic'),
+                      ),
+                      M3EToggleButtonGroupAction(
+                        icon: Icon(Icons.format_underlined),
+                        label: Text('Underline'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Tap the third action to squish neighbors
+        await tester.tap(find.text('Underline'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Verify all labels are still found in tree
+        expect(find.text('Bold'), findsOneWidget);
+        expect(find.text('Italic'), findsOneWidget);
+        expect(find.text('Underline'), findsOneWidget);
+      },
+    );
   });
 }
+
