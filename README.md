@@ -7,7 +7,7 @@
 
 ![M3E Intro](https://raw.githubusercontent.com/Mudit200408/m3e_core/main/doc/intro.png)
 
-A comprehensive Flutter package providing **Expressive Material 3** components: Segmented Lists, Dismissible Cards, Expandable Cards, Bottom Sheets, Dropdown Menus, Buttons, Floating Toolbars, Extended M3 Shapes, Seekbars, Progress & Loading Indicators, and Emphasized Typography.
+A comprehensive Flutter package providing **Expressive Material 3** components: Segmented Lists, Dismissible Cards, Expandable Cards, Bottom Sheets, Menus, Dropdown Menus, Buttons, Floating Toolbars, Extended M3 Shapes, Seekbars, Progress & Loading Indicators, and Emphasized Typography.
 
 ---
 
@@ -41,6 +41,7 @@ This package (`m3e_core`) bundles multiple M3E components. For detailed document
 - [m3e_loading_indicator](https://pub.dev/packages/m3e_loading_indicator) - Expressive loading indicator with shape morphing animations.
 - [m3e_seekbar](https://pub.dev/packages/m3e_seekbar) - Material 3 Expressive Seekbar with standard and wavy variants.
 - [m3e_typography](https://pub.dev/packages/m3e_typography) - Material 3 Expressive Emphasized Typography scale and variable font extensions.
+- [m3e_menu](https://pub.dev/packages/m3e_menu) - Material 3 Expressive spring menus with cascading submenus, segmented groups, shape morphing, and popups.
 
 
 ---
@@ -64,7 +65,7 @@ Add `m3e_core` and `material_ui` to your `pubspec.yaml`:
 ```yaml
 dependencies:
   material_ui: ^1.3.0
-  m3e_core: ^1.1.4
+  m3e_core: ^1.1.5
 ```
 
 ```dart
@@ -152,6 +153,10 @@ Material 3 Expressive Emphasized Typography scale elevating font weights, optica
 ### 15. M3E Bottom Sheet
 Material 3 Expressive standard and modal bottom sheets (`M3EBottomSheet`, `showM3EModalBottomSheet`) with spring dismiss animations, drag handle support, and full theme customization.
 [Detailed Documentation →](https://pub.dev/packages/m3e_bottom_sheet)
+
+### 16. M3E Menu
+Material 3 Expressive menu system featuring `M3EMenuAnchor`, `M3ESubmenuButton`, `M3EMenuItemButton`, `M3ECheckboxMenuButton`, `M3ERadioMenuButton`, and `M3EPopupMenuButton`. Includes cascading submenus with safe triangular hit-testing (Magic Triangle), segmented grouping with dynamic corner morphing, vibrant/standard color variants, and motor spring-driven entrance animations.
+[Detailed Documentation →](https://pub.dev/packages/m3e_menu)
 
 
 ---

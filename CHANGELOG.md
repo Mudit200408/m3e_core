@@ -1,3 +1,13 @@
+# 1.1.5
+- menu: introduce `M3EMenuAnchor`, `M3ESubmenuButton`, `M3EMenuItemButton`, `M3ECheckboxMenuButton`, `M3ERadioMenuButton`, and `M3EPopupMenuButton`
+- menu: support spring-driven entrance and reveal animations (`popup` and `dropdown`)
+- menu: support cascading submenus with cursor safety zones via `M3EMagicTriangle`
+- menu: support segmented menu groups (`M3EMenuGroup`, `M3EMenuGroupLabel`) with dynamic corner morphing
+- menu: add keyboard shortcut alignment, accessibility semantics, and subtree directionality preservation
+- buttons: adapt padding during neighbor squish to prevent label cutoff
+- buttons: support custom `minSquishPadding` on `M3EToggleButtonGroup` and `M3EToggleButtonGroupAction`
+- example: add interactive M3EMenu playground with live preview, controls, and code snippets
+
 # 1.1.4
 - segmented-list: let M3ESegmentedItem own isVisible so hidden items keep their surface
 - segmented-list: add isVisible to exclude hidden children from gap and radius math
