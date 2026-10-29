@@ -620,7 +620,9 @@ class ButtonCodeSnippets {
           buf.writeln("  expandedRatio: ${expandedRatio.toStringAsFixed(2)},");
         }
         if (neighborSquish && minSquishPadding != 4.0) {
-          buf.writeln("  minSquishPadding: ${minSquishPadding.toStringAsFixed(1)},");
+          buf.writeln(
+            "  minSquishPadding: ${minSquishPadding.toStringAsFixed(1)},",
+          );
         }
       }
       buf.writeln("  overflow: M3EButtonGroupOverflow.${overflow.name},");

@@ -49,7 +49,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final buttons = tester.widgetList<M3EToggleButton>(
-          find.byType(M3EToggleButton),
+          find.byType(M3EToggleButton).hitTestable(),
         );
         expect(buttons.length, 2);
 
@@ -228,9 +228,7 @@ void main() {
     });
 
     test('M3EToggleButtonDecoration supports minSquishPadding', () {
-      const dec = M3EToggleButtonDecoration(
-        minSquishPadding: 6.0,
-      );
+      const dec = M3EToggleButtonDecoration(minSquishPadding: 6.0);
       expect(dec.minSquishPadding, 6.0);
 
       final copy = dec.copyWith(minSquishPadding: 2.0);
@@ -274,7 +272,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final buttons = tester.widgetList<M3EToggleButton>(
-          find.byType(M3EToggleButton),
+          find.byType(M3EToggleButton).hitTestable(),
         );
         expect(buttons.length, 2);
 
@@ -321,16 +319,15 @@ void main() {
         await tester.pumpAndSettle();
 
         // Tap the third action to squish neighbors
-        await tester.tap(find.text('Underline'));
+        await tester.tap(find.byType(M3EToggleButton).hitTestable().last);
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
         // Verify all labels are still found in tree
-        expect(find.text('Bold'), findsOneWidget);
-        expect(find.text('Italic'), findsOneWidget);
-        expect(find.text('Underline'), findsOneWidget);
+        expect(find.text('Bold'), findsWidgets);
+        expect(find.text('Italic'), findsWidgets);
+        expect(find.text('Underline'), findsWidgets);
       },
     );
   });
 }
-

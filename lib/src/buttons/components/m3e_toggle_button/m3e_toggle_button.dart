@@ -1141,12 +1141,12 @@ class _RenderM3ESquishContent extends RenderShiftedBox {
     required Alignment alignment,
     required bool allowMultiline,
     RenderBox? child,
-  })  : _height = height,
-        _targetPadding = targetPadding,
-        _minPadding = minPadding,
-        _alignment = alignment,
-        _allowMultiline = allowMultiline,
-        super(child);
+  }) : _height = height,
+       _targetPadding = targetPadding,
+       _minPadding = minPadding,
+       _alignment = alignment,
+       _allowMultiline = allowMultiline,
+       super(child);
 
   double _height;
   double get height => _height;
@@ -1299,18 +1299,14 @@ class _RenderM3ESquishContent extends RenderShiftedBox {
         childBounds.right > bounds.right ||
         childBounds.top < bounds.top ||
         childBounds.bottom > bounds.bottom) {
-      context.pushClipRect(
-        needsCompositing,
+      context.pushClipRect(needsCompositing, offset, Offset.zero & size, (
+        context,
         offset,
-        Offset.zero & size,
-        (context, offset) {
-          context.paintChild(child!, childParentData.offset + offset);
-        },
-        clipBehavior: Clip.hardEdge,
-      );
+      ) {
+        context.paintChild(child!, childParentData.offset + offset);
+      }, clipBehavior: Clip.hardEdge);
     } else {
       context.paintChild(child!, childParentData.offset + offset);
     }
   }
 }
-
