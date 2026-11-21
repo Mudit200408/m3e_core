@@ -257,6 +257,40 @@ class _M3ELinearWavyProgressIndicatorState
   }
 }
 
+/// Left edge of the remaining track for a determinate linear wavy bar.
+///
+/// The active segment is stroked with [StrokeCap.round], so it is drawn from
+/// `strokeCapWidth` inward and the cap visually reaches `x == 0`. The track has
+/// to leave room for that cap plus [gapSize] on the right of the bar head.
+///
+/// Zero progress is special: `_drawWavyProgressSegment` guards on
+/// `(endFraction - startFraction).abs() > 0`, so at `progress == 0` nothing is
+/// filled and the track is the only thing painted. Anchoring it after the
+/// clamped head then left a `strokeCapWidth + gapSize + strokeCapWidth` hole at
+/// the left edge -- a zero row rendered visibly shorter than its siblings while
+/// sharing their right edge. Starting at `strokeCapWidth` lets the round cap
+/// reach `x == 0`, matching what Material's own `LinearProgressIndicator`
+/// paints at 0%.
+///
+/// Exposed for tests because the failure is silent: an inset track still
+/// "renders fine", so nothing but the geometry catches a regression.
+@visibleForTesting
+double m3eLinearDeterminateTrackStart({
+  required double progress,
+  required double width,
+  required double strokeWidth,
+  required double trackStrokeWidth,
+  required double gapSize,
+}) {
+  final double strokeCapWidth = math.max(strokeWidth / 2, trackStrokeWidth / 2);
+  if (progress.abs() <= 0.0) return strokeCapWidth;
+  final double adjustedBarHead = (progress * width).clamp(
+    strokeCapWidth,
+    width - strokeCapWidth,
+  );
+  return adjustedBarHead + gapSize + strokeCapWidth * 2;
+}
+
 class _LinearWavyProgressPainter extends CustomPainter {
   final _WavyPathCache cache;
   final double? progress;
@@ -449,11 +483,13 @@ class _LinearWavyProgressPainter extends CustomPainter {
         strokeWidth / 2,
         trackStrokeWidth / 2,
       );
-      final double adjustedBarHead = (currentProgress * size.width).clamp(
-        strokeCapWidth,
-        size.width - strokeCapWidth,
+      final double trackStart = m3eLinearDeterminateTrackStart(
+        progress: currentProgress,
+        width: size.width,
+        strokeWidth: strokeWidth,
+        trackStrokeWidth: trackStrokeWidth,
+        gapSize: gapSize,
       );
-      final double trackStart = adjustedBarHead + gapSize + strokeCapWidth * 2;
       final double trackEnd = size.width - strokeCapWidth;
 
       if (trackStart < trackEnd) {
