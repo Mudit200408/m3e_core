@@ -335,4 +335,49 @@ void main() {
       expect(find.byType(M3ELinearWavyProgressIndicator), findsOneWidget);
     });
   });
+
+  group('M3ELinearWavyProgressIndicator determinate track geometry', () {
+    // A flat bar as used for distribution charts: 10dp stroke in a 10dp
+    // container with the default 4dp gap.
+    const double width = 200;
+    const double strokeWidth = 10;
+    const double trackStrokeWidth = 10;
+    const double gapSize = 4;
+    const double strokeCapWidth = 5; // max(strokeWidth, trackStrokeWidth) / 2
+
+    double trackStart(double progress) => m3eLinearDeterminateTrackStart(
+      progress: progress,
+      width: width,
+      strokeWidth: strokeWidth,
+      trackStrokeWidth: trackStrokeWidth,
+      gapSize: gapSize,
+    );
+
+    // The track is stroked with a round cap, so what the user sees starts one
+    // cap-width before the path does.
+    double visibleLeft(double progress) =>
+        trackStart(progress) - strokeCapWidth;
+
+    test('zero progress paints the track from the very left edge', () {
+      // Regression: this used to be 14 (clamped head 5 + gap 4 + cap 10, minus
+      // the 5 cap), so a zero bucket in a distribution chart rendered visibly
+      // shorter than its siblings while sharing their right edge.
+      expect(visibleLeft(0), 0);
+    });
+
+    test('non-zero progress still leaves the gap after the bar head', () {
+      expect(trackStart(0.5), 0.5 * width + gapSize + strokeCapWidth * 2);
+    });
+
+    test('a head clamped up to the cap width keeps the gap', () {
+      // progress * width is below strokeCapWidth, so the head clamps to 5; the
+      // gap must survive or the dot and the track would merge into one blob.
+      expect(trackStart(0.001), strokeCapWidth + gapSize + strokeCapWidth * 2);
+    });
+
+    test('full progress leaves no track to draw', () {
+      final double trackEnd = width - strokeCapWidth;
+      expect(trackStart(1), greaterThan(trackEnd));
+    });
+  });
 }
