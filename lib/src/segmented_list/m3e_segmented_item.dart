@@ -516,6 +516,75 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
     super.dispose();
   }
 
+  Widget _buildCoreChild(Widget content, bool hasInteraction) {
+    final paddedContent = Padding(
+      padding: widget.isVisible
+          ? (widget.padding ?? const EdgeInsets.all(12.0))
+          : EdgeInsets.zero,
+      child: widget.pressedScale != null && widget.pressedScale != 1.0
+          ? SingleMotionBuilder(
+              motion: widget.pressedMotion.toMotion(),
+              value: _isPressed ? widget.pressedScale! : 1.0,
+              builder: (context, scale, _) => Transform.scale(
+                scale: scale,
+                alignment: Alignment.center,
+                child: content,
+              ),
+            )
+          : content,
+    );
+
+    if (!hasInteraction) {
+      return Material(type: MaterialType.transparency, child: paddedContent);
+    }
+
+    return Material(
+      type: MaterialType.transparency,
+      child: Focus(
+        focusNode: _effectiveFocusNode,
+        autofocus: widget.autofocus,
+        canRequestFocus: true,
+        onFocusChange: (focused) {
+          if (mounted && _isFocused != focused) {
+            setState(() => _isFocused = focused);
+          }
+          widget.onFocusChange?.call(focused);
+        },
+        onKeyEvent: _handleCardKeyEvent,
+        child: InkWell(
+          statesController: _statesController,
+          canRequestFocus: false,
+          splashColor: widget.splashColor,
+          highlightColor: widget.highlightColor,
+          splashFactory: widget.splashFactory ?? InkSparkle.splashFactory,
+          enableFeedback: widget.enableFeedback,
+          focusColor: widget.focusColor,
+          hoverColor: widget.hoverColor,
+          mouseCursor: widget.mouseCursor ?? SystemMouseCursors.click,
+          onTap: widget.enabled
+              ? () {
+                  widget.onTap?.call(widget.index);
+                  widget.haptic.apply();
+                }
+              : null,
+          onLongPress:
+              widget.enabled && widget.isVisible && widget.onLongPress != null
+              ? () {
+                  widget.onLongPress!(widget.index);
+                  widget.haptic.apply();
+                }
+              : null,
+          onHighlightChanged: (highlighted) {
+            if (mounted && _isPressed != highlighted) {
+              setState(() => _isPressed = highlighted);
+            }
+          },
+          child: paddedContent,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -708,80 +777,7 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
                   : null,
             ),
             clipBehavior: Clip.antiAlias,
-            child: Material(
-              type: MaterialType.transparency,
-              child: Focus(
-                focusNode: _effectiveFocusNode,
-                autofocus: widget.autofocus,
-                canRequestFocus: widget.enabled && widget.isVisible,
-                onFocusChange: (focused) {
-                  if (mounted && _isFocused != focused) {
-                    setState(() => _isFocused = focused);
-                  }
-                  widget.onFocusChange?.call(focused);
-                },
-                onKeyEvent: _handleCardKeyEvent,
-                child: InkWell(
-                  statesController: _statesController,
-                  canRequestFocus: false,
-                  splashColor: widget.splashColor,
-                  highlightColor: widget.highlightColor,
-                  splashFactory:
-                      widget.splashFactory ?? InkSparkle.splashFactory,
-                  enableFeedback: widget.enableFeedback,
-                  focusColor: widget.focusColor,
-                  hoverColor: widget.hoverColor,
-                  mouseCursor:
-                      widget.mouseCursor ??
-                      (hasInteraction
-                          ? SystemMouseCursors.click
-                          : SystemMouseCursors.basic),
-                  onTap: widget.enabled && hasInteraction
-                      ? () {
-                          widget.onTap?.call(widget.index);
-                          widget.haptic.apply();
-                        }
-                      : null,
-                  onLongPress:
-                      widget.enabled &&
-                          widget.isVisible &&
-                          widget.onLongPress != null
-                      ? () {
-                          widget.onLongPress!(widget.index);
-                          widget.haptic.apply();
-                        }
-                      : null,
-                  onHighlightChanged: hasInteraction
-                      ? (highlighted) {
-                          if (mounted && _isPressed != highlighted) {
-                            setState(() => _isPressed = highlighted);
-                          }
-                        }
-                      : null,
-                  child: Padding(
-                    // A hidden item keeps no inner padding either, otherwise the
-                    // container's own padding would leave a phantom block behind
-                    // for as long as the child takes to collapse.
-                    padding: widget.isVisible
-                        ? (widget.padding ?? const EdgeInsets.all(12.0))
-                        : EdgeInsets.zero,
-                    child:
-                        widget.pressedScale != null &&
-                            widget.pressedScale != 1.0
-                        ? SingleMotionBuilder(
-                            motion: widget.pressedMotion.toMotion(),
-                            value: _isPressed ? widget.pressedScale! : 1.0,
-                            builder: (context, scale, _) => Transform.scale(
-                              scale: scale,
-                              alignment: Alignment.center,
-                              child: content,
-                            ),
-                          )
-                        : content,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildCoreChild(content, hasInteraction),
           );
 
           return SegmentedFocusRing(

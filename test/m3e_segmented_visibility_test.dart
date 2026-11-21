@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:m3e_core/m3e_core.dart';
 
@@ -226,27 +227,26 @@ void main() {
     });
 
     testWidgets('a hidden item is not focusable', (tester) async {
+      final taps = <int>[];
       await tester.pumpWidget(
         _app(
           M3ESegmentedColumn(
-            onTap: (_) {},
+            onTap: taps.add,
             isVisible: (index) => index != 1,
-            children: [_cell('A'), _cell('B')],
+            children: [_cell('A'), _cell('B'), _cell('C')],
           ),
         ),
       );
       await tester.pumpAndSettle();
 
-      final focuses = tester
-          .widgetList<Focus>(
-            find.descendant(
-              of: find.byType(M3ESegmentedItem).at(1),
-              matching: find.byType(Focus),
-            ),
-          )
-          .toList();
-      expect(focuses, isNotEmpty);
-      expect(focuses.first.canRequestFocus, isFalse);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(taps, [0]);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(taps, [0, 2]);
     });
   });
 
