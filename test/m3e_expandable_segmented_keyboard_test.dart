@@ -357,6 +357,11 @@ void main() {
           MaterialApp(
             home: Scaffold(
               body: M3ESegmentedColumn(
+                // Interactive on purpose: only items with a handler mount a
+                // Focus node, so a column with nothing to activate has no tab
+                // stops at all (covered by the test below). This one is about
+                // there being exactly one stop per item.
+                onTap: (_) {},
                 children: const [
                   Text('Item 0'),
                   Text('Item 1'),
@@ -395,5 +400,26 @@ void main() {
         expect(ringsAfterTab3.length, 1);
       },
     );
+
+    testWidgets('a column with no handlers has no tab stops', (tester) async {
+      final fieldFocus = FocusNode();
+      addTearDown(fieldFocus.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: M3ESegmentedColumn(
+              children: [TextField(focusNode: fieldFocus)],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(fieldFocus.hasPrimaryFocus, isTrue);
+      await tester.enterText(find.byType(TextField), 'Campus');
+      expect(find.text('Campus'), findsOneWidget);
+    });
   });
 }
