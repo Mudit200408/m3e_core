@@ -1,3 +1,8 @@
+# 1.1.6
+- segmented-list: skip non-interactive items during focus traversal so nested inputs receive focus on first Tab without highlighting the surrounding item
+- segmented-list: preserve child state and reset interaction flags when item interactivity toggles
+- progress-indicator: paint the complete track from the left edge at zero progress in `M3ELinearWavyProgressIndicator`
+
 # 1.1.5
 - menu: introduce `M3EMenuAnchor`, `M3ESubmenuButton`, `M3EMenuItemButton`, `M3ECheckboxMenuButton`, `M3ERadioMenuButton`, and `M3EPopupMenuButton`
 - menu: support spring-driven entrance and reveal animations (`popup` and `dropdown`)

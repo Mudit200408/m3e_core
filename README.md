@@ -65,7 +65,7 @@ Add `m3e_core` and `material_ui` to your `pubspec.yaml`:
 ```yaml
 dependencies:
   material_ui: ^1.3.0
-  m3e_core: ^1.1.5
+  m3e_core: ^1.1.6
 ```
 
 ```dart
