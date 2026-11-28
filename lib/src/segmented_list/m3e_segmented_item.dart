@@ -376,6 +376,7 @@ class M3ESegmentedItem extends StatefulWidget {
 }
 
 class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
+  final GlobalKey _contentKey = GlobalKey();
   late final WidgetStatesController _statesController;
   FocusNode? _internalFocusNode;
   bool _isPressed = false;
@@ -386,6 +387,13 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
   bool _wasSelected = false;
 
   FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode!;
+
+  bool get _hasInteraction =>
+      widget.enabled &&
+      widget.isVisible &&
+      (widget.onTap != null ||
+          widget.onLongPress != null ||
+          widget.onReorderKey != null);
 
   @override
   void initState() {
@@ -419,6 +427,13 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
       }
       _effectiveFocusNode.addListener(_handleFocusNodeChanged);
       _isFocused = _effectiveFocusNode.hasFocus;
+    }
+    if (!_hasInteraction) {
+      // Unmounting InkWell/Focus skips their false callbacks; clear stale flags.
+      _isPressed = false;
+      _isHovered = false;
+      _isFocused = false;
+      _statesController.value = <WidgetState>{};
     }
   }
 
@@ -518,6 +533,7 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
 
   Widget _buildCoreChild(Widget content, bool hasInteraction) {
     final paddedContent = Padding(
+      key: _contentKey,
       padding: widget.isVisible
           ? (widget.padding ?? const EdgeInsets.all(12.0))
           : EdgeInsets.zero,
@@ -678,12 +694,7 @@ class _M3ESegmentedItemState extends State<M3ESegmentedItem> {
             (widget.position == M3ESegmentedItemPosition.last ||
                 widget.position == M3ESegmentedItemPosition.single));
 
-    final hasInteraction =
-        widget.enabled &&
-        widget.isVisible &&
-        (widget.onTap != null ||
-            widget.onLongPress != null ||
-            widget.onReorderKey != null);
+    final hasInteraction = _hasInteraction;
 
     Widget content = widget.child;
 

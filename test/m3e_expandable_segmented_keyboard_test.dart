@@ -421,5 +421,63 @@ void main() {
       await tester.enterText(find.byType(TextField), 'Campus');
       expect(find.text('Campus'), findsOneWidget);
     });
+
+    testWidgets('toggling interactivity preserves child state', (tester) async {
+      bool interactive = true;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                return Column(
+                  children: [
+                    TextButton(
+                      onPressed: () =>
+                          setState(() => interactive = !interactive),
+                      child: const Text('Toggle'),
+                    ),
+                    M3ESegmentedColumn(
+                      onTap: interactive ? (_) {} : null,
+                      children: const [_StatefulChild()],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Count: 0'));
+      await tester.pumpAndSettle();
+      expect(find.text('Count: 1'), findsOneWidget);
+
+      await tester.tap(find.text('Toggle'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Toggle'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Count: 1'), findsOneWidget);
+    });
   });
+}
+
+class _StatefulChild extends StatefulWidget {
+  const _StatefulChild();
+
+  @override
+  State<_StatefulChild> createState() => _StatefulChildState();
+}
+
+class _StatefulChildState extends State<_StatefulChild> {
+  int _count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => setState(() => _count++),
+      child: Text('Count: $_count'),
+    );
+  }
 }
